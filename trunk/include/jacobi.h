@@ -46,6 +46,10 @@ public:
 
   // Print the quadrature points (x) and weights (w).
   void printxw();
+
+  // Constant access to the points and weights vectors
+  const std::vector<mpfr_class>& get_points()  { return x; }
+  const std::vector<mpfr_class>& get_weights() { return w; }
   
 private:
   // Multi-precision versions of the parameters
