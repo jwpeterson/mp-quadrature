@@ -1,0 +1,26 @@
+dnl switch off caching, since that leads to insurmountable trouble if
+dnl you call ./configure subsequently on different systems without
+dnl clearing the cache
+define([AC_CACHE_LOAD], )dnl
+define([AC_CACHE_SAVE], )dnl
+AC_REVISION($Revision: 1.1 $)
+
+
+AC_INIT
+AC_CONFIG_FILES(Make.common)
+
+dnl Compute the canonical target system type variable "target", and its
+dnl three individual parts: "target_cpu", "target_vendor", and "target_os"
+AC_CANONICAL_TARGET
+
+dnl The AC_SUBST(foo) command creates an output variable from a shell variable.
+dnl This command also causes AC_OUTPUT to replace all instances of @VAR@ with
+dnl the value of the shell variable VAR in the output files (e.g. one or more Makefiles).
+AC_SUBST(host)
+
+AC_OUTPUT
+rm -f conftest* config.cache
+
+dnl Local Variables:
+dnl mode: m4
+dnl End:

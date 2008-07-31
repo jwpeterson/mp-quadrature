@@ -1,0 +1,35 @@
+# The variables in this file will be set by configure and placed
+# in the generated Make.common file.  You should include this Makefile
+# in all sub-Makefiles. 
+hosttype              = @host@
+hostos                = @host_os@
+
+CXX=g++
+CC=gcc
+
+# The libraries and include files for GMP & MPFR
+# You should really configure for these.  Right now
+# they are hard-coded.
+
+# Linux
+ifeq ($(findstring linux,$(hostos)),linux)
+GMP_LIBS=-L/usr/lib -lmpfr -lgmpxx -lgmp 
+GMP_INCLUDE=-I/usr/include
+endif
+
+# Mac OS
+ifeq ($(findstring darwin,$(hostos)),darwin)
+GMP_LIBS=-L/sw/lib -lmpfr -lgmpxx -lgmp 
+GMP_INCLUDE=-I/sw/include
+endif
+
+# Link against the "local" mpfr C++ interface
+GMPFRXX_LIBS=-L./gmpfrxx -lgmpfrxx
+GMPFRXX_INCLUDE=-I./gmpfrxx
+
+# Path to our local header files
+MPQ_INCLUDE=-I./include
+
+# Local Variables:
+# mode: makefile
+# End:
