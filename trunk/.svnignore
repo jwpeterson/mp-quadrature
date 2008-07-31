@@ -1,2 +1,5 @@
 config.log
 autom4te.cache
+Make.common
+lib/*.a
+gmpfrxx/*.a
