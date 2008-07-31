@@ -1,5 +1,6 @@
 #include <cassert>
 #include <iomanip> // std::setw
+#include <cmath> // fabs
 #include "jacobi.h"
 
 
@@ -333,7 +334,7 @@ void Jacobi::points(unsigned int n)
 	{
 	  const Real R1 = (4.1+a)/((1.+a)*(1.+.156*a));
 	  const Real R2 = 1. + .06*(nreal-8.)*(1.+.12*a)/nreal;
-	  const Real R3 = 1. + .012*b*(1. + .25*abs(a))/nreal;
+	  const Real R3 = 1. + .012*b*(1. + .25*fabs(a))/nreal;
 	  x[j] = x[1] - R1*R2*R3*(1.-x[1]);
 	}
 
