@@ -96,11 +96,11 @@ void gauss_rule(unsigned int n, // Number of points (not order!)
 	}
 
       // Debugging/status info
-      if (!skip_newton)
-	{
-	  std::cout << "Newton converged in " << n_its << " iterations, ";
-	  std::cout << "with tolerance=" << abs(pn) << std::endl;
-	}
+      //       if (!skip_newton)
+      // 	{
+      // 	  std::cout << "Newton converged in " << n_its << " iterations, ";
+      // 	  std::cout << "with tolerance=" << abs(pn) << std::endl;
+      // 	}
 
       // Set x[i] and its mirror image.  We set these in increasing order.
       x[i]     = -x[i];
@@ -116,6 +116,6 @@ void gauss_rule(unsigned int n, // Number of points (not order!)
   for (unsigned int j=1; j<w.size(); ++j)
     sumweights += w[j];
   
-  std::cout << "Sum of weights=" << sumweights << std::endl;
+  //std::cout << "Sum of weights=" << sumweights << std::endl;
   
 }

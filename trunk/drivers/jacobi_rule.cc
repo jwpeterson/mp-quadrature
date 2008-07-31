@@ -35,10 +35,10 @@ int main()
   mpfr_set_default_prec(256); 
 
   // Case 1: weights sum to 1/2
-  // const Real alpha=1.0, beta=0.0;
+  const Real alpha=1.0, beta=0.0;
   
   // Case 2: weights sum to 1/3
-  const Real alpha=2.0, beta=0.0;
+  // const Real alpha=2.0, beta=0.0;
 
   Jacobi p(alpha, beta);
 
@@ -48,6 +48,30 @@ int main()
       std::cout << "Jacobi rule with alpha=" << alpha << ", beta=" << beta << ", "
 		<< j << " points, order=" << 2*j-1 << std::endl;
       p.rule(j); // order = 2*j-1
+
+      // Scale Jacobi weights so they sum to 1/3 (alpha==2) or 1/2 (alpha==1)
+      if (alpha==2.0)
+	{
+	  mpfr_class one_third(1.0);
+	  one_third /= 3.0;
+	  p.scale_weights(one_third);
+	}
+      else if (alpha==1.0)
+	{
+	  p.scale_weights(0.5);
+	}
+      else
+	{
+	  std::cout << "Warning: weights unscaled!" << std::endl;
+	}
+      
+      // Scale Jacobi points so they lie on [0, 1]
+      mpfr_class zero(0.0), one(1.0);
+      p.scale_points(zero, one);
+      
+      // Print the result
+      p.printxw();
+      
       std::cout << "\n";
     }
   

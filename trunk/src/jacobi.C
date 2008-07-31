@@ -55,14 +55,16 @@ void Jacobi::rule(unsigned int n)
     }
 
   // Rescale the rule to lie on [0,1] and have weights
-  // which sum to 1 
-  this->scale();
+  // which sum to 1.  This is to be handled by the user
+  // through the public this->scale_weights() and
+  // this->scale_points() interfaces.
+  // this->scale();
 
   // Compute the sum of the weights as a check on the algorithm.
   this->sumweights();
 
   // Print out the points and weights of the rule.
-  this->printxw();
+  // this->printxw();
 }
 
 
@@ -74,26 +76,34 @@ void Jacobi::sumweights()
   for (unsigned int j=1; j<w.size(); ++j)
     sumweights += w[j];
   
-  std::cout << "Sum of weights=" << sumweights << std::endl;
+  //std::cout << "Sum of weights=" << sumweights << std::endl;
 }
 
 
 
-void Jacobi::scale()
+void Jacobi::scale_weights(const mpfr_class& scale_factor)
 {
-  // const mpfr_class half(0.5);
-  // const mpfr_class three(3.0);
-  // const mpfr_class one(1.0);
-  
-  for (unsigned int j=1; j<x.size(); ++j)
-    {
-      // x[j] = half*(x[j] + one);
-      // w[j] /= three;
-      x[j] = 0.5*(x[j] + 1.0);
-      w[j] /= 3.0; // alpha=2 case
-      // w[j] *= 0.5; // alpha=1 case
-    }
+  for (unsigned int j=1; j<w.size(); ++j)
+    w[j] *= scale_factor;
 }
+
+
+void Jacobi::scale_points(const mpfr_class& x1, const mpfr_class& x2)
+{
+  //{
+  // x[j] = half*(x[j] + one);
+  // w[j] /= three;
+  // x[j] = 0.5*(x[j] + 1.0);
+  // w[j] *= 0.5; // alpha=1 case
+  //}
+
+  mpfr_class a ( 0.5*(x2-x1) );
+  mpfr_class b ( 0.5*(x1+x2) );
+  for (unsigned int j=1; j<x.size(); ++j)
+    x[j] = a*x[j] + b;
+}
+
+
 
 
 

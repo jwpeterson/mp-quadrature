@@ -36,6 +36,17 @@ public:
   // this routine may try to re-use some data.
   void rule(unsigned int n);
 
+  // Scale the weights by multiplying them all by 'scale_factor'.
+  // (By default, the weights sum to 1.0)
+  void scale_weights(const mpfr_class& scale_factor);
+
+  // Scale the points to lie in the inverval [x1, x2]
+  // (By default, the points lie in [-1 1])
+  void scale_points(const mpfr_class& x1, const mpfr_class& x2);
+
+  // Print the quadrature points (x) and weights (w).
+  void printxw();
+  
 private:
   // Multi-precision versions of the parameters
   mpfr_class mp_alpha, mp_beta;
@@ -90,11 +101,7 @@ private:
   // guess.
   void newton(unsigned int n, mpfr_class& xroot);
 
-  // Print the quadrature points (x) and weights (w).
-  void printxw();
 
-  // Scale the rule normally defined on [-1 1] to like on [0 1]
-  void scale();
 
   // Sum up the entries in the w vector.
   void sumweights();
