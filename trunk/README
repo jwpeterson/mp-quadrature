@@ -8,3 +8,9 @@ the library which gets built in lib/.
 The configuration process is currently very basic, and only tries
 to find the GMP/MPFR/GMPFRXX libraries in one place depending on
 what type of system you are on.  This could definitely be improved.
+
+There are also some more-or-less OK Matlab/Octave implementations in
+the matlab/ directory, though these are strictly double-precision
+implementations.  The Gauss Matlab implementation in particular is
+very simplistic and should not be relied on for accurate results at
+high orders!
