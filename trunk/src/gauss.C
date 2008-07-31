@@ -1,4 +1,4 @@
-#include "gauss_rule.h"
+#include "gauss.h"
 
 void gauss_rule(unsigned int n, // Number of points (not order!)
 		std::vector<mpfr_class>& x, // Quadrature points
