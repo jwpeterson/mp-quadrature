@@ -1,0 +1,6 @@
+To build the library, type
+
+./configure; make
+
+There are several driver programs (.cc) which make use of
+the library.
