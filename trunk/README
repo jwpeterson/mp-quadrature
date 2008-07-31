@@ -2,7 +2,7 @@ To build the library, type
 
 ./configure; make
 
-There are several driver programs (drivers/*.cc) which make use of
+There are several driver programs (drivers/*.C) which make use of
 the library which gets built in lib/.
 
 The configuration process is currently very basic, and only tries

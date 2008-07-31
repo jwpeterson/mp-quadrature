@@ -16,27 +16,29 @@ CFLAGS += -g -Wall
 
 headers = $(wildcard *.h)
 
-example : example.o gmpfrxx.o mpfr_mul_d.o
-	$(CXX) -o $@ $(CFLAGS) $^ $(GMP_LIBS)
 
+LIBNAME = libgmpfrxx.a
 # Mac OS dynamic linking
 #sharedlibrary: gmpfrxx.o mpfr_mul_d.o
 #	$(CXX) -dynamiclib -Wl,-undefined,dynamic_lookup -o libgmpfrxx.so $^
 
 # Linux
 ifeq ($(findstring linux,$(hostos)),linux)
-library: gmpfrxx.o mpfr_mul_d.o
-	ar rv libgmpfrxx.a $^
+$(LIBNAME): gmpfrxx.o mpfr_mul_d.o
+	ar rv $(LIBNAME) $^
 endif
 
 # Mac OS static linking
 ifeq ($(findstring darwin,$(hostos)),darwin)
-library: gmpfrxx.o mpfr_mul_d.o
-	libtool -static -o libgmpfrxx.a $^
+$(LIBNAME): gmpfrxx.o mpfr_mul_d.o
+	libtool -static -o $(LIBNAME) $^
 endif
 
 echo:
 	@echo "GMP_INCLUDE=$(GMP_INCLUDE)"
+
+example : example.o gmpfrxx.o mpfr_mul_d.o
+	$(CXX) -o $@ $(CFLAGS) $^ $(GMP_LIBS)
 
 %.o : %.f
 	$(FC) -c $(FFLAGS) $<

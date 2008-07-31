@@ -1,0 +1,21 @@
+drivers/conical_product.o:\
+    drivers/conical_product.C\
+    include/common_definitions.h\
+    include/gauss.h\
+    include/jacobi.h
+drivers/jacobi_rule.o:\
+    drivers/jacobi_rule.C\
+    include/common_definitions.h\
+    include/jacobi.h
+drivers/print_gauss.o:\
+    drivers/print_gauss.C\
+    include/common_definitions.h\
+    include/gauss.h
+src/gauss.o:\
+    src/gauss.C\
+    include/common_definitions.h\
+    include/gauss.h
+src/jacobi.o:\
+    src/jacobi.C\
+    include/common_definitions.h\
+    include/jacobi.h
