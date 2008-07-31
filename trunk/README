@@ -2,5 +2,9 @@ To build the library, type
 
 ./configure; make
 
-There are several driver programs (.cc) which make use of
-the library.
+There are several driver programs (drivers/*.cc) which make use of
+the library which gets built in lib/.
+
+The configuration process is currently very basic, and only tries
+to find the GMP/MPFR/GMPFRXX libraries in one place depending on
+what type of system you are on.  This could definitely be improved.
