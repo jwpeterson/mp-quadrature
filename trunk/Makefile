@@ -27,7 +27,7 @@ EXTRA_FLAGS=
 all: 
 	make -C gmpfrxx library
 	make library
-
+	make $(drivers)
 
 
 # Static linking under linux
