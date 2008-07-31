@@ -7,6 +7,13 @@ srcfiles 	:= $(wildcard src/*.C)
 # object files
 objects		:= $(patsubst %.C, %.o, $(srcfiles))
 
+# driver source codes
+driver_src	:= $(wildcard drivers/*.cc)
+
+# driver executable files
+drivers		:= $(patsubst %.cc, %, $(driver_src))
+
+
 LIBNAME = libmpquad.a
 MPQ_LIB = -L./lib -lmpquad
 
@@ -21,7 +28,7 @@ all:
 	make -C gmpfrxx library
 	make library
 
-#$(CXX) $(EXTRA_FLAGS) $(ALL_INCLUDES) jacobi_rule.cc -o jacobi_rule $(ALL_LIBS)
+
 
 # Static linking under linux
 ifeq ($(findstring linux,$(hostos)),linux)
@@ -39,19 +46,17 @@ endif
 %.o: %.C
 	$(CXX) $(EXTRA_FLAGS) $(ALL_INCLUDES) -c $< -o $@ 
 
+drivers/%: drivers/%.cc
+	$(CXX) $(EXTRA_FLAGS) $(ALL_INCLUDES) $< -o $@ $(ALL_LIBS)
+
 echo:
 	@echo $(objects)
 #make -C gmpfrxx echo
 #@echo $(GMP_LIBS)
 #@echo $(GMP_INCLUDE)
 
-print_gauss: print_gauss.cc
-	$(CXX) $(ALL_INCLUDES) $< -o $@ $(ALL_LIBS)
-
-conical_product: conical_product.cc
-	$(CXX) $(ALL_INCLUDES) $< -o $@ $(ALL_LIBS)
 
 
 clean:
 	make -C gmpfrxx clean
-	rm -rf *~ jacobi_rule $(objects) ./lib/$(LIBNAME) print_gauss
+	rm -rf *~ $(objects) ./lib/$(LIBNAME) $(drivers)
