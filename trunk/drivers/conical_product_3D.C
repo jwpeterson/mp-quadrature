@@ -20,7 +20,7 @@ int main(int argc, char** argv)
     n=atoi(argv[1]);
   
   const unsigned int n_total = n*n*n;
-  std::cout << "\nComputing 3D conical product rule with n^2=" << n_total << " points." << std::endl;
+  std::cout << "\nComputing 3D conical product rule with n^3=" << n_total << " points." << std::endl;
 
   // Compute the Gauss rule points/weights
   std::vector<mpfr_class> gauss_x, gauss_w;
@@ -47,39 +47,26 @@ int main(int argc, char** argv)
   p1.rule(n);
   p1.scale_weights(0.5);
   p1.scale_points(zero, one);
+  // p1.printxw();  // Print the result
 
 
   // p2 := alpha=2, beta=0
   const Real alpha2=2.0, beta2=0.0;
   Jacobi p2(alpha2,beta2);
   p2.rule(n);
-  p2.scale_weights(0.5);
+  {
+    mpfr_class one_third(1.0);
+    one_third /= 3.0;
+    p2.scale_weights(one_third);
+  }
   p2.scale_points(zero, one);
-
-  
-  // Scale Jacobi weights so they sum to 1/3 (alpha==2) or 1/2 (alpha==1)
-  if (alpha==2.0)
-    {
-      mpfr_class one_third(1.0);
-      one_third /= 3.0;
-      p1.scale_weights(one_third);
-    }
-  else if (alpha==1.0)
-    {
-      p1.scale_weights(0.5);
-    }
-  else
-    {
-      std::cout << "Warning: weights unscaled!" << std::endl;
-    }
-
-
-  // Print the result
-  // p1.printxw();
+  // p2.printxw(); // Print the result
 
   // Get const references to the jacobi points and weights vectors.
   const std::vector<mpfr_class>& jacobi1_x = p1.get_points();
   const std::vector<mpfr_class>& jacobi1_w = p1.get_weights();
+  const std::vector<mpfr_class>& jacobi2_x = p2.get_points();
+  const std::vector<mpfr_class>& jacobi2_w = p2.get_weights();
 
   // Compute the conical product rule, with space for n^3 entries.
   // See also the code in LibMesh's src/quadrature/quadrature.C
@@ -90,14 +77,10 @@ int main(int argc, char** argv)
       for (unsigned int k=0; k<n; k++)
 	{
 	  // Note: Access the 1D arrays from [1] ... [n]
-	  //conical_x[gp] = jacobi_x[j+1];                     
-	  //conical_y[gp] = gauss_x[i+1] * (1.-jacobi_x[j+1]); 
-	  //conical_w[gp] = gauss_w[i+1] * jacobi_w[j+1];      
-	  
-	  conical_x[gp] = jacB1D.qp(k)(0);                                                  //t[k];
-	  conical_y[gp] = jacA1D.qp(j)(0)  * (1.-jacB1D.qp(k)(0));                         //s[j]*(1.-t[k]);
-	  conical_z[gp] = gauss1D.qp(i)(0) * (1.-jacA1D.qp(j)(0)) * (1.-jacB1D.qp(k)(0)); //r[i]*(1.-s[j])*(1.-t[k]);
-	  conical_w[gp] = gauss1D.w(i)     * jacA1D.w(j)          * jacB1D.w(k);          //A[i]*B[j]*C[k];
+	  conical_x[gp] = jacobi2_x[k+1]; // jacB1D.qp(k)(0);
+	  conical_y[gp] = jacobi1_x[j+1] * (1.-jacobi2_x[k+1]); // jacA1D.qp(j)(0) * (1.-jacB1D.qp(k)(0));
+	  conical_z[gp] = gauss_x[i+1] * (1.-jacobi1_x[j+1]) * (1.-jacobi2_x[k+1]); // gauss1D.qp(i)(0) * (1.-jacA1D.qp(j)(0)) * (1.-jacB1D.qp(k)(0)); 
+	  conical_w[gp] = gauss_w[i+1] * jacobi1_w[j+1] * jacobi2_w[k+1]; //gauss1D.w(i) * jacA1D.w(j) * jacB1D.w(k);          
 	  gp++;
 	}
   
