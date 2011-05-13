@@ -1,0 +1,7 @@
+* There is a new version of gmpfrxx available at 
+
+  http://math.berkeley.edu/~wilken/code/gmpfrxx/
+
+  as of 2008/11/16 "to incorporate new features of MPFR 2.3.*"
+
+  Should probably get this version integrated into this code...
