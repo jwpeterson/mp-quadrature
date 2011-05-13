@@ -14,3 +14,25 @@ the matlab/ directory, though these are strictly double-precision
 implementations.  The Gauss Matlab implementation in particular is
 very simplistic and should not be relied on for accurate results at
 high orders!
+
+
+
+Notes on obtaining supporting software:
+
+.) GNU GMP
+   The Rudix project provides a pre-built DMG for GMP:
+   http://code.google.com/p/rudix/downloads/detail?name=gmp-4.3.1-2.dmg&can=1&q=gmp
+   
+   Files are installed in /usr/local/include and /usr/local/lib by default 
+   (and I could not see a way to change this).
+
+   Also, this is apparently an i386 library, and this causes problems with
+   building MPFR from source later if you are on Snow Leopard, which is a
+   64-bit OS....
+
+
+.) GNU MPFR (http://www.mpfr.org/)
+   A C library for multiple-precision floating-point computations with correct rounding.
+   A cursory search did not reveal any prebuilt DMG's for this library.
+   I grabbed source code from http://www.mpfr.org/mpfr-current/mpfr-3.0.1.tar.bz2
+   ./configure --with-gmp-include=/usr/local/include --with-gmp-lib=/usr/local/lib

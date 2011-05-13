@@ -18,6 +18,20 @@ dnl This command also causes AC_OUTPUT to replace all instances of @VAR@ with
 dnl the value of the shell variable VAR in the output files (e.g. one or more Makefiles).
 AC_SUBST(host)
 
+dnl Let the user specify the location of gmp header files with --with-gmp-include=/foo/bar
+AC_ARG_WITH(gmp-include,
+            AC_HELP_STRING([--with-gmp-include=PATH],[Specify the path for GMP header files]),
+            withgmpinc=$withval,
+            withgmpinc=/usr/include)
+AC_SUBST(withgmpinc)
+
+dnl Let the user specify the location of gmp libraries with --with-gmp-lib=/foo/bar
+AC_ARG_WITH(gmp-lib,
+            AC_HELP_STRING([--with-gmp-lib=PATH],[Specify the path for GMP libraries]),
+            withgmplib=$withval,
+            withgmplib=/usr/lib)
+AC_SUBST(withgmplib)
+
 AC_OUTPUT
 rm -f conftest* config.cache
 

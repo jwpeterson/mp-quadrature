@@ -11,17 +11,20 @@ CC=gcc
 # You should really configure for these.  Right now
 # they are hard-coded.
 
-# Linux
-ifeq ($(findstring linux,$(hostos)),linux)
-GMP_LIBS=-L/usr/lib -lmpfr -lgmpxx -lgmp 
-GMP_INCLUDE=-I/usr/include
-endif
+GMP_INCLUDE=-I@withgmpinc@
+GMP_LIBS=-L@withgmplib@ -lmpfr -lgmpxx -lgmp 
 
-# Mac OS
-ifeq ($(findstring darwin,$(hostos)),darwin)
-GMP_LIBS=-L/sw/lib -lmpfr -lgmpxx -lgmp 
-GMP_INCLUDE=-I/sw/include
-endif
+# # Linux
+# ifeq ($(findstring linux,$(hostos)),linux)
+# GMP_LIBS=-L/usr/lib -lmpfr -lgmpxx -lgmp 
+# GMP_INCLUDE=-I/usr/include
+# endif
+# 
+# # Mac OS
+# ifeq ($(findstring darwin,$(hostos)),darwin)
+# GMP_LIBS=-L/sw/lib -lmpfr -lgmpxx -lgmp 
+# GMP_INCLUDE=-I/sw/include
+# endif
 
 # Link against the "local" mpfr C++ interface
 GMPFRXX_LIBS=-L./gmpfrxx -lgmpfrxx
