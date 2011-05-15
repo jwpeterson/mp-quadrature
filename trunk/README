@@ -13,11 +13,37 @@ and libs on your system using the following options to configure:
 There are several driver programs (drivers/*.C) which make use of
 the library which gets built in lib/.
 
-drivers/print_gauss.C
+.) drivers/print_gauss.C
   Computes Legendre polynomial roots and weights for 1D Gaussian
   quadrature rules.  To compute values for the rule with 10 points, run:
+
   ./drivers/print_gauss 10
-                        
+
+.) drivers/jacobi_rule.C
+  Computes and prints Jacobi quadrature rules for alpha=1, beta=0,
+  rescaled to the interval [0,1], for rules with 2 through 22 points
+  (i.e. through order 43).
+
+.) drivers/conical_product_2D.C
+  Computes and prints conical product rule points and weights for
+  rule having n^2 points.  (Quadrature rule for triangles).  Run with e.g.
+
+  ./drivers/conical_product_rule_2D 3	
+
+  to get points and weights for a rule having 3*3=9 points.
+  The sum of weights is also printed for verification, it should
+  be 0.5, the area of the reference triangle.
+
+.) drivers/conical_product_3D.C
+  Computes and prints conical product rule points and weights for
+  rule having n^3 points.  (Quadrature rule for tets).  Run with e.g.
+
+  ./drivers/conical_product_rule_3D 3	
+
+  to get points and weights for a rule having 3*3*3=27 points.
+  The sum of weights is also printed for verification, it should
+  be 0.1666..., the volume of the reference tetrahedron.
+  
 
 There are also some more-or-less OK Matlab/Octave implementations in
 the matlab/ directory, though these are strictly double-precision
