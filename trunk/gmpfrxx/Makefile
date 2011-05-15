@@ -38,19 +38,19 @@ echo:
 	@echo "GMP_INCLUDE=$(GMP_INCLUDE)"
 
 example : example.o gmpfrxx.o mpfr_mul_d.o
-	$(CXX) -o $@ $(CFLAGS) $^ $(GMP_LIBS)
+	$(CXX) -o $@ $(CFLAGS) $^ $(GMP_LIBS) $(MPFR_LIBS)
 
 %.o : %.f
 	$(FC) -c $(FFLAGS) $<
 
 %.o : %.cc $(headers)
-	$(CXX) -c $(CFLAGS) $(GMP_INCLUDE) $<
+	$(CXX) -c $(CFLAGS) $(GMP_INCLUDE) $(MPFR_INCLUDE) $<
 
 %.o : %.cpp $(headers)
-	$(CXX) -c $(CFLAGS) $(GMP_INCLUDE) $<
+	$(CXX) -c $(CFLAGS) $(GMP_INCLUDE) $(MPFR_INCLUDE) $<
 
 %.o : %.c $(headers)
-	$(CC) -c $(CFLAGS) $(GMP_INCLUDE) $<
+	$(CC) -c $(CFLAGS) $(GMP_INCLUDE) $(MPFR_INCLUDE) $<
 
 files = README example.cpp gmpfrxx.h gmpfrxx.cpp mpfr_mul_d.h \
 	mpfr_mul_d.c Makefile

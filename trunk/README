@@ -1,13 +1,23 @@
 To build the library, type
 
-./configure; make
+./configure
+make
+
+You may optionally specify the locations of the GMP and MPFR headers
+and libs on your system using the following options to configure:
+--with-gmp-include=/path/to/gmp/include
+--with-gmp-lib=/path/to/gmp/lib
+--with-mpfr-include=/path/to/mpfr/include
+--with-mpfr-lib=/path/to/mpfr/lib
 
 There are several driver programs (drivers/*.C) which make use of
 the library which gets built in lib/.
 
-The configuration process is currently very basic, and only tries
-to find the GMP/MPFR/GMPFRXX libraries in one place depending on
-what type of system you are on.  This could definitely be improved.
+drivers/print_gauss.C
+  Computes Legendre polynomial roots and weights for 1D Gaussian
+  quadrature rules.  To compute values for the rule with 10 points, run:
+  ./drivers/print_gauss 10
+                        
 
 There are also some more-or-less OK Matlab/Octave implementations in
 the matlab/ directory, though these are strictly double-precision
@@ -30,9 +40,22 @@ Notes on obtaining supporting software:
    building MPFR from source later if you are on Snow Leopard, which is a
    64-bit OS....
 
+   To build GMP from source:
+   CXX=g++ CC=gcc ./configure --prefix=/location/to/install/gmp --enable-cxx
+   make
+   make check (this worked just fine for me on Snow Leopard)
+   make install
 
 .) GNU MPFR (http://www.mpfr.org/)
    A C library for multiple-precision floating-point computations with correct rounding.
    A cursory search did not reveal any prebuilt DMG's for this library.
    I grabbed source code from http://www.mpfr.org/mpfr-current/mpfr-3.0.1.tar.bz2
-   ./configure --with-gmp-include=/usr/local/include --with-gmp-lib=/usr/local/lib
+   
+   CXX=g++ CC=gcc ./configure --with-gmp-include=/location/to/install/gmp/include \
+                              --with-gmp-lib=/location/to/install/gmp/lib \
+			      --prefix=/location/to/install/mpfr
+   make
+   make check
+   make install
+
+			      

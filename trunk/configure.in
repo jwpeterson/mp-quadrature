@@ -32,6 +32,20 @@ AC_ARG_WITH(gmp-lib,
             withgmplib=/usr/lib)
 AC_SUBST(withgmplib)
 
+dnl Let the user specify the location of mpfr header files with --with-mpfr-include=/foo/bar
+AC_ARG_WITH(mpfr-include,
+            AC_HELP_STRING([--with-mpfr-include=PATH],[Specify the path for MPFR header files]),
+            withmpfrinc=$withval,
+            withmpfrinc=/usr/include)
+AC_SUBST(withmpfrinc)
+
+dnl Let the user specify the location of mpfr libraries with --with-mpfr-lib=/foo/bar
+AC_ARG_WITH(mpfr-lib,
+            AC_HELP_STRING([--with-mpfr-lib=PATH],[Specify the path for MPFR libraries]),
+            withmpfrlib=$withval,
+            withmpfrlib=/usr/lib)
+AC_SUBST(withmpfrlib)
+
 AC_OUTPUT
 rm -f conftest* config.cache
 

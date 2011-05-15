@@ -628,6 +628,8 @@ target_vendor
 target_os
 withgmpinc
 withgmplib
+withmpfrinc
+withmpfrlib
 LIBOBJS
 LTLIBOBJS'
 ac_subst_files=''
@@ -1209,6 +1211,9 @@ Optional Packages:
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
   --with-gmp-include=PATH Specify the path for GMP header files
   --with-gmp-lib=PATH     Specify the path for GMP libraries
+  --with-mpfr-include=PATH
+                          Specify the path for MPFR header files
+  --with-mpfr-lib=PATH    Specify the path for MPFR libraries
 
 _ACEOF
 ac_status=$?
@@ -1792,6 +1797,26 @@ if test "${with_gmp_lib+set}" = set; then
   withval=$with_gmp_lib; withgmplib=$withval
 else
   withgmplib=/usr/lib
+fi
+
+
+
+
+# Check whether --with-mpfr-include was given.
+if test "${with_mpfr_include+set}" = set; then
+  withval=$with_mpfr_include; withmpfrinc=$withval
+else
+  withmpfrinc=/usr/include
+fi
+
+
+
+
+# Check whether --with-mpfr-lib was given.
+if test "${with_mpfr_lib+set}" = set; then
+  withval=$with_mpfr_lib; withmpfrlib=$withval
+else
+  withmpfrlib=/usr/lib
 fi
 
 
@@ -2403,11 +2428,13 @@ target_vendor!$target_vendor$ac_delim
 target_os!$target_os$ac_delim
 withgmpinc!$withgmpinc$ac_delim
 withgmplib!$withgmplib$ac_delim
+withmpfrinc!$withmpfrinc$ac_delim
+withmpfrlib!$withmpfrlib$ac_delim
 LIBOBJS!$LIBOBJS$ac_delim
 LTLIBOBJS!$LTLIBOBJS$ac_delim
 _ACEOF
 
-  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 53; then
+  if test `sed -n "s/.*$ac_delim\$/X/p" conf$$subs.sed | grep -c X` = 55; then
     break
   elif $ac_last_try; then
     { { echo "$as_me:$LINENO: error: could not make $CONFIG_STATUS" >&5

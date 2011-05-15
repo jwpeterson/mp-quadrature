@@ -12,7 +12,10 @@ CC=gcc
 # they are hard-coded.
 
 GMP_INCLUDE=-I@withgmpinc@
-GMP_LIBS=-L@withgmplib@ -lmpfr -lgmpxx -lgmp 
+GMP_LIBS=-L@withgmplib@ -lgmpxx -lgmp 
+
+MPFR_INCLUDE=-I@withmpfrinc@
+MPFR_LIBS=-L@withmpfrlib@ -lmpfr 
 
 # # Linux
 # ifeq ($(findstring linux,$(hostos)),linux)

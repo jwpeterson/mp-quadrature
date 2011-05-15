@@ -17,8 +17,8 @@ drivers		:= $(patsubst %.C, %, $(driver_src))
 LIBNAME = libmpquad.a
 MPQ_LIB = -L./lib -lmpquad
 
-ALL_INCLUDES=$(GMP_INCLUDE) $(GMPFRXX_INCLUDE) $(MPQ_INCLUDE)
-ALL_LIBS=$(MPQ_LIB) $(GMP_LIBS) $(GMPFRXX_LIBS) 
+ALL_INCLUDES=$(GMP_INCLUDE) $(MPFR_INCLUDE) $(GMPFRXX_INCLUDE) $(MPQ_INCLUDE)
+ALL_LIBS=$(MPQ_LIB) $(GMP_LIBS) $(MPFR_LIBS) $(GMPFRXX_LIBS) 
 
 # Flags to turn on extra debugging and print routines.
 #EXTRA_FLAGS=-g -DDEBUG
