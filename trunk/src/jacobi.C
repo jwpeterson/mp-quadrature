@@ -1,6 +1,8 @@
 #include <cassert>
 #include <iomanip> // std::setw
 #include <cmath> // fabs
+#include <algorithm> // std::sort
+
 #include "jacobi.h"
 
 

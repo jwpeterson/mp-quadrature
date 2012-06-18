@@ -50,6 +50,7 @@ MA 02110-1301, USA. */
 
 #include <iosfwd>
 #include <iostream>
+#include <cstdlib>
 #include <cstring>  /* for strlen */
 #include <string>
 #include <stdexcept>
