@@ -13,7 +13,11 @@
 
 
 void gauss_rule(unsigned int n, // Number of points (not order!)
-		std::vector<mpfr_class>& x,  // Quadrature points
-		std::vector<mpfr_class>& w); // Quadrature weights
+                std::vector<mpfr_class>& x,  // Quadrature points
+                std::vector<mpfr_class>& w); // Quadrature weights
+
+void gauss_lobatto_rule(unsigned int n, // Number of points (not order!)
+                        std::vector<mpfr_class>& x,  // Quadrature points
+                        std::vector<mpfr_class>& w); // Quadrature weights
 
 #endif

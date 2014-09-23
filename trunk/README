@@ -1,87 +1,139 @@
-To build the library, type
+1.) INSTALLATION
 
-./configure
-make
+  To build the library, type
 
-You may optionally specify the locations of the GMP and MPFR headers
-and libs on your system using the following options to configure:
---with-gmp-include=/path/to/gmp/include
---with-gmp-lib=/path/to/gmp/lib
---with-mpfr-include=/path/to/mpfr/include
---with-mpfr-lib=/path/to/mpfr/lib
+  ./configure
+  make
 
-There are several driver programs (drivers/*.C) which make use of
-the library which gets built in lib/.
+  You must have both the GMP and MPFR libraries installed in order to
+  build the mp-quadrature library.  There are at least two options:
 
-.) drivers/print_gauss.C
-  Computes Legendre polynomial roots and weights for 1D Gaussian
-  quadrature rules.  To compute values for the rule with 10 points, run:
+  a.) Run the included build_gmp_mpfr.sh script.  This will download, build,
+      and install GMP and MPFR from source into ./gmp and ./mpfr directories.
+      The configure script will automatically find those.
 
-  ./drivers/print_gauss 10
+  b.) Specify the locations of your system's GMP and MPFR
+      installations using the following options to configure:
+      --with-gmp-include=/path/to/gmp/include
+      --with-gmp-lib=/path/to/gmp/lib
+      --with-mpfr-include=/path/to/mpfr/include
+      --with-mpfr-lib=/path/to/mpfr/lib
 
-.) drivers/jacobi_rule.C
-  Computes and prints Jacobi quadrature rules for alpha=1, beta=0,
-  rescaled to the interval [0,1], for rules with 2 through 22 points
-  (i.e. through order 43).
-
-.) drivers/conical_product_2D.C
-  Computes and prints conical product rule points and weights for
-  rule having n^2 points.  (Quadrature rule for triangles).  Run with e.g.
-
-  ./drivers/conical_product_rule_2D 3	
-
-  to get points and weights for a rule having 3*3=9 points.
-  The sum of weights is also printed for verification, it should
-  be 0.5, the area of the reference triangle.
-
-.) drivers/conical_product_3D.C
-  Computes and prints conical product rule points and weights for
-  rule having n^3 points.  (Quadrature rule for tets).  Run with e.g.
-
-  ./drivers/conical_product_rule_3D 3	
-
-  to get points and weights for a rule having 3*3*3=27 points.
-  The sum of weights is also printed for verification, it should
-  be 0.1666..., the volume of the reference tetrahedron.
-  
-
-There are also some more-or-less OK Matlab/Octave implementations in
-the matlab/ directory, though these are strictly double-precision
-implementations.  The Gauss Matlab implementation in particular is
-very simplistic and should not be relied on for accurate results at
-high orders!
+  Configure will print an error message if some simple test codes
+  involving these libraries fail to compile.
 
 
 
-Notes on obtaining supporting software:
+2.) DRIVER PROGRAMS
 
-.) GNU GMP
-   The Rudix project provides a pre-built DMG for GMP:
-   http://code.google.com/p/rudix/downloads/detail?name=gmp-4.3.1-2.dmg&can=1&q=gmp
-   
-   Files are installed in /usr/local/include and /usr/local/lib by default 
-   (and I could not see a way to change this).
+  There are several driver programs (drivers/*.C) which make use of
+  the library which gets built in lib/.
 
-   Also, this is apparently an i386 library, and this causes problems with
-   building MPFR from source later if you are on Snow Leopard, which is a
-   64-bit OS....
+  .) drivers/print_gauss.C
+     Computes Legendre polynomial roots and weights for 1D Gaussian
+     quadrature rules.  To compute values for the rule with 10 points, run:
 
-   To build GMP from source:
-   CXX=g++ CC=gcc ./configure --prefix=/location/to/install/gmp --enable-cxx
-   make
-   make check (this worked just fine for me on Snow Leopard)
-   make install
+     ./drivers/print_gauss 10
 
-.) GNU MPFR (http://www.mpfr.org/)
-   A C library for multiple-precision floating-point computations with correct rounding.
-   A cursory search did not reveal any prebuilt DMG's for this library.
-   I grabbed source code from http://www.mpfr.org/mpfr-current/mpfr-3.0.1.tar.bz2
-   
-   CXX=g++ CC=gcc ./configure --with-gmp-include=/location/to/install/gmp/include \
-                              --with-gmp-lib=/location/to/install/gmp/lib \
-			      --prefix=/location/to/install/mpfr
-   make
-   make check
-   make install
+  .) drivers/jacobi_rule.C
+     Computes and prints Jacobi quadrature rules for alpha=1, beta=0,
+     rescaled to the interval [0,1], for rules with 2 through 22 points
+     (i.e. through order 43).
 
-			      
+  .) drivers/conical_product_2D.C and drivers/conical_product_3D.C
+     Computes and prints conical product rule points and weights for
+     rules having n^2 (2D) or n^3 (3D) points.  Run with e.g.
+
+     ./drivers/conical_product_rule_2D 3
+     ./drivers/conical_product_rule_3D 3
+
+     to get points and weights for a rule having 3*3=9 (2D) or 3*3*3=27
+     (3D) points.  The sum of weights is also printed for verification,
+     it should be 0.5, the area of the reference triangle (2D) or
+     0.1666..., the volume of the reference tetrahedron (3D).
+
+  .) drivers/test_qsolver.C
+     * Tests the "QSolver" class which is apparently some kind of class
+       designed to solve for Lyness & Jesperson style rules.
+     * Uses D3Basis and Orbit objects.
+     * Subclasses of Orbit include Centroid, Median, and Arbitrary Orbits.
+     * Can compute the number of points in the rule based on the number and types
+       of Orbits.
+     * Actual solving does not yet appear to be implemented.
+     * The test does not seem to do much other than construct D3Basis objects
+       for various orders and print out (m,n) pairs comprising it.  The (m,n)
+       pairs are the powers to which the "P_2" and "P_3" basis polynomials are
+       raised to give a corresponding polynomial of the required order which must be
+       integrated exactly.
+
+  .) drivers/orbits.C
+     * Tests the basic interfaces of the Centroid, Median, and ArbitraryOrbit
+       classes.  Uses numbers like pi, e, etc. that have a well-known decimal
+       expansion so their correctness can be verified.
+
+  .) drivers/D3_polys_test.C
+     * For each polynomial order, print the size (dimension) of the D3 basis.
+     * For each polynomial order, print all the (m,n) pairs associated
+       with that order, and verify that 2*m + 3*n is indeed equal to
+       the current power.
+
+  .) drivers/lu.C
+     * Uses the LU solver implemented in the "Matrix" type to compute
+       solutions to linear systems with ill-conditioned matrices,
+       comparing the result with a known solution used to generate the
+       right-hand side.
+     * Tests are currently run for n*n Hilbert matrices, where n is an
+       input parameter.
+     * Results confirm that the multi-precision version of LU is
+       working, we lose the same number of digits in the
+       scalar_type=MPFR,256 and scalar_type=Real cases, the MPFR case
+       is just much more accurate.
+
+
+3.) NOTES ON OBTAINING SUPPORTING SOFTWARE:
+
+  .) GNU GMP
+     The Rudix project provides a pre-built DMG for GMP:
+     http://code.google.com/p/rudix/downloads/detail?name=gmp-4.3.1-2.dmg&can=1&q=gmp
+
+     Files are installed in /usr/local/include and /usr/local/lib by default
+     (and I could not see a way to change this).
+
+     Also, this is apparently an i386 library, and this causes problems with
+     building MPFR from source later if you are on Snow Leopard, which is a
+     64-bit OS....
+
+     To build GMP from source:
+     cd /where/you/want/to/build
+     curl -O https://ftp.gnu.org/gnu/gmp/gmp-5.1.3.tar.bz2
+     tar jxvf gmp-5.1.3.tar.bz2
+     ./configure --prefix=/location/to/install/gmp --enable-cxx
+     make -j4
+     make -j4 check  # this worked just fine for me on Snow Leopard,
+                     # and much later using the clang compiler on Mavericks
+     sudo make install
+
+  .) GNU MPFR (http://www.mpfr.org/)
+     A C library for multiple-precision floating-point computations with correct rounding.
+     A cursory search did not reveal any prebuilt DMG's for this library.
+
+     To build MPFR from source:
+     cd /where/you/want/to/build
+     curl -O http://www.mpfr.org/mpfr-current/mpfr-3.1.2.tar.bz2
+     tar jxvf mpfr-3.1.2.tar.bz2
+     cd mpfr-3.1.2
+     ./configure --with-gmp-include=/location/to/install/gmp/include \
+                 --with-gmp-lib=/location/to/install/gmp/lib \
+                 --prefix=/location/to/install/mpfr
+     make -j4
+     make -j4 check
+     sudo make install
+
+
+4.) MISCELLANEOUS
+
+    There are also some more-or-less OK Matlab/Octave implementations in
+    the matlab/ directory, though these are strictly double-precision
+    implementations.  The Gauss Matlab implementation in particular is
+    very simplistic and should not be relied on for accurate results at
+    high orders!

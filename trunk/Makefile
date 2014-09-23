@@ -4,6 +4,9 @@ include Make.common
 # source files
 srcfiles 	:= $(wildcard src/*.C)
 
+# header files
+headerfiles 	:= $(wildcard include/*.h)
+
 # object files
 objects		:= $(patsubst %.C, %.o, $(srcfiles))
 
@@ -22,7 +25,7 @@ ALL_LIBS=$(MPQ_LIB) $(GMP_LIBS) $(MPFR_LIBS) $(GMPFRXX_LIBS)
 
 # Flags to turn on extra debugging and print routines.
 #EXTRA_FLAGS=-g -DDEBUG
-EXTRA_FLAGS=
+EXTRA_FLAGS=-Wall
 
 all: 
 	make -C gmpfrxx
@@ -36,18 +39,20 @@ ifeq ($(findstring linux,$(hostos)),linux)
 	ar rv ./lib/$(LIBNAME) $^
 endif
 
-# Mac OS static linking
+# Mac OS static linking.  Make sure to use the libtool in /usr/bin to avoid
+# getting a GNU libtool that might otherwise be in your PATH.
 ifeq ($(findstring darwin,$(hostos)),darwin)
 ./lib/$(LIBNAME): $(objects)
-	libtool -static -o ./lib/$(LIBNAME) $^
+	mkdir -p lib
+	/usr/bin/libtool -static -o ./lib/$(LIBNAME) $^
 endif
 
 
-%.o: %.C
+%.o: %.C $(headerfiles)
 	$(CXX) $(EXTRA_FLAGS) $(ALL_INCLUDES) -c $< -o $@ 
 
 # Link target for driver programs.  
-drivers/%: drivers/%.o
+drivers/%: drivers/%.o $(srcfiles)
 	$(CXX) $(EXTRA_FLAGS) $(ALL_INCLUDES) $< -o $@ $(ALL_LIBS)
 
 echo:
