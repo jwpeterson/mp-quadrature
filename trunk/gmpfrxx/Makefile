@@ -1,21 +1,10 @@
 include ../Make.common
 
+# Compile with debugging information and warnings turned on.
 CFLAGS += -g -Wall
 
-# # Linux
-# INC    = -I/usr/include
-# LIBS   = -L/usr/lib -lmpfr -lgmp -lgmpxx -lm
-
-
-# Mac
-#INC    = -I/sw/include
-#LIBS   = -L/sw/lib -lmpfr -lgmp -lgmpxx -lm
-
-# Above here should be included from Make.common
-
-
+# All the headers for gmpfrxx
 headers = $(wildcard *.h)
-
 
 LIBNAME = libgmpfrxx.a
 # Mac OS dynamic linking
@@ -28,10 +17,11 @@ $(LIBNAME): gmpfrxx.o mpfr_mul_d.o
 	ar rv $(LIBNAME) $^
 endif
 
-# Mac OS static linking
+# Mac OS static linking.  Make sure to use the libtool in /usr/bin so
+# as not to be confused with any GNU libtool that might be in your PATH.
 ifeq ($(findstring darwin,$(hostos)),darwin)
 $(LIBNAME): gmpfrxx.o mpfr_mul_d.o
-	libtool -static -o $(LIBNAME) $^
+	/usr/bin/libtool -static -o $(LIBNAME) $^
 endif
 
 echo:
