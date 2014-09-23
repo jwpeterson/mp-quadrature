@@ -1,3 +1,11 @@
+drivers/conical_product_2D
+drivers/conical_product_3D
+drivers/jacobi_rule
+drivers/print_gauss
+drivers/print_gauss_lobatto
+lib/
+*.a
+*.o
 *~
 Make.common
 config.log
