@@ -79,5 +79,6 @@ clean:
 	make -C gmpfrxx clean
 	rm -rf *~ $(objects) ./lib/$(LIBNAME) $(drivers) drivers/*.o
 
-
-include .depend
+# It's not an error if the file doesn't exist, so it can at least work the first time.
+# We should really improve the dependency generation for this project...
+-include .depend
