@@ -1,2 +1,6 @@
+*~
+Make.common
+config.log
+config.status
 gmp
 mpfr
