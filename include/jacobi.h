@@ -44,9 +44,6 @@ public:
   // (By default, the points lie in [-1 1])
   void scale_points(const mpfr_class& x1, const mpfr_class& x2);
 
-  // Print the quadrature points (x) and weights (w).
-  void printxw();
-
   // Constant access to the points and weights vectors
   const std::vector<mpfr_class>& get_points()  { return x; }
   const std::vector<mpfr_class>& get_weights() { return w; }

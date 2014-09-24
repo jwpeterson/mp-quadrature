@@ -64,9 +64,6 @@ void Jacobi::rule(unsigned int n)
 
   // Compute the sum of the weights as a check on the algorithm.
   this->sumweights();
-
-  // Print out the points and weights of the rule.
-  // this->printxw();
 }
 
 
@@ -107,24 +104,6 @@ void Jacobi::scale_points(const mpfr_class& x1, const mpfr_class& x2)
 
 
 
-
-
-void Jacobi::printxw()
-{
-  for (unsigned int j=1; j<x.size(); ++j)
-    {
-      // 1-based
-      // std::cout << "x[" << j << "]=" << x[j] << "\t";
-      // std::cout << "w[" << j << "]=" << w[j] << std::endl;
-
-      // 0-based with vectors named _points and _weights
-      std::cout << "_points["  << std::setw(2) << j-1 << "](0)=" << x[j] << ";\t";
-      std::cout << "_weights[" << std::setw(2) << j-1 << "]=" << w[j] << ";\n";
-    }
-}
-
-
-
 // Reset any computed data which depends on alpha and beta.
 void Jacobi::set_alpha(Real alpha)
 {
@@ -132,12 +111,15 @@ void Jacobi::set_alpha(Real alpha)
   this->reset();
 }
 
+
+
 // Reset any computed data which depends on alpha and beta.
 void Jacobi::set_beta(Real beta)
 {
   mp_beta = beta;
   this->reset();
 }
+
 
 
 void Jacobi::constants(unsigned int n)
