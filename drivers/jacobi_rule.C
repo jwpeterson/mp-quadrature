@@ -32,11 +32,11 @@ int main()
 
   // # of binary digits
   // 53 binary digits is about what you normally get with a double.
-  mpfr_set_default_prec(256); 
+  mpfr_set_default_prec(256);
 
   // Case 1: weights sum to 1/2
   const Real alpha=1.0, beta=0.0;
-  
+
   // Case 2: weights sum to 1/3
   // const Real alpha=2.0, beta=0.0;
 
@@ -64,17 +64,17 @@ int main()
         {
           std::cout << "Warning: weights unscaled!" << std::endl;
         }
-      
+
       // Scale Jacobi points so they lie on [0, 1]
       mpfr_class zero(0.0), one(1.0);
       jacobi_rule.scale_points(zero, one);
-      
+
       // Print the result
       jacobi_rule.printxw();
-      
+
       std::cout << "\n";
     }
-  
+
   // jacobi_rule.rule(12); // order 23
   // jacobi_rule.rule(21); // Happened to need a slightly tighter tolerance...
   // jacobi_rule.rule(22); // order 43
@@ -82,4 +82,3 @@ int main()
 
   return 0;
 }
-
