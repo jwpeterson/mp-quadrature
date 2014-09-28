@@ -20,6 +20,9 @@ drivers/print_gauss_lobatto.o:\
     drivers/print_gauss_lobatto.C\
     include/common_definitions.h\
     include/gauss.h
+src/common_definitions.o:\
+    src/common_definitions.C\
+    include/common_definitions.h
 src/gauss.o:\
     src/gauss.C\
     include/common_definitions.h\
