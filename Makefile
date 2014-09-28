@@ -80,7 +80,7 @@ echo:
 
 clean:
 	make -C gmpfrxx clean
-	rm -rf *~ $(objects) ./lib/$(LIBNAME) $(drivers) drivers/*.o $(src_depend) $(drivers_depend)
+	rm -rf *~ $(objects) ./lib/* $(drivers) drivers/*.o $(src_depend) $(drivers_depend)
 
 # Include dependency rules we generated for all the sources
 -include $(src_depend) $(drivers_depend)
