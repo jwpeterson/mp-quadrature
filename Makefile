@@ -35,7 +35,6 @@ EXTRA_FLAGS=-Wall
 
 all: 
 	make -C gmpfrxx
-	make ./lib/$(LIBNAME)
 	make $(drivers)
 
 
