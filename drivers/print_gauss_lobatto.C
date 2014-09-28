@@ -13,7 +13,7 @@
 
 // Header files for this project
 #include "common_definitions.h"
-#include "gauss.h"
+#include "gauss_lobatto.h"
 
 // This program prints the points and weights for 1D Gauss-Lobatto rules.
 int main(int argc, char** argv)
