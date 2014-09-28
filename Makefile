@@ -50,6 +50,9 @@ ifeq ($(findstring darwin,$(hostos)),darwin)
 ./lib/$(LIBNAME).a: $(objects)
 	mkdir -p lib
 	/usr/bin/libtool -static -o ./lib/$(LIBNAME).a $^
+
+# Apple's libtool apparently supports a -install_name to implement the "-rpath" functionality
+# http://lists.apple.com/archives/unix-porting/2008/Mar/msg00008.html
 endif
 
 # -MMD Like -MD except mention only user header files, not system header files.
