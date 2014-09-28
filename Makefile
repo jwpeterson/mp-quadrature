@@ -66,8 +66,10 @@ endif
 %.o: %.C
 	$(CXX) -MMD -MP $(EXTRA_FLAGS) $(ALL_INCLUDES) -c $< -o $@
 
-# Link target for driver programs.  
-drivers/%: drivers/%.o
+# Link target for driver programs.  Because we currently build a
+# static library, the executables all have an explicit dependence on
+# the library.
+drivers/%: drivers/%.o ./lib/$(LIBNAME)
 	$(CXX) -MMD -MP $(EXTRA_FLAGS) $(ALL_INCLUDES) $< -o $@ $(ALL_LIBS)
 
 echo:
