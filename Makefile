@@ -23,7 +23,7 @@ drivers		:= $(patsubst %.C, %, $(driver_src))
 drivers_depend	:= $(patsubst %.C, %.d, $(driver_src))
 
 
-LIBNAME = libmpquad.a
+LIBNAME = libmpquad
 MPQ_LIB = -L./lib -lmpquad
 
 ALL_INCLUDES=$(GMP_INCLUDE) $(MPFR_INCLUDE) $(GMPFRXX_INCLUDE) $(MPQ_INCLUDE)
@@ -40,16 +40,16 @@ all:
 
 # Static linking under linux
 ifeq ($(findstring linux,$(hostos)),linux)
-./lib/$(LIBNAME): $(objects)
-	ar rv ./lib/$(LIBNAME) $^
+./lib/$(LIBNAME).a: $(objects)
+	ar rv ./lib/$(LIBNAME).a $^
 endif
 
 # Mac OS static linking.  Make sure to use the libtool in /usr/bin to avoid
 # getting a GNU libtool that might otherwise be in your PATH.
 ifeq ($(findstring darwin,$(hostos)),darwin)
-./lib/$(LIBNAME): $(objects)
+./lib/$(LIBNAME).a: $(objects)
 	mkdir -p lib
-	/usr/bin/libtool -static -o ./lib/$(LIBNAME) $^
+	/usr/bin/libtool -static -o ./lib/$(LIBNAME).a $^
 endif
 
 # -MMD Like -MD except mention only user header files, not system header files.
@@ -68,7 +68,7 @@ endif
 # Link target for driver programs.  Because we currently build a
 # static library, the executables all have an explicit dependence on
 # the library.
-drivers/%: drivers/%.o ./lib/$(LIBNAME)
+drivers/%: drivers/%.o ./lib/$(LIBNAME).a
 	$(CXX) -MMD -MP $(EXTRA_FLAGS) $(ALL_INCLUDES) $< -o $@ $(ALL_LIBS)
 
 echo:
