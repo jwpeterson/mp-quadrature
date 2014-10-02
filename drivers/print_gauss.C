@@ -181,10 +181,10 @@ int main(int argc, char** argv)
 
       
       for (unsigned int i=0; i<x_analytical.size(); ++i)
-        std::cout << "x_analytical["<<i<<"]=" << x_analytical[i] << std::endl;
+        std::cout << "x_analytical["<<i<<"]=" << fix_string(x_analytical[i]) << std::endl;
       std::cout << std::endl;
       for (unsigned int i=0; i<w_analytical.size(); ++i)
-        std::cout << "w_analytical["<<i<<"]=" << w_analytical[i] << std::endl;
+        std::cout << "w_analytical["<<i<<"]=" << fix_string(w_analytical[i]) << std::endl;
     } // end if analytical_check
   
   // Print points and weights using standard C-style indexing and
