@@ -10,11 +10,17 @@ headerfiles 	:= $(wildcard include/*.h)
 # object files
 objects		:= $(patsubst %.C, %.o, $(srcfiles))
 
+# libtool object (.lo) files
+libtool_objects	:= $(patsubst %.C, %.lo, $(srcfiles))
+
 # src dependency files
 src_depend	:= $(patsubst %.C, %.d, $(srcfiles))
 
 # driver source codes
 driver_src	:= $(wildcard drivers/*.C)
+
+# driver libtool object files
+driver_libtool_objects := $(patsubst %.C, %.lo, $(driver_src))
 
 # driver executable files
 drivers		:= $(patsubst %.C, %, $(driver_src))
@@ -22,6 +28,8 @@ drivers		:= $(patsubst %.C, %, $(driver_src))
 # driver dependency files
 drivers_depend	:= $(patsubst %.C, %.d, $(driver_src))
 
+# An absolute PATH to the current directory.  This is needed for the -rpath stuff that libtool does.
+MPQ_DIR ?= $(shell pwd)
 
 LIBNAME = libmpquad
 MPQ_LIB = -L./lib -lmpquad
@@ -38,7 +46,7 @@ ALL_LIBS=$(MPQ_LIB) $(GMPFRXX_LIBS) $(MPFR_LIBS) $(GMP_LIBS)
 #EXTRA_FLAGS=-g -DDEBUG
 EXTRA_FLAGS=-Wall
 
-all: 
+all:
 	make -C gmpfrxx
 	make $(drivers)
 
@@ -50,15 +58,23 @@ ifeq ($(findstring linux,$(hostos)),linux)
 	ar rv ./lib/$(LIBNAME).a $^
 endif
 
-# Mac OS static linking.  Make sure to use the libtool in /usr/bin to avoid
-# getting a GNU libtool that might otherwise be in your PATH.
+# Use GNU libtool for linking.  Note: if the name of the output file
+# is .la, it will try to build a libtool library archive, but you can
+# also give it a .a and it won't try to build a shared library at all.
+# It seems that you must use libtool objects (.lo files) when linking
+# with libtool otherwise libtool generates an errant command which
+# doesn't make any sense:
+#
+# ar cru /Users/petejw/projects/mp-quadrature/lib/.libs/libmpquad.a
+#
+# i.e. there have to be some object files following the name of the
+# archive for this to work.
 ifeq ($(findstring darwin,$(hostos)),darwin)
-./lib/$(LIBNAME).a: $(objects)
-	mkdir -p lib
-	/usr/bin/libtool -static -o ./lib/$(LIBNAME).a $^
-
-# Apple's libtool apparently supports a -install_name to implement the "-rpath" functionality
-# http://lists.apple.com/archives/unix-porting/2008/Mar/msg00008.html
+$(MPQ_DIR)/lib/$(LIBNAME).la: $(libtool_objects)
+	@echo "Linking Library "$@"..."
+	@mkdir -p lib
+	@./libtool --quiet --tag=CXX --mode=link $(CXX) -o $(MPQ_DIR)/lib/$(LIBNAME).la $(libtool_objects) -rpath $(MPQ_DIR)/lib
+	@./libtool --quiet --mode=install install -c ./lib/$(LIBNAME).la $(MPQ_DIR)/lib
 endif
 
 # -MMD Like -MD except mention only user header files, not system header files.
@@ -70,15 +86,15 @@ endif
 # -MT  target = Change the target of the rule emitted by dependency
 #      generation.  By default CPP takes the name of the main input file,
 #      deletes any directory components and any file suffix such as .c,
-#      and appends the platform's usual object suffix.  The result is the
-%.o: %.C
-	$(CXX) -MMD -MP $(EXTRA_FLAGS) $(ALL_INCLUDES) -c $< -o $@
+#      and appends the platform's usual object suffix.
+%.lo: %.C
+	@echo "Compiling $<..."
+	@./libtool --quiet --tag=CXX --mode=compile $(CXX) -MMD -MP $(EXTRA_FLAGS) $(ALL_INCLUDES) -c $< -o $@
 
-# Link target for driver programs.  Because we currently build a
-# static library, the executables all have an explicit dependence on
-# the library.
-drivers/%: drivers/%.o ./lib/$(LIBNAME).a
-	$(CXX) -MMD -MP $(EXTRA_FLAGS) $(ALL_INCLUDES) -o $@ $< $(ALL_LIBS)
+# Link target for driver programs.
+drivers/%: drivers/%.lo $(MPQ_DIR)/lib/$(LIBNAME).la
+	@echo "Compiling driver program $@..."
+	@./libtool --quiet --tag=CXX --mode=link $(CXX) -MMD -MP $(EXTRA_FLAGS) $(ALL_INCLUDES) -o $@ $< $(ALL_LIBS)
 
 echo:
 	@echo $(src_depend) $(drivers_depend)
@@ -89,7 +105,7 @@ echo:
 
 clean:
 	make -C gmpfrxx clean
-	rm -rf *~ $(objects) ./lib/* $(drivers) drivers/*.o $(src_depend) $(drivers_depend)
+	rm -rf *~ src/*~ $(objects) ./lib/* ./lib/.libs src/.libs drivers/.libs $(drivers) drivers/*.o $(src_depend) $(drivers_depend) $(libtool_objects) $(driver_libtool_objects)
 
 # Include dependency rules we generated for all the sources
 -include $(src_depend) $(drivers_depend)

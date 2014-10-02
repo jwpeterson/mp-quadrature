@@ -13,3 +13,4 @@ config.status
 gmp
 mpfr
 *.d
+*.lo
