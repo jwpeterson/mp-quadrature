@@ -117,44 +117,20 @@ int main(int argc, char** argv)
 
         case 5:
           {
-            // x = +/- sqrt(245 +/- 14*sqrt(70))/21
             x_analytical.resize(5);
-            mpfr_class fourteen_root_seventy = 70.0;
-            fourteen_root_seventy = sqrt(fourteen_root_seventy);
-            fourteen_root_seventy *= 14.0;
+            w_analytical.resize(5);
 
-            // We'll print the negative roots, since that is what the
-            // algorithm computes
-            x_analytical[0] = 245.0 + fourteen_root_seventy;
-            x_analytical[0] = sqrt(x_analytical[0]);
-            x_analytical[0] /= 21.0;
-            x_analytical[0] *= -1.0;
-
-            x_analytical[1] = 245.0 - fourteen_root_seventy;
-            x_analytical[1] = sqrt(x_analytical[1]);
-            x_analytical[1] /= 21.0;
-            x_analytical[1] *= -1.0;
-
+            // x = +/- sqrt(245 +/- 14*sqrt(70))/21
+            x_analytical[0] = sqrt(245.0 + 14.0*sqrt(mpfr_class(70.0))) / mpfr_class(-21.0);
+            x_analytical[1] = sqrt(245.0 - 14.0*sqrt(mpfr_class(70.0))) / mpfr_class(-21.0);
             x_analytical[2] = 0.0;
-
             x_analytical[3] = -1.0*x_analytical[1];
             x_analytical[4] = -1.0*x_analytical[0];
 
             // w = (322 +/- 13*sqrt(70))/900, 128/225
-            w_analytical.resize(5);
-            mpfr_class thirteen_root_seventy = 70.0;
-            thirteen_root_seventy = sqrt(thirteen_root_seventy);
-            thirteen_root_seventy *= 13.0;
-
-            w_analytical[0] = 322. - thirteen_root_seventy;
-            w_analytical[0] /= 900.;
-
-            w_analytical[1] = 322. + thirteen_root_seventy;
-            w_analytical[1] /= 900.;
-
-            w_analytical[2] = 128.0;
-            w_analytical[2] /= 225.;
-
+            w_analytical[0] = (322. - 13.0*sqrt(mpfr_class(70.0))) / mpfr_class(900.0);
+            w_analytical[1] = (322. + 13.0*sqrt(mpfr_class(70.0))) / mpfr_class(900.0);
+            w_analytical[2] = mpfr_class(128.0) / mpfr_class(225.0);
             w_analytical[3] = w_analytical[1];
             w_analytical[4] = w_analytical[0];
 
