@@ -41,6 +41,7 @@ all:
 # Static linking under linux
 ifeq ($(findstring linux,$(hostos)),linux)
 ./lib/$(LIBNAME).a: $(objects)
+	mkdir -p lib
 	ar rv ./lib/$(LIBNAME).a $^
 endif
 
