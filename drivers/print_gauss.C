@@ -62,13 +62,14 @@ int main(int argc, char** argv)
         {
         case 2:
           {
-            // x= +/-sqrt(3)/3
             x_analytical.resize(2);
+            w_analytical.resize(2);
+
+            // x= +/-sqrt(3)/3
             x_analytical[0] = sqrt(mpfr_class(3.0)) / mpfr_class(-3.0);
             x_analytical[1] = -1.0*x_analytical[0];
 
             // w=1 for this case
-            w_analytical.resize(2);
             w_analytical[0] = 1.0;
             w_analytical[1] = 1.0;
             break;
@@ -76,24 +77,17 @@ int main(int argc, char** argv)
 
         case 3:
           {
-            // x= 0, +/-sqrt(15)/5
             x_analytical.resize(3);
-            x_analytical[0] = 15.0;
-            x_analytical[0] = sqrt(x_analytical[0]);
-            x_analytical[0] /= 5.0;
-            x_analytical[0] *= -1.0;
+            w_analytical.resize(3);
 
+            // x= 0, +/-sqrt(15)/5
+            x_analytical[0] = sqrt(mpfr_class(15.0)) / mpfr_class(-5.0);
             x_analytical[1] = 0.0;
             x_analytical[2] = -1.0 * x_analytical[0];
 
             // w=8/9, 5/9
-            w_analytical.resize(3);
-            w_analytical[0] = 5.0;
-            w_analytical[0] /= 9.0;
-
-            w_analytical[1] = 8.0;
-            w_analytical[1] /= 9.0;
-
+            w_analytical[0] = mpfr_class(5.0) / mpfr_class(9.0);
+            w_analytical[1] = mpfr_class(8.0) / mpfr_class(9.0);
             w_analytical[2] = w_analytical[0];
 
             break;
