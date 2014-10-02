@@ -27,7 +27,12 @@ LIBNAME = libmpquad
 MPQ_LIB = -L./lib -lmpquad
 
 ALL_INCLUDES=$(GMP_INCLUDE) $(MPFR_INCLUDE) $(GMPFRXX_INCLUDE) $(MPQ_INCLUDE)
-ALL_LIBS=$(MPQ_LIB) $(GMP_LIBS) $(MPFR_LIBS) $(GMPFRXX_LIBS) 
+
+# A note on static library linking (http://stackoverflow.com/questions/45135/linker-order-gcc)
+# If any [static] library A depends on symbols defined in library B,
+# then library A should appear first in the list supplied to the
+# linker.
+ALL_LIBS=$(MPQ_LIB) $(GMPFRXX_LIBS) $(MPFR_LIBS) $(GMP_LIBS)
 
 # Flags to turn on extra debugging and print routines.
 #EXTRA_FLAGS=-g -DDEBUG
@@ -73,7 +78,7 @@ endif
 # static library, the executables all have an explicit dependence on
 # the library.
 drivers/%: drivers/%.o ./lib/$(LIBNAME).a
-	$(CXX) -MMD -MP $(EXTRA_FLAGS) $(ALL_INCLUDES) $< -o $@ $(ALL_LIBS)
+	$(CXX) -MMD -MP $(EXTRA_FLAGS) $(ALL_INCLUDES) -o $@ $< $(ALL_LIBS)
 
 echo:
 	@echo $(src_depend) $(drivers_depend)

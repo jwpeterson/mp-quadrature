@@ -12,7 +12,7 @@ CC=gcc
 # which might be totally wrong for your system...
 
 GMP_INCLUDE=-I@withgmpinc@
-GMP_LIBS=-L@withgmplib@ -lgmpxx -lgmp 
+GMP_LIBS=-L@withgmplib@ -lgmpxx -L@withgmplib@ -lgmp
 
 MPFR_INCLUDE=-I@withmpfrinc@
 MPFR_LIBS=-L@withmpfrlib@ -lmpfr 
