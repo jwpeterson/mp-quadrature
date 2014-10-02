@@ -230,31 +230,18 @@ int main(int argc, char** argv)
   // to the mirror of the first half.
   const unsigned int m=(n+1)/2;
 
-  // Side-by-side output.  This is a little hard to get right...
-//   for (unsigned int i=1; i<=m; ++i)
-//     {
-//       std::cout << "_points[" << i-1 << "](0)=" << x[i] << ";\t";
-//       std::cout << "_weights[" << i-1 << "]=" << w[i] << std::endl;
-//     }
-//   for (unsigned int i=m+1,d=m-1; i<=n; ++i,--d)
-//     {
-//       std::cout << "_points[" << i-1 << "](0)=-_points[" << d-1 << "];\t";
-//       std::cout << "_weights[" << i-1 << "]=_weights[" << d-1 << "];" << std::endl;
-//     }
-
-  
-  // Points first, then weights.  This is how the library currently is...
+  // Points first, then weights.  This is how the libmesh library currently formats the rules it uses.
   std::cout << std::endl;
 
   for (unsigned int i=1; i<=m; ++i)
-    std::cout << "_points[" << std::setw(2) << i-1 << "](0) = " << x[i] << ";\n";
+    std::cout << "_points[" << std::setw(2) << i-1 << "](0) = " << fix_string(x[i]) << ";\n";
   for (unsigned int i=m+1,d=(n%2)?m-1:m; i<=n; ++i,--d)
     std::cout << "_points[" << std::setw(2) << i-1 << "]    = -_points[" << d-1 << "];\n";
 
   std::cout << std::endl;
   
   for (unsigned int i=1; i<=m; ++i)
-    std::cout << "_weights[" << std::setw(2) << i-1 << "]   = " << w[i] << ";\n";
+    std::cout << "_weights[" << std::setw(2) << i-1 << "]   = " << fix_string(w[i]) << ";\n";
   for (unsigned int i=m+1,d=(n%2)?m-1:m; i<=n; ++i,--d)
     std::cout << "_weights[" << std::setw(2) << i-1 << "]   = _weights[" << d-1 << "];" << std::endl;
   
