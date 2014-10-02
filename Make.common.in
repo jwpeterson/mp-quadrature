@@ -4,8 +4,9 @@
 hosttype              = @host@
 hostos                = @host_os@
 
-CXX=g++
-CC=gcc
+# Set CXX and CC from the environment, if available.
+CXX ?= g++
+CC  ?= gcc
 
 # The libraries and include files for GMP & MPFR Unless the user
 # specifies something, these get set to /usr/include and /usr/lib,
