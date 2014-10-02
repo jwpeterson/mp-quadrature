@@ -64,11 +64,7 @@ int main(int argc, char** argv)
 	  {
 	    // x= +/-sqrt(3)/3
 	    x_analytical.resize(2);
-	    x_analytical[0] = 3.0;
-	    x_analytical[0] = sqrt(x_analytical[0]);
-	    x_analytical[0] /= 3.0;
-	    x_analytical[0] *= -1.0;
-	    
+            x_analytical[0] = sqrt(mpfr_class(3.0)) / mpfr_class(-3.0);
 	    x_analytical[1] = -1.0*x_analytical[0];
 
 	    // w=1 for this case
@@ -207,6 +203,20 @@ int main(int argc, char** argv)
 
 	      std::cout << "delta_x[" << i << "]=" << delta_x << ", "
 			<< "delta_w[" << i << "]=" << delta_w << std::endl;
+
+              // Print an error message and abort if the error in either the points or weights is too large
+              if (abs(delta_x) > mpfr_class(1.e-30))
+                {
+                  std::cerr << "Error: Disagreement between analytical and computed point values!" << std::endl;
+                  std::abort();
+                }
+
+              if (abs(delta_w) > mpfr_class(1.e-30))
+                {
+                  std::cerr << "Error: Disagreement between analytical and computed weight values!" << std::endl;
+                  std::abort();
+                }
+
 	    }
 	  std::cout << std::endl;
 	}
