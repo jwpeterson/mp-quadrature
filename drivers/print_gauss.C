@@ -95,38 +95,20 @@ int main(int argc, char** argv)
 
         case 4:
           {
-            // x= +/- sqrt(525 - 70*sqrt(30))/35,
-            //    +/- sqrt(525 + 70*sqrt(30))/35,
             x_analytical.resize(4);
-            mpfr_class seventy_root_thirty = 30.0;
-            seventy_root_thirty = sqrt(seventy_root_thirty);
-            seventy_root_thirty *= 70.0;
+            w_analytical.resize(4);
 
-            x_analytical[0] = 525. + seventy_root_thirty;
-            x_analytical[0] = sqrt(x_analytical[0]);
-            x_analytical[0] /= 35.0;
-            x_analytical[0] *= -1.0;
-
-            x_analytical[1] = 525. - seventy_root_thirty;
-            x_analytical[1] = sqrt(x_analytical[1]);
-            x_analytical[1] /= 35.0;
-            x_analytical[1] *= -1.0;
-
+            // x= +/- sqrt(525 + 70*sqrt(30))/35,
+            //    +/- sqrt(525 - 70*sqrt(30))/35,
+            x_analytical[0] = sqrt(525. + 70.*sqrt(mpfr_class(30.))) / mpfr_class(-35.0);
+            x_analytical[1] = sqrt(525. - 70.*sqrt(mpfr_class(30.))) / mpfr_class(-35.0);
             x_analytical[2] = -1.0 * x_analytical[1];
             x_analytical[3] = -1.0 * x_analytical[0];
 
-            // w= 1/36 * (18 + sqrt(30)),
-            //    1/36 * (18 - sqrt(30))
-            w_analytical.resize(4);
-            mpfr_class sqrt_thirty = 30.0;
-            sqrt_thirty = sqrt(sqrt_thirty);
-
-            w_analytical[0] = 18. - sqrt_thirty;
-            w_analytical[0] /= 36.0;
-
-            w_analytical[1] = 18. + sqrt_thirty;
-            w_analytical[1] /= 36.0;
-
+            // w= 1/36 * (18 - sqrt(30)),
+            //    1/36 * (18 + sqrt(30))
+            w_analytical[0] = (18. - sqrt(mpfr_class(30.0))) / mpfr_class(36.0);
+            w_analytical[1] = (18. + sqrt(mpfr_class(30.0))) / mpfr_class(36.0);
             w_analytical[2] = w_analytical[1];
             w_analytical[3] = w_analytical[0];
 
