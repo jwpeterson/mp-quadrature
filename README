@@ -52,56 +52,16 @@
      it should be 0.5, the area of the reference triangle (2D) or
      0.1666..., the volume of the reference tetrahedron (3D).
 
-  .) drivers/test_qsolver.C
-     * Tests the "QSolver" class which is apparently some kind of class
-       designed to solve for Lyness & Jesperson style rules.
-     * Uses D3Basis and Orbit objects.
-     * Subclasses of Orbit include Centroid, Median, and Arbitrary Orbits.
-     * Can compute the number of points in the rule based on the number and types
-       of Orbits.
-     * Actual solving does not yet appear to be implemented.
-     * The test does not seem to do much other than construct D3Basis objects
-       for various orders and print out (m,n) pairs comprising it.  The (m,n)
-       pairs are the powers to which the "P_2" and "P_3" basis polynomials are
-       raised to give a corresponding polynomial of the required order which must be
-       integrated exactly.
-
-  .) drivers/orbits.C
-     * Tests the basic interfaces of the Centroid, Median, and ArbitraryOrbit
-       classes.  Uses numbers like pi, e, etc. that have a well-known decimal
-       expansion so their correctness can be verified.
-
-  .) drivers/D3_polys_test.C
-     * For each polynomial order, print the size (dimension) of the D3 basis.
-     * For each polynomial order, print all the (m,n) pairs associated
-       with that order, and verify that 2*m + 3*n is indeed equal to
-       the current power.
-
-  .) drivers/lu.C
-     * Uses the LU solver implemented in the "Matrix" type to compute
-       solutions to linear systems with ill-conditioned matrices,
-       comparing the result with a known solution used to generate the
-       right-hand side.
-     * Tests are currently run for n*n Hilbert matrices, where n is an
-       input parameter.
-     * Results confirm that the multi-precision version of LU is
-       working, we lose the same number of digits in the
-       scalar_type=MPFR,256 and scalar_type=Real cases, the MPFR case
-       is just much more accurate.
 
 
 3.) NOTES ON OBTAINING SUPPORTING SOFTWARE:
 
+  .) The simplest approach (if it works!) is to run the included
+     build_gmp_mpfr.sh script.  This will download and install the GMP
+     and MPFR libraries from source.  If this does not work for some reason,
+     see the directions below to build from source...
+
   .) GNU GMP
-     The Rudix project provides a pre-built DMG for GMP:
-     http://code.google.com/p/rudix/downloads/detail?name=gmp-4.3.1-2.dmg&can=1&q=gmp
-
-     Files are installed in /usr/local/include and /usr/local/lib by default
-     (and I could not see a way to change this).
-
-     Also, this is apparently an i386 library, and this causes problems with
-     building MPFR from source later if you are on Snow Leopard, which is a
-     64-bit OS....
 
      To build GMP from source:
      cd /where/you/want/to/build
@@ -114,8 +74,6 @@
      sudo make install
 
   .) GNU MPFR (http://www.mpfr.org/)
-     A C library for multiple-precision floating-point computations with correct rounding.
-     A cursory search did not reveal any prebuilt DMG's for this library.
 
      To build MPFR from source:
      cd /where/you/want/to/build
