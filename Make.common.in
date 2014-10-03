@@ -4,8 +4,9 @@
 hosttype              = @host@
 hostos                = @host_os@
 
-CXX=g++
-CC=gcc
+# Set CXX and CC from the environment, if available.
+CXX ?= g++
+CC  ?= gcc
 
 # The libraries and include files for GMP & MPFR Unless the user
 # specifies something, these get set to /usr/include and /usr/lib,
@@ -23,6 +24,14 @@ GMPFRXX_INCLUDE=-I./gmpfrxx
 
 # Path to our local header files
 MPQ_INCLUDE=-I./include
+
+# This may not be necessary.  libtool is always built when you run
+# ./configure for the first time, if it needs to be automatically
+# regenerated, I guess we can add this back in, but it shouldn't be
+# the first rule in the Makefile.
+# LIBTOOL_DEPS = @LIBTOOL_DEPS@
+# libtool: $(LIBTOOL_DEPS)
+# 	$(SHELL) ./config.status libtool
 
 # Local Variables:
 # mode: makefile

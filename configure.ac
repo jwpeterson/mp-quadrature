@@ -53,6 +53,15 @@ AC_ARG_WITH(mpfr-lib,
             withmpfrlib=$MY_TOP_SRCDIR/mpfr/lib)
 AC_SUBST(withmpfrlib)
 
+# Initialize libtool
+LT_INIT
+
+# Set the shell variable LIBTOOL_DEPS, which can be used to automatically update the libtool script.
+# See the special rule for this purpose in Make.common.in
+AC_SUBST([LIBTOOL_DEPS])
+
+# Makes it so that libtool supports the --tag=CXX syntax
+LT_LANG([C++])
 
 #
 # Testing GMP
