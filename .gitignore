@@ -14,3 +14,5 @@ gmp
 mpfr
 *.d
 *.lo
+autom4te.cache
+libtool
