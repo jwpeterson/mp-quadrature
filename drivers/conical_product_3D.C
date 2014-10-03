@@ -88,21 +88,21 @@ int main(int argc, char** argv)
   // (These are now in 0-based storage)
   for (unsigned int i=0; i<n_total; ++i)
     {
-      std::cout << "_points[" << std::setw(2) << i << "](0)=" << conical_x[i] << "L;\n";
-      std::cout << "_points[" << std::setw(2) << i << "](1)=" << conical_y[i] << "L;\n";
-      std::cout << "_points[" << std::setw(2) << i << "](2)=" << conical_z[i] << "L;\n";
+      std::cout << "_points[" << std::setw(2) << i << "](0)=" << fix_string(conical_x[i]) << ";\n";
+      std::cout << "_points[" << std::setw(2) << i << "](1)=" << fix_string(conical_y[i]) << ";\n";
+      std::cout << "_points[" << std::setw(2) << i << "](2)=" << fix_string(conical_z[i]) << ";\n";
     }
 
   std::cout << "\n";
   for (unsigned int i=0; i<n_total; ++i)
-    std::cout << "_weights[" << std::setw(2) << i << "]=" << conical_w[i] << "L;\n";
+    std::cout << "_weights[" << std::setw(2) << i << "]=" << fix_string(conical_w[i]) << ";\n";
 
   // As a check of the method, compute the sum of the weights
   mpfr_class sumweights=0.0;
   for (unsigned int i=0; i<n_total; ++i)
     sumweights += conical_w[i];
 
-  std::cout << "Sum of weights = " << sumweights << std::endl;
+  std::cout << "Sum of weights = " << fix_string(sumweights) << std::endl;
 
   return 0;
 }
