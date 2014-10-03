@@ -51,13 +51,6 @@ all:
 	make $(drivers)
 
 
-# Static linking under linux
-ifeq ($(findstring linux,$(hostos)),linux)
-./lib/$(LIBNAME).a: $(objects)
-	mkdir -p lib
-	ar rv ./lib/$(LIBNAME).a $^
-endif
-
 # Use GNU libtool for linking.  Note: if the name of the output file
 # is .la, it will try to build a libtool library archive, but you can
 # also give it a .a and it won't try to build a shared library at all.
@@ -69,13 +62,11 @@ endif
 #
 # i.e. there have to be some object files following the name of the
 # archive for this to work.
-ifeq ($(findstring darwin,$(hostos)),darwin)
 $(MPQ_DIR)/lib/$(LIBNAME).la: $(libtool_objects)
 	@echo "Linking Library "$@"..."
 	@mkdir -p lib
 	@./libtool --quiet --tag=CXX --mode=link $(CXX) -o $(MPQ_DIR)/lib/$(LIBNAME).la $(libtool_objects) -rpath $(MPQ_DIR)/lib
 	@./libtool --quiet --mode=install install -c ./lib/$(LIBNAME).la $(MPQ_DIR)/lib
-endif
 
 # -MMD Like -MD except mention only user header files, not system header files.
 # -MP  This option instructs CPP to add a phony target for each
@@ -89,12 +80,12 @@ endif
 #      and appends the platform's usual object suffix.
 %.lo: %.C
 	@echo "Compiling $<..."
-	@./libtool --quiet --tag=CXX --mode=compile $(CXX) -MMD -MP $(EXTRA_FLAGS) $(ALL_INCLUDES) -c $< -o $@
+	@./libtool --quiet --tag=CXX --mode=compile $(CXX) -MMD -MP -MT $@ $(EXTRA_FLAGS) $(ALL_INCLUDES) -c $< -o $@
 
 # Link target for driver programs.
 drivers/%: drivers/%.lo $(MPQ_DIR)/lib/$(LIBNAME).la
 	@echo "Compiling driver program $@..."
-	@./libtool --quiet --tag=CXX --mode=link $(CXX) -MMD -MP $(EXTRA_FLAGS) $(ALL_INCLUDES) -o $@ $< $(ALL_LIBS)
+	@./libtool --quiet --tag=CXX --mode=link $(CXX) -MMD -MP -MT $@ $(EXTRA_FLAGS) $(ALL_INCLUDES) -o $@ $< $(ALL_LIBS)
 
 echo:
 	@echo $(src_depend) $(drivers_depend)
