@@ -148,20 +148,20 @@ void Jacobi::constants(unsigned int n)
       // No entry for i==0: b[i], c[i] defined for i=1,2,3,...
       // This is easier than trying to rescale all the formulas.
       if (i==0)
-	{
-	  b.push_back( 0.0 );
-	  c.push_back( 0.0 );
-	  continue;
-	}
+        {
+          b.push_back( 0.0 );
+          c.push_back( 0.0 );
+          continue;
+        }
       
       const Real ireal = static_cast<Real>(i);
 
       b.push_back( (mp_alpha+mp_beta) / (mp_alpha+mp_beta+2.*ireal) *
-		   (mp_beta-mp_alpha) / (mp_alpha+mp_beta+2.*ireal-2.) );
+                   (mp_beta-mp_alpha) / (mp_alpha+mp_beta+2.*ireal-2.) );
       
       c.push_back( 4.*(ireal-1.) / (mp_alpha+mp_beta+2.*ireal-1.) * (mp_alpha+ireal-1.) /
-		   (mp_alpha+mp_beta+2.*ireal-2.)/(mp_alpha+mp_beta+2.*ireal-2.) *
-		   (mp_beta+ireal-1.) / (mp_alpha+mp_beta+2.*ireal-3.) * (mp_alpha+mp_beta+ireal-1.) );
+                   (mp_alpha+mp_beta+2.*ireal-2.)/(mp_alpha+mp_beta+2.*ireal-2.) *
+                   (mp_beta+ireal-1.) / (mp_alpha+mp_beta+2.*ireal-3.) * (mp_alpha+mp_beta+ireal-1.) );
     }
 
   // Debugging
@@ -229,17 +229,17 @@ void Jacobi::value(const mpfr_class& xval, unsigned int n)
   mpfr_class dpnm1 = 1.0;
 
 #ifdef DEBUG
-      std::cout << "Jacobi::value(n=" << n << ") - Initial Values" << std::endl;
+  std::cout << "Jacobi::value(n=" << n << ") - Initial Values" << std::endl;
 
-      // Recurrence relation polynomial values.
-      std::cout << "p=" << p << std::endl;
-      std::cout << "pnm1=" << pnm1 << std::endl;
-      std::cout << "pnm2=" << pnm2 << std::endl;
+  // Recurrence relation polynomial values.
+  std::cout << "p=" << p << std::endl;
+  std::cout << "pnm1=" << pnm1 << std::endl;
+  std::cout << "pnm2=" << pnm2 << std::endl;
 
-      // Recurrence relation derivative values
-      std::cout << "dp=" << dp << std::endl;
-      std::cout << "dpnm1=" << dpnm1 << std::endl;
-      std::cout << "dpnm2=" << dpnm2 << std::endl;
+  // Recurrence relation derivative values
+  std::cout << "dp=" << dp << std::endl;
+  std::cout << "dpnm1=" << dpnm1 << std::endl;
+  std::cout << "dpnm2=" << dpnm2 << std::endl;
 #endif
   
   // Compute all recurrence relation constants for this n
@@ -269,7 +269,7 @@ void Jacobi::value(const mpfr_class& xval, unsigned int n)
       // If we're at the last step, return before
       // updating values.
       if (j==n)
-	return; // or break; to print return values
+        return; // or break; to print return values
 
       // Update polynomial values
       pnm2 = pnm1;
@@ -317,51 +317,51 @@ void Jacobi::points(unsigned int n)
     {
       // Stroud's "largest zero," the root closest to x=1
       if (j==1)
-	{
-	  const Real R1 = (1.+a)*(2.78/(4.+nreal*nreal) + .768*an/nreal);
-	  const Real R2 = 1. + 1.48*an + .96*bn + .452*an*an + .83*an*bn;
-	  x[j] = 1.- R1/R2;
-	}
+        {
+          const Real R1 = (1.+a)*(2.78/(4.+nreal*nreal) + .768*an/nreal);
+          const Real R2 = 1. + 1.48*an + .96*bn + .452*an*an + .83*an*bn;
+          x[j] = 1.- R1/R2;
+        }
 
       // Stroud's "second zero"
       if (j==2)
-	{
-	  const Real R1 = (4.1+a)/((1.+a)*(1.+.156*a));
-	  const Real R2 = 1. + .06*(nreal-8.)*(1.+.12*a)/nreal;
-	  const Real R3 = 1. + .012*b*(1. + .25*fabs(a))/nreal;
-	  x[j] = x[1] - R1*R2*R3*(1.-x[1]);
-	}
+        {
+          const Real R1 = (4.1+a)/((1.+a)*(1.+.156*a));
+          const Real R2 = 1. + .06*(nreal-8.)*(1.+.12*a)/nreal;
+          const Real R3 = 1. + .012*b*(1. + .25*fabs(a))/nreal;
+          x[j] = x[1] - R1*R2*R3*(1.-x[1]);
+        }
 
       // Stroud's "third zero"
       if (j==3)
-	{
-	  const Real R1 = (1.67 + .28*a)/(1. + .37*a);
-	  const Real R2 = 1. + .22*(nreal-8.)/nreal;
-	  const Real R3 = 1. + 8.*b/((6.28 + b)*nreal*nreal);
-	  x[j] = x[2] - R1*R2*R3*(x[1] - x[2]);
-	}
+        {
+          const Real R1 = (1.67 + .28*a)/(1. + .37*a);
+          const Real R2 = 1. + .22*(nreal-8.)/nreal;
+          const Real R3 = 1. + 8.*b/((6.28 + b)*nreal*nreal);
+          x[j] = x[2] - R1*R2*R3*(x[1] - x[2]);
+        }
 
       // Stroud's "middle zeros"
       if ((j > 3) && (j<n-1))
-	x[j] = 3.*x[j-1] - 3.*x[j-2] + x[j-3];
+        x[j] = 3.*x[j-1] - 3.*x[j-2] + x[j-3];
 
       // Stroud's "second last zero"
       if ((j==n-1) && (n>3))
-	{
-	  const Real R1 = (1. + .235*b)/(.766 + .119*b);
-	  const Real R2 = 1. / (1. + .639*(nreal-4.)/(1. + .71*(nreal-4.)));  
-	  const Real R3 = 1. / (1. + 20.*a/((7.5+a)*nreal*nreal) );
-	  x[j] = x[j-1] + R1*R2*R3*(x[j-1] - x[j-2]);
-	}
+        {
+          const Real R1 = (1. + .235*b)/(.766 + .119*b);
+          const Real R2 = 1. / (1. + .639*(nreal-4.)/(1. + .71*(nreal-4.)));
+          const Real R3 = 1. / (1. + 20.*a/((7.5+a)*nreal*nreal) );
+          x[j] = x[j-1] + R1*R2*R3*(x[j-1] - x[j-2]);
+        }
 
       // Stroud's "last zero"
       if ((j==n) && (n>3))
-	{
-	  const Real R1 = (1. + .37*b)/(1.67 + .28*b);
-	  const Real R2 = 1. / (1. + .22*(nreal-8.)/nreal);
-	  const Real R3 = 1. / (1. + 8.*a/((6.28+a)*nreal*nreal));
-	  x[j] = x[j-1] + R1*R2*R3*(x[j-1] - x[j-2]);
-	}
+        {
+          const Real R1 = (1. + .37*b)/(1.67 + .28*b);
+          const Real R2 = 1. / (1. + .22*(nreal-8.)/nreal);
+          const Real R3 = 1. / (1. + 8.*a/((6.28+a)*nreal*nreal));
+          x[j] = x[j-1] + R1*R2*R3*(x[j-1] - x[j-2]);
+        }
 
       
       // Compute root using x[j] as initial guess.
@@ -371,11 +371,11 @@ void Jacobi::points(unsigned int n)
       // std::cout << "x[" << j << "]=" << x[j] << std::endl;
 
       // What is the best way to check for NaN?
-//       if ( isnan(x[j]) )
-// 	{
-// 	  std::cerr << "Polynomial root is NaN!" << std::endl;
-// 	  abort();
-// 	}
+      //       if ( isnan(x[j]) )
+      // {
+      //   std::cerr << "Polynomial root is NaN!" << std::endl;
+      //   abort();
+      // }
     }
 }
 

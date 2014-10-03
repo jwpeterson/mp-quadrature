@@ -34,8 +34,8 @@ int main(int argc, char** argv)
     mpfr_class b ( 0.5*(zero+one) );
     for (unsigned int j=1; j<gauss_x.size(); ++j)
       {
-	gauss_x[j] = a*gauss_x[j] + b;
-	gauss_w[j] *= 0.5;
+        gauss_x[j] = a*gauss_x[j] + b;
+        gauss_w[j] *= 0.5;
       }
   }
 
@@ -75,14 +75,14 @@ int main(int argc, char** argv)
   for (unsigned int i=0; i<n; i++)
     for (unsigned int j=0; j<n; j++)
       for (unsigned int k=0; k<n; k++)
-	{
-	  // Note: Access the 1D arrays from [1] ... [n]
-	  conical_x[gp] = jacobi2_x[k+1]; // jacB1D.qp(k)(0);
-	  conical_y[gp] = jacobi1_x[j+1] * (1.-jacobi2_x[k+1]); // jacA1D.qp(j)(0) * (1.-jacB1D.qp(k)(0));
-	  conical_z[gp] = gauss_x[i+1] * (1.-jacobi1_x[j+1]) * (1.-jacobi2_x[k+1]); // gauss1D.qp(i)(0) * (1.-jacA1D.qp(j)(0)) * (1.-jacB1D.qp(k)(0)); 
-	  conical_w[gp] = gauss_w[i+1] * jacobi1_w[j+1] * jacobi2_w[k+1]; //gauss1D.w(i) * jacA1D.w(j) * jacB1D.w(k);          
-	  gp++;
-	}
+        {
+          // Note: Access the 1D arrays from [1] ... [n]
+          conical_x[gp] = jacobi2_x[k+1]; // jacB1D.qp(k)(0);
+          conical_y[gp] = jacobi1_x[j+1] * (1.-jacobi2_x[k+1]); // jacA1D.qp(j)(0) * (1.-jacB1D.qp(k)(0));
+          conical_z[gp] = gauss_x[i+1] * (1.-jacobi1_x[j+1]) * (1.-jacobi2_x[k+1]); // gauss1D.qp(i)(0) * (1.-jacA1D.qp(j)(0)) * (1.-jacB1D.qp(k)(0));
+          conical_w[gp] = gauss_w[i+1] * jacobi1_w[j+1] * jacobi2_w[k+1]; //gauss1D.w(i) * jacA1D.w(j) * jacB1D.w(k);
+          gp++;
+        }
   
   // Print out the conical product points and weights in a form we can use
   // (These are now in 0-based storage)

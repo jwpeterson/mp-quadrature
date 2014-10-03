@@ -32,8 +32,8 @@ int main(int argc, char** argv)
     mpfr_class b ( 0.5*(zero+one) );
     for (unsigned int j=1; j<gauss_x.size(); ++j)
       {
-	gauss_x[j] = a*gauss_x[j] + b;
-	gauss_w[j] *= 0.5;
+        gauss_x[j] = a*gauss_x[j] + b;
+        gauss_w[j] *= 0.5;
       }
   }
 
@@ -75,11 +75,11 @@ int main(int argc, char** argv)
   for (unsigned int i=0; i<n; i++)
     for (unsigned int j=0; j<n; j++)
       {
-	// Note: Access the 1D arrays from [1] ... [n]
-	conical_x[gp] = jacobi_x[j+1];                     //s[j];
-	conical_y[gp] = gauss_x[i+1] * (1.-jacobi_x[j+1]); //r[i]*(1.-s[j]);
-	conical_w[gp] = gauss_w[i+1] * jacobi_w[j+1];      //A[i]*B[j];
-	gp++;
+        // Note: Access the 1D arrays from [1] ... [n]
+        conical_x[gp] = jacobi_x[j+1];                     //s[j];
+        conical_y[gp] = gauss_x[i+1] * (1.-jacobi_x[j+1]); //r[i]*(1.-s[j]);
+        conical_w[gp] = gauss_w[i+1] * jacobi_w[j+1];      //A[i]*B[j];
+        gp++;
       }
   
   // Print out the conical product points and weights in a form we can use

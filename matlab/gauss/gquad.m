@@ -34,7 +34,7 @@ for j=1:n
  % get the weight.
  intlagrange = polyint(lagrange);
  w(j) = 1/lagconst * (polyval(intlagrange, 1) - ...
-		      polyval(intlagrange,-1));
+                      polyval(intlagrange,-1));
 end
 
 msg = ['The sum of the weights is: ', num2str(sum(w)), '.'];
