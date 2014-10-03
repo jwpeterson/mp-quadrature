@@ -12,13 +12,13 @@ int main(int argc, char** argv)
 
   // # of binary digits
   // 53 binary digits is about what you normally get with a double.
-  mpfr_set_default_prec(256); 
+  mpfr_set_default_prec(256);
 
   // Read number of points in rule from command line
   unsigned int n=6;
   if (argc > 1)
     n=atoi(argv[1]);
-  
+
   const unsigned int n_total = n*n*n;
   std::cout << "\nComputing 3D conical product rule with n^3=" << n_total << " points." << std::endl;
 
@@ -83,7 +83,7 @@ int main(int argc, char** argv)
           conical_w[gp] = gauss_w[i+1] * jacobi1_w[j+1] * jacobi2_w[k+1]; //gauss1D.w(i) * jacA1D.w(j) * jacB1D.w(k);
           gp++;
         }
-  
+
   // Print out the conical product points and weights in a form we can use
   // (These are now in 0-based storage)
   for (unsigned int i=0; i<n_total; ++i)
@@ -103,6 +103,6 @@ int main(int argc, char** argv)
     sumweights += conical_w[i];
 
   std::cout << "Sum of weights = " << sumweights << std::endl;
-  
+
   return 0;
 }

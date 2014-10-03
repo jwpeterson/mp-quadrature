@@ -23,7 +23,7 @@ function [p,dp,pnm1] = jacobi_recur(a, b, n, x)
 % P_n^(a,b)(1) = (n+a)! / n! / a!
 % I don't think Stroud's recurrence relation follows this convention, but
 % that scaling does not change the roots of course.
-  
+
 % Special return for n=0 and 1
 if (n==0)
   p=1.;
@@ -55,7 +55,7 @@ dpnm1 = 1.;
 for j=2:n
   % Compute the recurrence coefficients b_j, c_j.
   [bj,cj] = jacobi_constants(a,b,j);
-  
+
   % Compute P_{n}, dP/dx_{n} using the recurrence relation
   p  = (x-bj).*pnm1 - cj*pnm2;
   dp = (x-bj).*dpnm1 + pnm1 - cj*dpnm2;
@@ -64,11 +64,11 @@ for j=2:n
   if (j==n)
     return;
   end
-  
+
   % Update polynomial values
   pnm2 = pnm1;
   pnm1 = p;
-  
+
   % Update polynomial derivs
   dpnm2 = dpnm1;
   dpnm1 = dp;

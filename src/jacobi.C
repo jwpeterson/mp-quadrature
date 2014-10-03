@@ -24,7 +24,7 @@ void Jacobi::rule(unsigned int n)
   // Allocate space for the weights.  As with everything
   // else, allocate one extra space and skip the [0] index.
   w.resize(n+1);
-  
+
   // Compute the quadrature points for a degree n rule.
   this->points(n);
 
@@ -33,26 +33,26 @@ void Jacobi::rule(unsigned int n)
   // will expect.  Be careful when sorting not to sort the
   // [0] entry!
   std::sort(++(x.begin()), x.end());
-  
+
   // Compute the product of the c_j, from j=2 to n.  The
   // constants have already been computed by the call to
   // points, so this should be a no-op...
   this->constants(n);
   //this->print_constants();
-  
+
   mpfr_class cprod(1.0);
   for (unsigned int j=2; j<=n; ++j)
     cprod *= c[j];
-  
+
   // For each point, compute the weight
   for (unsigned int j=1; j<=n; ++j)
     {
       this->value(x[j], n);
-      
+
       // Need to check dp, pnm1 against NaN?
       // std::cout << "dp=" << dp << std::endl;
       // std::cout << "pnm1=" << pnm1 << std::endl;
-      
+
       w[j] = cprod / dp / pnm1;
     }
 
@@ -74,7 +74,7 @@ void Jacobi::sumweights()
   mpfr_class sumweights(0.0);
   for (unsigned int j=1; j<w.size(); ++j)
     sumweights += w[j];
-  
+
   //std::cout << "Sum of weights=" << sumweights << std::endl;
 }
 
@@ -125,7 +125,7 @@ void Jacobi::set_beta(Real beta)
 void Jacobi::constants(unsigned int n)
 {
   assert (n>=1);
-  
+
   // Check for easy return: we may have already computed and stored
   // enough b and c coefficients.
   if ((b.size() >= n+1) && (c.size() >= n+1))
@@ -138,13 +138,13 @@ void Jacobi::constants(unsigned int n)
   c.reserve(n+1);
 
   //std::cout << "b.size()=" << b.size() << std::endl;
-    
+
   // Otherwise, compute entries through n
   for (unsigned int i=b.size(); i<n+1; ++i)
     {
       // debugging
       //std::cout << "Computing b[i], c[i]  for i=" << i << std::endl;
-      
+
       // No entry for i==0: b[i], c[i] defined for i=1,2,3,...
       // This is easier than trying to rescale all the formulas.
       if (i==0)
@@ -153,12 +153,12 @@ void Jacobi::constants(unsigned int n)
           c.push_back( 0.0 );
           continue;
         }
-      
+
       const Real ireal = static_cast<Real>(i);
 
       b.push_back( (mp_alpha+mp_beta) / (mp_alpha+mp_beta+2.*ireal) *
                    (mp_beta-mp_alpha) / (mp_alpha+mp_beta+2.*ireal-2.) );
-      
+
       c.push_back( 4.*(ireal-1.) / (mp_alpha+mp_beta+2.*ireal-1.) * (mp_alpha+ireal-1.) /
                    (mp_alpha+mp_beta+2.*ireal-2.)/(mp_alpha+mp_beta+2.*ireal-2.) *
                    (mp_beta+ireal-1.) / (mp_alpha+mp_beta+2.*ireal-3.) * (mp_alpha+mp_beta+ireal-1.) );
@@ -203,23 +203,23 @@ void Jacobi::value(const mpfr_class& xval, unsigned int n)
       p=0.5*(mp_alpha+mp_beta+2.)*xval + 0.5*(mp_alpha-mp_beta);
       dp=0.5*(mp_alpha+mp_beta+2.);
       pnm1=1.;
-      return; 
+      return;
     }
 
 #ifdef DEBUG
   std::cout << "================================================================================" << std::endl;
   std::cout << "Jacobi::value(n=" << n << ") - Pre-initialized Values" << std::endl;
-  
+
   // Recurrence relation polynomial values.
   std::cout << "p=" << p << std::endl;
   std::cout << "pnm1=" << pnm1 << std::endl;
-  
+
   // Recurrence relation derivative values
   std::cout << "dp=" << dp << std::endl;
   std::cout << "x=" << xval << std::endl;
 #endif
 
-      
+
   // Initialize for the recurrence relation:
   // P_{n-2} and P'_{n-2}
   mpfr_class pnm2 = 1.0, dpnm2 = 0.0;
@@ -241,7 +241,7 @@ void Jacobi::value(const mpfr_class& xval, unsigned int n)
   std::cout << "dpnm1=" << dpnm1 << std::endl;
   std::cout << "dpnm2=" << dpnm2 << std::endl;
 #endif
-  
+
   // Compute all recurrence relation constants for this n
   this->constants(n);
 
@@ -265,7 +265,7 @@ void Jacobi::value(const mpfr_class& xval, unsigned int n)
       std::cout << "dpnm1=" << dpnm1 << std::endl;
       std::cout << "dpnm2=" << dpnm2 << std::endl;
 #endif
-      
+
       // If we're at the last step, return before
       // updating values.
       if (j==n)
@@ -274,13 +274,13 @@ void Jacobi::value(const mpfr_class& xval, unsigned int n)
       // Update polynomial values
       pnm2 = pnm1;
       pnm1 = p;
-  
+
       // Update polynomial derivs
       dpnm2 = dpnm1;
       dpnm1 = dp;
     }
 
-  
+
   // Debugging
   // std::cout << "p(x)=" << p << std::endl;
   // std::cout << "dp(x)=" << dp << std::endl;
@@ -308,11 +308,11 @@ void Jacobi::points(unsigned int n)
   const Real b = mp_beta.get_d();
   const Real an = a / nreal;
   const Real bn = b / nreal;
-  
+
   // We probably don't need to compute the guess in multi-precision, but
   // the returned root will be an MP object.
   //mpfr_class guess (0.0);
-  
+
   for (unsigned int j=1; j<=n; ++j)
     {
       // Stroud's "largest zero," the root closest to x=1
@@ -363,7 +363,7 @@ void Jacobi::points(unsigned int n)
           x[j] = x[j-1] + R1*R2*R3*(x[j-1] - x[j-2]);
         }
 
-      
+
       // Compute root using x[j] as initial guess.
       this->newton(n, x[j]);
 
@@ -400,12 +400,12 @@ void Jacobi::newton(unsigned int n, mpfr_class& xroot)
       // Compute the Newton update
       xroot = xroot - (p/dp);
 
-      // Compute the residual (the distance of p(x) from zero) 
+      // Compute the residual (the distance of p(x) from zero)
       residual = abs(p);
 
       // Debugging: check quadratic Newton convergence
       // std::cout << "residual[" << n_its << "]=" << residual << std::endl;
-      
+
       // Update the iteration count
       n_its++;
     }

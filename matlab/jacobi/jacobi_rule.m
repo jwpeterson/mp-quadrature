@@ -37,15 +37,15 @@ tsa = 2^(alpha+beta+1) * factorial(alpha) / factorial(alpha+beta+1) * factorial(
 %%   if (j<=alpha)
 %%     weight = weight * j; % alpha!
 %%   end
-%% 
+%%
 %%   if (j<=alpha+beta+1)
 %%     weight = weight * (2. / j); % 2^(alpha+beta+1) / (alpha+beta+1)!
 %%   end
-%%   
+%%
 %%   if (j<=beta)
 %%     weight = weight * j; % beta!
 %%   end
-%% 
+%%
 %%   if ((j>=2) & (j<=n))
 %%     weight = weight * c(j); % c(2)*c(3)*...*c(n)
 %%   end

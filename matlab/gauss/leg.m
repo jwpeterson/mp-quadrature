@@ -1,5 +1,5 @@
 function [P,R] = leg(n)
-  
+
 % [P,R] = leg(n)
 % Computes Pn, the Legendre polynomial
 % of order n on the interval [-1,1].
@@ -11,7 +11,7 @@ function [P,R] = leg(n)
 %      polynomial
 
 
-  
+
 % The recursion relation needs the first
 % two polynomials to get started.
 P{1} = 1;
@@ -47,4 +47,3 @@ end
 for i=3:length(P)
   R{i} = sort(roots(P{i}));
 end
-

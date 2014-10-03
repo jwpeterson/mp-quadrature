@@ -6,9 +6,9 @@ function r = jacobi_newton(a, b, n, x)
 %   is readily available from the recurrence relation.
 % * This routine, like jacobi_recur(), expects its
 %   x-arguments to lie in [-1 1]
-  
-% Tolerance to converge Newton residual to.  
-tol = 1.e-15;  
+
+% Tolerance to converge Newton residual to.
+tol = 1.e-15;
 
 % Current residual of the Newton system.
 residual = 1.;
@@ -21,7 +21,7 @@ while ((residual > tol) & (n_its<max_its))
   residual = norm(p);
   n_its=n_its+1;
 end
-  
+
 if ((n_its==max_its) & (residual > tol))
   error('Iterations did not converge!');
 end

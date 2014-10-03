@@ -28,13 +28,13 @@ int main(int argc, char** argv)
 
   // # of binary digits
   // 53 binary digits is about what you normally get with a double.
-  mpfr_set_default_prec(256); 
+  mpfr_set_default_prec(256);
 
   unsigned int n=6;
   // Read number of points in rule from command line
   if (argc > 1)
     n=atoi(argv[1]);
-  
+
   // Probably failed to read the number of points from the command line...
   if (n==0)
     {
@@ -50,7 +50,7 @@ int main(int argc, char** argv)
   // For certain rules we have analytical expressions for the points
   // and weights.
   bool analytical_check=false;
-  
+
   if ((n>=2) && (n<=5))
     analytical_check = true;
 
@@ -143,7 +143,7 @@ int main(int argc, char** argv)
           }
         }
 
-      // Compute error in x, w.  Note, the values returned in x, w are 1-based. 
+      // Compute error in x, w.  Note, the values returned in x, w are 1-based.
       if ((x.size()-1 == x_analytical.size()) && (w.size()-1 == w_analytical.size()))
         {
           std::cout << "\nError in points and weights: " << std::endl;
@@ -179,14 +179,14 @@ int main(int argc, char** argv)
         }
 
 
-      
+
       for (unsigned int i=0; i<x_analytical.size(); ++i)
         std::cout << "x_analytical["<<i<<"]=" << fix_string(x_analytical[i]) << std::endl;
       std::cout << std::endl;
       for (unsigned int i=0; i<w_analytical.size(); ++i)
         std::cout << "w_analytical["<<i<<"]=" << fix_string(w_analytical[i]) << std::endl;
     } // end if analytical_check
-  
+
   // Print points and weights using standard C-style indexing and
   // by setting the second half of the points and weights equal
   // to the mirror of the first half.
@@ -201,12 +201,11 @@ int main(int argc, char** argv)
     std::cout << "_points[" << std::setw(2) << i-1 << "]    = -_points[" << d-1 << "];\n";
 
   std::cout << std::endl;
-  
+
   for (unsigned int i=1; i<=m; ++i)
     std::cout << "_weights[" << std::setw(2) << i-1 << "]   = " << fix_string(w[i]) << ";\n";
   for (unsigned int i=m+1,d=(n%2)?m-1:m; i<=n; ++i,--d)
     std::cout << "_weights[" << std::setw(2) << i-1 << "]   = _weights[" << d-1 << "];" << std::endl;
-  
+
   return 0;
 }
-  

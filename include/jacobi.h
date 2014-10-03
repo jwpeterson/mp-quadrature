@@ -30,7 +30,7 @@ public:
 
   // Set or re-set the beta parameter.
   void set_beta(Real beta);
-  
+
   // Compute and print the Jacobi quadrature rule of
   // degree n.  If previous rules have been computed,
   // this routine may try to re-use some data.
@@ -47,7 +47,7 @@ public:
   // Constant access to the points and weights vectors
   const std::vector<mpfr_class>& get_points()  { return x; }
   const std::vector<mpfr_class>& get_weights() { return w; }
-  
+
 private:
   // Multi-precision versions of the parameters
   mpfr_class mp_alpha, mp_beta;
@@ -63,7 +63,7 @@ private:
 
   // Multi-precision object to hold P_{n-1}(x)
   mpfr_class pnm1;
-  
+
   // Jacobi recurrence relation coefficients.
   std::vector<mpfr_class> b, c;
 
@@ -72,7 +72,7 @@ private:
 
   // Weights for a Jacobi quadrature rule of degree n.
   std::vector<mpfr_class> w;
-  
+
   // Function which computes Jacobi polynomial recurrence relation
   // constants.  Only computes those which have not already been
   // computed.
@@ -85,7 +85,7 @@ private:
   // Computes p, dp, and pnm1 for the Jacobi polynomial of
   // degree n at the point x.  x must lie in the
   // domain [-1 1].  A version of this could also
-  // be available to be called publicly... 
+  // be available to be called publicly...
   // The input value x is a multi-precision object.  It would
   // be nice to have a version of this function where x is a
   // vector, but not essential.
@@ -109,7 +109,7 @@ private:
 
   // Print out the recurrence relation constants (the b_i and c_i)
   void print_constants();
-  
+
   // Copy constructor. Unimplemented.
   Jacobi(const Jacobi&);
 
