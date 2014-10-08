@@ -2,7 +2,7 @@
 
 #include "common_definitions.h"
 
-std::string fix_string(mpfr_class& x)
+std::string fix_string(const mpfr_class& x)
 {
   // Go to some extra trouble to print e-01L instead of e-1
   std::ostringstream number_stream;
