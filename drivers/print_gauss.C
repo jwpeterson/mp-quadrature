@@ -14,13 +14,15 @@
 #include "common_definitions.h"
 #include "gauss.h"
 
+// Helper function to raise an arbitrary precision parameter to an integer power
+mpfr_class pow(mpfr_class, unsigned);
+
 // This program implements what is probably a Numerical
 // recipes algorithm for computing Legendre polynomial
 // zeros via Newton's method and computing weights for
 // Gaussian quadrature formulae.  We're using a multi-precision
 // library to achieve a larger number of significant
 // digits.
-
 int main(int argc, char** argv)
 {
   std::cout.precision(32);
@@ -207,5 +209,54 @@ int main(int argc, char** argv)
   for (unsigned int i=m+1,d=(n%2)?m-1:m; i<=n; ++i,--d)
     std::cout << "_weights[" << std::setw(2) << i-1 << "]   = _weights[" << d-1 << "];" << std::endl;
 
+  // Verify that polynomials up to the supported order are integrated
+  // exactly (to within the arbitrary precision we are using).  Be
+  // careful with the 1-based indexing we are using...
+  std::cout << "\nVerifying rule:" << std::endl;
+  unsigned max_order = 2*n - 1;
+  for (unsigned order=0; order <= max_order; ++order)
+    {
+      mpfr_class sum = 0.;
+      for (unsigned n_qp=1; n_qp<x.size(); ++n_qp)
+        {
+          sum += w[n_qp] * pow(x[n_qp], order);
+        }
+
+      // The exact solution to int(x^p, x=-1, 1) is:
+      // x^{p+1} / (p+1) |_{-1}^{+1}
+      // = (1 - (-1)^{p+1}) / (p+1)
+      // = { 2/(p+1), p even
+      //   { 0,       p odd
+      mpfr_class exact = (order%2==0) ? mpfr_class(2.)/mpfr_class(order+1) : mpfr_class(0.);
+
+      // std::cout << "quadrature = " << sum << std::endl;
+      // std::cout << "exact      = " << exact << std::endl;
+
+      // Compute the absolute error:
+      mpfr_class abs_err = abs(sum-exact);
+
+      // Print message
+      std::cout << "Computing int(x^" << order << ", x=-1..1)"
+                << ", abs_err = " << abs_err << std::endl;
+
+      // Abort if error is too large.  Most of the results are
+      // accurate to a tighter tolerance than 1.e-30, but 1.e-30 at
+      // least guarantees that all the tests pass.
+      if (abs_err > mpfr_class(1.e-30))
+        {
+          std::cerr << "Quadrature error too large, possible problem with points and weights!" << std::endl;
+          std::abort();
+        }
+    }
+
   return 0;
+}
+
+
+mpfr_class pow(mpfr_class x, unsigned p)
+{
+  mpfr_class result = 1.0;
+  for (unsigned i=0; i<p; ++i)
+    result *= x;
+  return result;
 }
