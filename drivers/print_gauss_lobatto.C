@@ -25,19 +25,19 @@ int main(int argc, char** argv)
   // 53 binary digits is about what you normally get with a double.
   mpfr_set_default_prec(256);
 
-  unsigned int n=6;
   // Read number of points in rule from command line
+  unsigned int n=6;
   if (argc > 1)
     n = atoi(argv[1]);
 
   // Don't allow n==0, 1
   if (n<2)
     {
-      std::cout << "n>=2 is required, running with default order 6 rule." << std::endl;
+      std::cout << "n>=2 is required, running with default 6 point rule." << std::endl;
       n = 6;
     }
 
-  std::cout << "\nComputing Gauss-Lobatto rule for n=" << n << std::endl;
+  std::cout << "\nComputing Gauss-Lobatto rule with " << n << " points" <<  std::endl;
   std::vector<mpfr_class> x, w;
   gauss_lobatto_rule(n, x, w);
 
@@ -180,6 +180,46 @@ int main(int argc, char** argv)
 
   for (unsigned int i=m+1,d=(n%2)?m-1:m; i<=n; ++i,--d)
     std::cout << "_weights[" << std::setw(2) << i-1 << "]   = _weights[" << d-1 << "];" << std::endl;
+
+  // Verify that polynomials up to the supported order are integrated
+  // exactly (to within the arbitrary precision we are using).  Be
+  // careful with the 1-based indexing we are using...
+  std::cout << "\nVerifying rule:" << std::endl;
+  unsigned max_order = 2*n - 3;
+  for (unsigned order=0; order <= max_order; ++order)
+    {
+      mpfr_class sum = 0.;
+      for (unsigned n_qp=1; n_qp<x.size(); ++n_qp)
+        {
+          sum += w[n_qp] * pow(x[n_qp], order);
+        }
+
+      // The exact solution to int(x^p, x=-1, 1) is:
+      // x^{p+1} / (p+1) |_{-1}^{+1}
+      // = (1 - (-1)^{p+1}) / (p+1)
+      // = { 2/(p+1), p even
+      //   { 0,       p odd
+      mpfr_class exact = (order%2==0) ? mpfr_class(2.)/mpfr_class(order+1) : mpfr_class(0.);
+
+      // std::cout << "quadrature = " << sum << std::endl;
+      // std::cout << "exact      = " << exact << std::endl;
+
+      // Compute the absolute error:
+      mpfr_class abs_err = abs(sum-exact);
+
+      // Print message
+      std::cout << "Computing int(x^" << order << ", x=-1..1)"
+                << ", abs_err = " << abs_err << std::endl;
+
+      // Abort if error is too large.  Most of the results are
+      // accurate to a tighter tolerance than 1.e-30, but 1.e-30 at
+      // least guarantees that all the tests pass.
+      if (abs_err > mpfr_class(1.e-30))
+        {
+          std::cerr << "Quadrature error too large, possible problem with points and weights!" << std::endl;
+          std::abort();
+        }
+    }
 
   return 0;
 }
