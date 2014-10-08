@@ -33,10 +33,10 @@ int main(int argc, char** argv)
   mpfr_set_default_prec(256);
 
   // Case 1: weights sum to 1/2
-  const Real alpha=1.0, beta=0.0;
+  // const Real alpha=1.0, beta=0.0;
 
   // Case 2: weights sum to 1/3
-  // const Real alpha=2.0, beta=0.0;
+  const Real alpha=2.0, beta=0.0;
 
   Jacobi jacobi_rule(alpha, beta);
 
@@ -103,21 +103,14 @@ int main(int argc, char** argv)
 
       // Exact solutions for alpha=1:
       //
-      // We use the scaled interval [0,1] here, so the exact
-      // solution for alpha=1 to int((1-x)*x^p, x=0..1) is given
-      // by:
-      // 1 / (p^2 + 3p + 2)
+      // int((1-x)*x^p, x=0..1) = 1 / (p^2 + 3p + 2)
+
+      // Exact solution for alpha=2:
       //
-      // If one instead uses the interval [-1,1]:
-      // int((1-x)*x^p, x=-1..1), the exact solution is given by:
-      //        p           p
-      //  2 (-1)  p + 3 (-1)  + 1
-      //  -----------------------
-      //      (p + 2) (p + 1)
-      //
-      // = { ( 2*p + 4) / (p + 2) / (p + 1), p even
-      //   { (-2*p - 2) / (p + 2) / (p + 1), p odd
-      mpfr_class exact = mpfr_class(1.0)/mpfr_class(order*order + 3*order + 2);
+      // int((1-x)^2*x^p, x=0..1) = 2 / (p^3 + 6*p^2 + 11*p + 6)
+      mpfr_class exact = (alpha==1.0) ?
+        mpfr_class(1.0)/mpfr_class(order*order + 3*order + 2) :
+        mpfr_class(2.0)/mpfr_class(order*order*order + 6*order*order + 11*order + 6) ;
 
       // std::cout << "quadrature = " << sum << std::endl;
       // std::cout << "exact      = " << exact << std::endl;
@@ -143,3 +136,14 @@ int main(int argc, char** argv)
 
   return 0;
 }
+
+// We used the scaled interval [0,1] here, if one instead uses
+// the interval [-1,1]: int((1-x)*x^p, x=-1..1), the exact
+// solution is given by:
+//        p           p
+//  2 (-1)  p + 3 (-1)  + 1
+//  -----------------------
+//      (p + 2) (p + 1)
+//
+// = { ( 2*p + 4) / (p + 2) / (p + 1), p even
+//   { (-2*p - 2) / (p + 2) / (p + 1), p odd
