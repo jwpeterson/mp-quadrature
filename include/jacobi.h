@@ -102,11 +102,6 @@ private:
   // guess.
   void newton(unsigned int n, mpfr_class& xroot);
 
-
-
-  // Sum up the entries in the w vector.
-  void sumweights();
-
   // Print out the recurrence relation constants (the b_i and c_i)
   void print_constants();
 

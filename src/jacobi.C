@@ -61,22 +61,8 @@ void Jacobi::rule(unsigned int n)
   // through the public this->scale_weights() and
   // this->scale_points() interfaces.
   // this->scale();
-
-  // Compute the sum of the weights as a check on the algorithm.
-  this->sumweights();
 }
 
-
-
-
-void Jacobi::sumweights()
-{
-  mpfr_class sumweights(0.0);
-  for (unsigned int j=1; j<w.size(); ++j)
-    sumweights += w[j];
-
-  //std::cout << "Sum of weights=" << sumweights << std::endl;
-}
 
 
 
