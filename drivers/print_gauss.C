@@ -14,9 +14,6 @@
 #include "common_definitions.h"
 #include "gauss.h"
 
-// Helper function to raise an arbitrary precision parameter to an integer power
-mpfr_class pow(mpfr_class, unsigned);
-
 // This program implements what is probably a Numerical
 // recipes algorithm for computing Legendre polynomial
 // zeros via Newton's method and computing weights for
@@ -250,13 +247,4 @@ int main(int argc, char** argv)
     }
 
   return 0;
-}
-
-
-mpfr_class pow(mpfr_class x, unsigned p)
-{
-  mpfr_class result = 1.0;
-  for (unsigned i=0; i<p; ++i)
-    result *= x;
-  return result;
 }

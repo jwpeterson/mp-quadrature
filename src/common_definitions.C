@@ -48,3 +48,13 @@ std::string fix_string(mpfr_class& x)
 
   return number;
 }
+
+
+
+mpfr_class pow(const mpfr_class& x, unsigned power)
+{
+  mpfr_class result = 1.0;
+  for (unsigned i=0; i<power; ++i)
+    result *= x;
+  return result;
+}
