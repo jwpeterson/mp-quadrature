@@ -186,8 +186,8 @@ void Jacobi::value(const mpfr_class& xval, unsigned int n)
 
   if (n==1)
     {
-      p=0.5*(mp_alpha+mp_beta+2.)*xval + 0.5*(mp_alpha-mp_beta);
-      dp=0.5*(mp_alpha+mp_beta+2.);
+      p = xval + (mp_alpha - mp_beta)/(mp_alpha + mp_beta + 2);
+      dp = 1.0;
       pnm1=1.;
       return;
     }
