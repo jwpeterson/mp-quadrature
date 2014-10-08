@@ -5,6 +5,7 @@
 #include <vector>
 #include <iomanip>
 #include <sstream>
+#include <getopt.h> // getopt_long()
 
 // The GNU multi-precision library
 #include "gmp.h"
@@ -23,6 +24,9 @@
 #include "common_definitions.h"
 #include "jacobi.h"
 
+// Print a simple usage message when unrecognized command line arguments are encountered
+void usage();
+
 int main(int argc, char** argv)
 {
   std::cout.precision(32);
@@ -32,30 +36,84 @@ int main(int argc, char** argv)
   // 53 binary digits is about what you normally get with a double.
   mpfr_set_default_prec(256);
 
-  // Case 1: weights sum to 1/2
+  // Case 1: alpha=1, beta=0, weights sum to 1/2
+  // Case 2: alpha=2, beta=0, weights sum to 1/3
   unsigned
     alpha = 1,
     beta = 0;
 
-  // Case 2: weights sum to 1/3
-  // unsigned
-  //   alpha = 2,
-  //   beta = 0;
+  // Number of points in rule, to be read from command line
+  unsigned int n = 6;
+
+  // options descriptor - this associates the following "long" and "short" command line options
+  // --alpha, -a
+  // --beta, -b
+  // --npoints, -n
+  static struct option longopts[] =
+    {
+      {"alpha",   required_argument, NULL, 'a'},
+      {"beta",    required_argument, NULL, 'b'},
+      {"npoints", required_argument, NULL, 'n'},
+      {"help",    no_argument,       NULL, 'h'},
+    };
+
+  // Parse command line options using getopt_long()
+  int ch = -1;
+  while ((ch = getopt_long(argc, argv, "ha:b:n:", longopts, NULL)) != -1)
+    {
+      switch (ch)
+        {
+        case 'a':
+          {
+            alpha = atoi(optarg);
+            if (!(alpha == 1 || alpha == 2))
+              {
+                std::cerr << "Error, only alpha=1, 2 are supported, but alpha = " << alpha << " was provided!" << std::endl;
+                std::abort();
+              }
+
+            break;
+          }
+
+        case 'b':
+          {
+            beta = atoi(optarg);
+
+            if (beta != 0)
+              {
+                std::cerr << "Error, only beta=0 is supported, but beta = " << beta << " was provided!" << std::endl;
+                std::abort();
+              }
+            break;
+          }
+
+        case 'n':
+          {
+            n = atoi(optarg);
+
+            // Make sure n is valid
+            if (n==0)
+              {
+                std::cout << "Warning, could not determine valid rule order from command line." << std::endl;
+                std::cout << "Running with default 6-point rule." << std::endl;
+                n = 6;
+              }
+            break;
+          }
+
+        case 'h':
+          {
+            usage();
+            return 0;
+          }
+
+        default:
+          // We could error here, print a usage command, or just ignore unrecognized arguments...
+          usage();
+        }
+    } // end while
 
   Jacobi jacobi_rule(alpha, beta);
-
-  // Read number of points in rule from command line
-  unsigned int n=6;
-  if (argc > 1)
-    n = atoi(argv[1]);
-
-  // Make sure n is valid
-  if (n==0)
-    {
-      std::cout << "Warning, could not determine valid rule order from command line." << std::endl;
-      std::cout << "Running with default 6-point rule." << std::endl;
-      n = 6;
-    }
 
   std::cout << "Jacobi rule with alpha=" << alpha << ", beta=" << beta << ", "
             << n << " points, order=" << 2*n-1 << std::endl;
@@ -152,3 +210,16 @@ int main(int argc, char** argv)
 //
 // = { ( 2*p + 4) / (p + 2) / (p + 1), p even
 //   { (-2*p - 2) / (p + 2) / (p + 1), p odd
+
+void usage()
+{
+  std::cout << "\n";
+  std::cout << "This program generates the points and weights for a Jacobi quadrature rule.\n";
+  std::cout << "\n";
+  std::cout << "Valid command line options are:\n";
+  std::cout << "--npoints, -n # = Build Jacobi rule with # points.\n";
+  std::cout << "--alpha, -a #   = Build Jacobi rule with alpha = #.  Only alpha=1, 2 are supported.\n";
+  std::cout << "--beta, -b #    = Build Jacobi rule with beta = #.  Only beta=0 is supported.\n";
+  std::cout << "--help, -h      = Print this message.\n";
+  std::cout << "\n";
+}
