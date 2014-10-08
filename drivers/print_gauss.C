@@ -30,8 +30,8 @@ int main(int argc, char** argv)
   // 53 binary digits is about what you normally get with a double.
   mpfr_set_default_prec(256);
 
-  unsigned int n=6;
   // Read number of points in rule from command line
+  unsigned int n=6;
   if (argc > 1)
     n=atoi(argv[1]);
 
@@ -39,11 +39,11 @@ int main(int argc, char** argv)
   if (n==0)
     {
       std::cout << "Warning, could not determine valid rule order from command line." << std::endl;
-      std::cout << "Running with default order 6 rule." << std::endl;
+      std::cout << "Running with default 6-point rule." << std::endl;
       n=6;
     }
 
-  std::cout << "\nComputing Gauss rule for n=" << n << std::endl;
+  std::cout << "\nComputing " << n << " point Gauss rule." << std::endl;
   std::vector<mpfr_class> x, w;
   gauss_rule(n, x, w);
 
