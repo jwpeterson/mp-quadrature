@@ -33,14 +33,14 @@ int main(int argc, char** argv)
   mpfr_set_default_prec(256);
 
   // Case 1: weights sum to 1/2
-  // unsigned
-  // alpha = 1,
-  // beta = 0;
+  unsigned
+    alpha = 1,
+    beta = 0;
 
   // Case 2: weights sum to 1/3
-  unsigned
-    alpha = 2,
-    beta = 0;
+  // unsigned
+  //   alpha = 2,
+  //   beta = 0;
 
   Jacobi jacobi_rule(alpha, beta);
 
@@ -63,6 +63,22 @@ int main(int argc, char** argv)
   // Valid for polynomials (not including the weighting function) of order = 2*n-1
   jacobi_rule.rule(n);
 
+  // Get a reference to the 1-based points and weights arrays
+  const std::vector<mpfr_class>& x = jacobi_rule.get_points();
+  const std::vector<mpfr_class>& w = jacobi_rule.get_weights();
+
+  // Debugging: Print the pre-scaled weights:
+  {
+    mpfr_class sumweights = 0.;
+    for (unsigned i=1; i<w.size(); ++i)
+      sumweights += w[i];
+    std::cout << "Sum of unscaled weights is: " << sumweights << std::endl;
+
+    // for (unsigned i=1; i<w.size(); ++i)
+    //   std::cout << "unscaled weights[" << std::setw(2) << i-1 << "]   = " << fix_string(w[i]) << ";\n";
+  }
+
+
   // Scale Jacobi weights so they sum to 1/3 (alpha==2) or 1/2 (alpha==1)
   if (alpha == 2)
     jacobi_rule.scale_weights(mpfr_class(1.0)/mpfr_class(3.0));
@@ -77,11 +93,6 @@ int main(int argc, char** argv)
   jacobi_rule.scale_points(mpfr_class(0.0), mpfr_class(1.0));
 
   // Print the result
-
-  // The points and weights arrays are 1-based
-  const std::vector<mpfr_class>& x = jacobi_rule.get_points();
-  const std::vector<mpfr_class>& w = jacobi_rule.get_weights();
-
   for (unsigned i=1; i<x.size(); ++i)
     std::cout << "_points[" << std::setw(2) << i-1 << "](0) = " << fix_string(x[i]) << ";\n";
 
@@ -91,6 +102,8 @@ int main(int argc, char** argv)
   for (unsigned i=1; i<w.size(); ++i)
     std::cout << "_weights[" << std::setw(2) << i-1 << "]   = " << fix_string(w[i]) << ";\n";
 
+
+  // Do numerical verification
   std::cout << "\nVerifying rule:" << std::endl;
 
   mpfr_class sumweights = 0.;
