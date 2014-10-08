@@ -23,7 +23,7 @@
 #include "common_definitions.h"
 #include "jacobi.h"
 
-int main()
+int main(int argc, char** argv)
 {
   std::cout.precision(32);
   std::cout.setf(std::ios_base::scientific);
@@ -40,18 +40,30 @@ int main()
 
   Jacobi jacobi_rule(alpha, beta);
 
-  for (unsigned int j=6; j<=6; ++j)
+  // Read number of points in rule from command line
+  unsigned int n=6;
+  if (argc > 1)
+    n = atoi(argv[1]);
+
+  // Make sure n is valid
+  if (n==0)
     {
-      std::cout << "================================================================================" << std::endl;
+      std::cout << "Warning, could not determine valid rule order from command line." << std::endl;
+      std::cout << "Running with default 6-point rule." << std::endl;
+      n = 6;
+    }
+
       std::cout << "Jacobi rule with alpha=" << alpha << ", beta=" << beta << ", "
-                << j << " points, order=" << 2*j-1 << std::endl;
-      jacobi_rule.rule(j); // order = 2*j-1
+                << n << " points, order=" << 2*n-1 << std::endl;
+
+      // Valid for polynomials (not including the weighting function) of order = 2*n-1
+      jacobi_rule.rule(n);
 
       // Scale Jacobi weights so they sum to 1/3 (alpha==2) or 1/2 (alpha==1)
-      if (alpha==2.0)
+      if (alpha == 2.0)
         jacobi_rule.scale_weights(mpfr_class(1.0)/mpfr_class(3.0));
 
-      else if (alpha==1.0)
+      else if (alpha == 1.0)
         jacobi_rule.scale_weights(0.5);
 
       else
@@ -82,7 +94,7 @@ int main()
         sumweights += w[i];
       std::cout << "Sum of weights is: " << sumweights << std::endl;
 
-      unsigned max_order = 2*j - 1;
+      unsigned max_order = 2*n - 1;
       for (unsigned order=0; order <= max_order; ++order)
         {
           mpfr_class sum = 0.;
@@ -128,12 +140,6 @@ int main()
         }
 
       std::cout << "\n";
-    }
-
-  // jacobi_rule.rule(12); // order 23
-  // jacobi_rule.rule(21); // Happened to need a slightly tighter tolerance...
-  // jacobi_rule.rule(22); // order 43
-
 
   return 0;
 }
