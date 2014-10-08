@@ -67,18 +67,6 @@ int main(int argc, char** argv)
   const std::vector<mpfr_class>& x = jacobi_rule.get_points();
   const std::vector<mpfr_class>& w = jacobi_rule.get_weights();
 
-  // Debugging: Print the pre-scaled weights:
-  {
-    mpfr_class sumweights = 0.;
-    for (unsigned i=1; i<w.size(); ++i)
-      sumweights += w[i];
-    std::cout << "Sum of unscaled weights is: " << sumweights << std::endl;
-
-    // for (unsigned i=1; i<w.size(); ++i)
-    //   std::cout << "unscaled weights[" << std::setw(2) << i-1 << "]   = " << fix_string(w[i]) << ";\n";
-  }
-
-
   // Scale Jacobi weights so they sum to 1/3 (alpha==2) or 1/2 (alpha==1)
   if (alpha == 2)
     jacobi_rule.scale_weights(mpfr_class(1.0)/mpfr_class(3.0));
