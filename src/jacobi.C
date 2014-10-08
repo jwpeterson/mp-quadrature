@@ -6,10 +6,9 @@
 #include "jacobi.h"
 
 
-Jacobi::Jacobi(Real alpha, Real beta)
+Jacobi::Jacobi(unsigned alpha, unsigned beta)
   : mp_alpha(alpha),
     mp_beta(beta),
-    //n(0),
     p(0.0),
     dp(0.0),
     pnm1(0.0)
@@ -91,7 +90,7 @@ void Jacobi::scale_points(const mpfr_class& x1, const mpfr_class& x2)
 
 
 // Reset any computed data which depends on alpha and beta.
-void Jacobi::set_alpha(Real alpha)
+void Jacobi::set_alpha(unsigned alpha)
 {
   mp_alpha = alpha;
   this->reset();
@@ -100,7 +99,7 @@ void Jacobi::set_alpha(Real alpha)
 
 
 // Reset any computed data which depends on alpha and beta.
-void Jacobi::set_beta(Real beta)
+void Jacobi::set_beta(unsigned beta)
 {
   mp_beta = beta;
   this->reset();

@@ -20,16 +20,16 @@ class Jacobi
 public:
   // Constructor.  Initializes the alpha, beta
   // parameters.
-  Jacobi(Real alpha, Real beta);
+  Jacobi(unsigned alpha, unsigned beta);
 
   // Destructor.
   ~Jacobi() {}
 
   // Set or re-set the alpha parameter.
-  void set_alpha(Real alpha);
+  void set_alpha(unsigned alpha);
 
   // Set or re-set the beta parameter.
-  void set_beta(Real beta);
+  void set_beta(unsigned beta);
 
   // Compute and print the Jacobi quadrature rule with n points.  If
   // previous rules have been computed, this routine may try to re-use
@@ -51,9 +51,6 @@ public:
 private:
   // Multi-precision versions of the parameters
   mpfr_class mp_alpha, mp_beta;
-
-  // Order of Jacobi polynomial we're computing.
-  //unsigned int n;
 
   // Multi-precision object to hold P_n(x)
   mpfr_class p;
