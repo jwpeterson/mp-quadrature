@@ -40,7 +40,7 @@ int main()
 
   Jacobi jacobi_rule(alpha, beta);
 
-  for (unsigned int j=2; j<23; ++j)
+  for (unsigned int j=6; j<=6; ++j)
     {
       std::cout << "================================================================================" << std::endl;
       std::cout << "Jacobi rule with alpha=" << alpha << ", beta=" << beta << ", "
@@ -81,6 +81,51 @@ int main()
       for (unsigned i=1; i<w.size(); ++i)
         sumweights += w[i];
       std::cout << "Sum of weights is: " << sumweights << std::endl;
+
+      unsigned max_order = 2*j - 1;
+      for (unsigned order=0; order <= max_order; ++order)
+        {
+          mpfr_class sum = 0.;
+          for (unsigned n_qp=1; n_qp<x.size(); ++n_qp)
+            sum += w[n_qp] * pow(x[n_qp], order);
+
+          // Exact solutions for alpha=1:
+          //
+          // We use the scaled interval [0,1] here, so the exact
+          // solution for alpha=1 to int((1-x)*x^p, x=0..1) is given
+          // by:
+          // 1 / (p^2 + 3p + 2)
+          //
+          // If one instead uses the interval [-1,1]:
+          // int((1-x)*x^p, x=-1..1), the exact solution is given by:
+          //        p           p
+          //  2 (-1)  p + 3 (-1)  + 1
+          //  -----------------------
+          //      (p + 2) (p + 1)
+          //
+          // = { ( 2*p + 4) / (p + 2) / (p + 1), p even
+          //   { (-2*p - 2) / (p + 2) / (p + 1), p odd
+          mpfr_class exact = mpfr_class(1.0)/mpfr_class(order*order + 3*order + 2);
+
+          // std::cout << "quadrature = " << sum << std::endl;
+          // std::cout << "exact      = " << exact << std::endl;
+
+          // Compute the absolute error:
+          mpfr_class abs_err = abs(sum - exact);
+
+          // Print message
+          std::cout << "Computing int((1-x)^" << static_cast<unsigned>(alpha) << " * x^" << order << ", x=0..1)"
+                    << ", abs_err = " << abs_err << std::endl;
+
+          // Abort if error is too large.  Most of the results are
+          // accurate to a tighter tolerance than 1.e-30, but 1.e-30 at
+          // least guarantees that all the tests pass.
+          if (abs_err > mpfr_class(1.e-30))
+            {
+              std::cerr << "Quadrature error too large, possible problem with points and weights!" << std::endl;
+              std::abort();
+            }
+        }
 
       std::cout << "\n";
     }

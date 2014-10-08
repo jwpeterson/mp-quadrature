@@ -31,9 +31,9 @@ public:
   // Set or re-set the beta parameter.
   void set_beta(Real beta);
 
-  // Compute and print the Jacobi quadrature rule of
-  // degree n.  If previous rules have been computed,
-  // this routine may try to re-use some data.
+  // Compute and print the Jacobi quadrature rule with n points.  If
+  // previous rules have been computed, this routine may try to re-use
+  // some data.
   void rule(unsigned int n);
 
   // Scale the weights by multiplying them all by 'scale_factor'.
