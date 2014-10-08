@@ -75,6 +75,13 @@ int main()
       for (unsigned i=1; i<w.size(); ++i)
         std::cout << "_weights[" << std::setw(2) << i-1 << "]   = " << fix_string(w[i]) << ";\n";
 
+      std::cout << "\nVerifying rule:" << std::endl;
+
+      mpfr_class sumweights = 0.;
+      for (unsigned i=1; i<w.size(); ++i)
+        sumweights += w[i];
+      std::cout << "Sum of weights is: " << sumweights << std::endl;
+
       std::cout << "\n";
     }
 
