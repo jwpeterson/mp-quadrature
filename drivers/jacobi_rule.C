@@ -33,10 +33,14 @@ int main(int argc, char** argv)
   mpfr_set_default_prec(256);
 
   // Case 1: weights sum to 1/2
-  // const Real alpha=1.0, beta=0.0;
+  // unsigned
+  // alpha = 1,
+  // beta = 0;
 
   // Case 2: weights sum to 1/3
-  const Real alpha=2.0, beta=0.0;
+  unsigned
+    alpha = 2,
+    beta = 0;
 
   Jacobi jacobi_rule(alpha, beta);
 
@@ -60,10 +64,10 @@ int main(int argc, char** argv)
   jacobi_rule.rule(n);
 
   // Scale Jacobi weights so they sum to 1/3 (alpha==2) or 1/2 (alpha==1)
-  if (alpha == 2.0)
+  if (alpha == 2)
     jacobi_rule.scale_weights(mpfr_class(1.0)/mpfr_class(3.0));
 
-  else if (alpha == 1.0)
+  else if (alpha == 1)
     jacobi_rule.scale_weights(0.5);
 
   else
@@ -108,7 +112,7 @@ int main(int argc, char** argv)
       // Exact solution for alpha=2:
       //
       // int((1-x)^2*x^p, x=0..1) = 2 / (p^3 + 6*p^2 + 11*p + 6)
-      mpfr_class exact = (alpha==1.0) ?
+      mpfr_class exact = (alpha==1) ?
         mpfr_class(1.0)/mpfr_class(order*order + 3*order + 2) :
         mpfr_class(2.0)/mpfr_class(order*order*order + 6*order*order + 11*order + 6) ;
 
@@ -119,7 +123,7 @@ int main(int argc, char** argv)
       mpfr_class abs_err = abs(sum - exact);
 
       // Print message
-      std::cout << "Computing int((1-x)^" << static_cast<unsigned>(alpha) << " * x^" << order << ", x=0..1)"
+      std::cout << "Computing int((1-x)^" << alpha << " * x^" << order << ", x=0..1)"
                 << ", abs_err = " << abs_err << std::endl;
 
       // Abort if error is too large.  Most of the results are
