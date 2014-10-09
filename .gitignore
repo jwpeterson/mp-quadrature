@@ -20,3 +20,6 @@ libtool
 *.dylib
 *.la
 gmpfrxx/example
+*.so
+*.so.*
+
