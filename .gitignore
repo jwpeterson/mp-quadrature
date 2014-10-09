@@ -16,3 +16,7 @@ mpfr
 *.lo
 autom4te.cache
 libtool
+.libs
+*.dylib
+*.la
+gmpfrxx/example
