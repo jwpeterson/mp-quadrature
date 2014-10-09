@@ -38,4 +38,5 @@ echo:
 .PHONY : clean
 
 clean:
-	rm -rf .libs *.lo example *.a *.so *~
+	@echo "Cleaning in gmpfrxx..."
+	@rm -rf .libs *.lo example *.a *.so *~

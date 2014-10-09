@@ -95,8 +95,9 @@ echo:
 #@echo $(GMP_INCLUDE)
 
 clean:
-	make -C gmpfrxx clean
-	rm -rf *~ src/*~ $(objects) ./lib/* ./lib/.libs src/.libs drivers/.libs $(drivers) drivers/*.o $(src_depend) $(drivers_depend) $(libtool_objects) $(driver_libtool_objects)
+	@make -C gmpfrxx clean
+	@echo "Cleaning in mp-quadrature..."
+	@rm -rf *~ src/*~ $(objects) ./lib/* ./lib/.libs src/.libs drivers/.libs $(drivers) drivers/*.o $(src_depend) $(drivers_depend) $(libtool_objects) $(driver_libtool_objects)
 
 # Include dependency rules we generated for all the sources
 -include $(src_depend) $(drivers_depend)
