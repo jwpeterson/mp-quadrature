@@ -64,9 +64,10 @@ void example3() {
     mpfr_class::set_rnd(GMP_RNDZ);
     g = rint(f);
     cout << "GMP_RNDZ    : " << g << endl;
-    mpfr_class::set_rnd(GMP_RND_MAX);
-    g = rint(f);
-    cout << "GMP_RND_MAX : " << g << endl;
+    // GMP_RND_MAX is no longer part of MPFR as of version 2.4.2
+    // mpfr_class::set_rnd(GMP_RND_MAX);
+    // g = rint(f);
+    // cout << "GMP_RND_MAX : " << g << endl;
     mpfr_class::set_rnd();
     g = rint(f);
     cout << "GMP_RNDN    : " << g << endl;

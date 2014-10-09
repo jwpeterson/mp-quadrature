@@ -3,53 +3,40 @@ include ../Make.common
 # Compile with debugging information and warnings turned on.
 CFLAGS += -g -Wall
 
-# All the headers for gmpfrxx
-headers = $(wildcard *.h)
+# An absolute PATH to the current directory.  This is needed for the -rpath stuff that libtool does.
+GMPFRXX_DIR ?= $(shell pwd)
 
-LIBNAME = libgmpfrxx.a
-# Mac OS dynamic linking
-#sharedlibrary: gmpfrxx.o mpfr_mul_d.o
-#	$(CXX) -dynamiclib -Wl,-undefined,dynamic_lookup -o libgmpfrxx.so $^
+# The basename of the library object to build.
+LIBNAME = libgmpfrxx
 
-# Linux
-ifeq ($(findstring linux,$(hostos)),linux)
-$(LIBNAME): gmpfrxx.o mpfr_mul_d.o
-	ar rv $(LIBNAME) $^
-endif
+# The first target.  This is what get runs when you just type 'make'.
+# It depends on the .lo object files
+$(GMPFRXX_DIR)/$(LIBNAME).la: gmpfrxx.lo mpfr_mul_d.lo
+	@echo "Linking library "$@"..."
+	@../libtool --quiet --tag=CXX --mode=link $(CXX) -o $(GMPFRXX_DIR)/$(LIBNAME).la $< -rpath $(GMPFRXX_DIR)
+	@../libtool --quiet --mode=install install -c $(LIBNAME).la $(GMPFRXX_DIR)
 
-# Mac OS static linking.  Make sure to use the libtool in /usr/bin so
-# as not to be confused with any GNU libtool that might be in your PATH.
-ifeq ($(findstring darwin,$(hostos)),darwin)
-$(LIBNAME): gmpfrxx.o mpfr_mul_d.o
-	/usr/bin/libtool -static -o $(LIBNAME) $^
-endif
+example : example.lo $(GMPFRXX_DIR)/$(LIBNAME).la
+	@echo "Linking gmpfrxx example program..."
+	@../libtool --quiet --tag=CXX --mode=link $(CXX) -o $@ $^ $(GMP_LIBS) $(MPFR_LIBS)
+
+%.lo : %.cpp
+	@echo "Compiling $<..."
+	@../libtool --quiet --tag=CXX --mode=compile $(CXX) -MMD -MP -MT $@ -c $(CFLAGS) $(GMP_INCLUDE) $(MPFR_INCLUDE) $< -o $@
+
+# There is a C file in this library as well
+%.lo : %.c
+	@echo "Compiling $<..."
+	@../libtool --quiet --tag=CC --mode=compile $(CC) -MMD -MP -MT $@ -c $(CFLAGS) $(GMP_INCLUDE) $(MPFR_INCLUDE) $< -o $@
 
 echo:
 	@echo "GMP_INCLUDE=$(GMP_INCLUDE)"
 
-example : example.o gmpfrxx.o mpfr_mul_d.o
-	$(CXX) -o $@ $(CFLAGS) $^ $(GMP_LIBS) $(MPFR_LIBS)
-
-%.o : %.f
-	$(FC) -c $(FFLAGS) $<
-
-%.o : %.cc $(headers)
-	$(CXX) -c $(CFLAGS) $(GMP_INCLUDE) $(MPFR_INCLUDE) $<
-
-%.o : %.cpp $(headers)
-	$(CXX) -c $(CFLAGS) $(GMP_INCLUDE) $(MPFR_INCLUDE) $<
-
-%.o : %.c $(headers)
-	$(CC) -c $(CFLAGS) $(GMP_INCLUDE) $(MPFR_INCLUDE) $<
-
-files = README example.cpp gmpfrxx.h gmpfrxx.cpp mpfr_mul_d.h \
-	mpfr_mul_d.c Makefile
-
-.PHONY : always
-gmpfrxx.zip : always
-	cp -a $(files) gmpfrxx
-	zip -r gmpfrxx gmpfrxx
-
 .PHONY : clean
+
 clean:
-	rm -f *.o example *.a *.so *~
+	@echo "Cleaning in gmpfrxx..."
+	@rm -rf .libs *.lo example *.a *.so *~ *.d *.dylib *.la *.o
+
+# Include dependency files for all the C++ and C source files
+-include example.d gmpfrxx.d mpfr_mul_d.d
