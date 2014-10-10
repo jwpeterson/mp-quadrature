@@ -101,5 +101,74 @@ int main(int argc, char** argv)
 
   std::cout << "Sum of weights = " << fix_string(sumweights) << std::endl;
 
+  // Maple commands:
+  // assume(a, integer, a, nonnegative);
+  // assume(b, integer, b, nonnegative);
+  // simplify(int(int(x^a * y^b, y=0..1-x), x=0..1));
+  // Result is:
+  // 1/(b+1)*Beta(a+1,b+2)
+  // where Beta(p,q) := (p-1)! (q-1)! / (p+q-1)! is the beta function, as defined for positive integers.
+  // After simplification, the result is:
+  // a! b! / (a + b + 2)!
+
+  // The rule with n^2 points should be able to integrate a polynomial of _total_ degree 2*n-1
+  std::cout << "\nVerifying rule:" << std::endl;
+  unsigned max_order = 2*n-1;
+  for (unsigned x_power=0; x_power<max_order; ++x_power)
+    for (unsigned y_power=0; y_power<max_order; ++y_power)
+      {
+        // Only try to integrate polynomials we can integrate exactly
+        if (x_power + y_power > max_order)
+          continue;
+
+        // conical_w, conical_x, and conical_y use 0-based array access!
+        mpfr_class sum = 0.;
+        for (unsigned n_qp=0; n_qp<conical_x.size(); ++n_qp)
+          sum += conical_w[n_qp] * pow(conical_x[n_qp], x_power) * pow(conical_y[n_qp], y_power);
+
+        // std::cout << "quadrature = " << sum << std::endl;
+
+        // Compute the exact solution as described above, divide
+        // term-by-term to avoid huge numbers/overflows (even though
+        // this is GMP).
+        mpfr_class analytical = 1.0;
+        unsigned
+          numerator_1 = x_power,
+          numerator_2 = y_power,
+          denominator = x_power + y_power + 2;
+        while (true)
+          {
+            // If a factor is nonzero, multiply/divide by it and decrement
+            if (numerator_1)
+              analytical *= numerator_1--;
+
+            if (numerator_2)
+              analytical *= numerator_2--;
+
+            if (denominator)
+              analytical /= denominator--;
+
+            // When all the factors are zero, we're done!
+            if (numerator_1==0 && numerator_2==0 && denominator==0)
+              break;
+          }
+
+        // std::cout << "analytical = " << analytical << std::endl;
+
+        // Compute the absolute error:
+        mpfr_class abs_err = abs(sum-analytical);
+
+        // Print message
+        std::cout << "Computing integral of: x^" << x_power << " y^" << y_power
+                  << ", abs_err = " << abs_err << std::endl;
+
+        // Abort if error is too large.
+        if (abs_err > mpfr_class(1.e-30))
+          {
+            std::cerr << "Quadrature error too large, possible problem with points and weights!" << std::endl;
+            std::abort();
+          }
+      }
+
   return 0;
 }
