@@ -6,6 +6,7 @@
 // (written by Jon Wilkening on Aug 8, 2007)
 
 
+#include <stdlib.h> // calloc
 #include "gmpfrxx.h"
 using namespace std;
 
