@@ -1,3 +1,4 @@
+#include <stdlib.h> // atoi
 #include <iomanip>
 #include "gauss.h"
 #include "jacobi.h"

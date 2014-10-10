@@ -1,8 +1,11 @@
-// example file to illustrate mpfrxx.h
+// example file to illustrate gmpfrxx.h
 
 #include "gmpfrxx.h"
 #include <vector>
 #include <algorithm>
+#include <sstream>
+#include <complex>
+
 using namespace std;
 
 
@@ -29,6 +32,10 @@ void example1() {
     f.set_base(16);  // output in base 16
     cout << f << endl;
     mpfr_class::set_base(10); // change it back to base 10
+
+    ostringstream s;
+    s << f;
+    cout << s.str() << endl;
 }
 
 
@@ -131,6 +138,18 @@ void example5() {
     cout << S << endl;
 }
 
+void example6() {
+    mpfr_class x(1.0,53);
+    mpfr_class y(1.0,106);
+
+    y = const_pi();
+    complex<mpfr_class> z(x,y);
+
+    cout << "\nexample 6\n";
+    cout.precision(0);
+    cout << z << endl;
+    // cout << exp(z) << endl;
+}
 
 int main() {
     example1();
@@ -138,6 +157,7 @@ int main() {
     example3();
     example4();
     example5();
+    example6();
 
     return 0;
 }

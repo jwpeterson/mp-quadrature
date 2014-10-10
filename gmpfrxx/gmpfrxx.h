@@ -4,7 +4,7 @@ this is a re-write of gmpxx.h to replace mpf with mpfr
 and add all the features of mpfr that aren't in mpf
 (modified by Jon Wilkening)
 
-CVS version:  1.14
+CVS version:  1.18
 
 The original gmpxx.h file is part of the GNU MP Library.
 
@@ -50,7 +50,6 @@ MA 02110-1301, USA. */
 
 #include <iosfwd>
 #include <iostream>
-#include <cstdlib>
 #include <cstring>  /* for strlen */
 #include <string>
 #include <stdexcept>
@@ -956,6 +955,13 @@ struct __gmp_binary_greater
   { return mpfr_cmp_d(f, d) < 0; }
 };
 
+// not in gmpxx.h
+struct __gmp_cmpabs_function
+{
+  static int eval(mpfr_srcptr f, mpfr_srcptr g)
+  { return mpfr_cmpabs(f, g); }
+};
+
 struct __gmp_binary_greater_equal
 {
   static bool eval(mpz_srcptr z, mpz_srcptr w) { return mpz_cmp(z, w) >= 0; }
@@ -1044,6 +1050,12 @@ struct __gmp_abs_function
   { mpfr_abs(f, g, MpFrC::get_rnd()); }
 };
 
+struct __gmp_dim_function // not in gmpxx
+{
+  static void eval(mpfr_ptr f, mpfr_srcptr g, mpfr_srcptr h)
+  { mpfr_dim(f, g, h, MpFrC::get_rnd()); }
+};
+
 struct __gmp_rint_function // not in gmpxx
 {
   static void eval(mpfr_ptr f, mpfr_srcptr g)
@@ -1065,11 +1077,45 @@ struct __gmp_ceil_function
   static void eval(mpfr_ptr f, mpfr_srcptr g) { mpfr_ceil(f, g); }
 };
 
+struct __gmp_sqr_function // not in gmpxx
+{
+  static void eval(mpfr_ptr f, mpfr_srcptr g)
+  { mpfr_sqr(f, g, MpFrC::get_rnd()); }
+};
+
 struct __gmp_sqrt_function
 {
   static void eval(mpz_ptr z, mpz_srcptr w) { mpz_sqrt(z, w); }
   static void eval(mpfr_ptr f, mpfr_srcptr g)
   { mpfr_sqrt(f, g, MpFrC::get_rnd()); }
+};
+
+struct __gmp_cbrt_function // not in gmpxx
+{
+  static void eval(mpfr_ptr f, mpfr_srcptr g)
+  { mpfr_cbrt(f, g, MpFrC::get_rnd()); }
+};
+
+struct __gmp_root_function // not in gmpxx
+{
+  static void eval(mpfr_ptr f, mpfr_srcptr g, unsigned long int l)
+  { mpfr_root(f, g, l, MpFrC::get_rnd()); }
+};
+
+struct __gmp_pow_function // not in gmpxx
+{
+  static void eval(mpfr_ptr f, mpfr_srcptr g, mpfr_srcptr h)
+  { mpfr_pow(f, g, h, MpFrC::get_rnd()); }
+  static void eval(mpfr_ptr f, mpfr_srcptr g, unsigned long int l)
+  { mpfr_pow_ui(f, g, l, MpFrC::get_rnd()); }
+  static void eval(mpfr_ptr f, mpfr_srcptr g, long int l)
+  { mpfr_pow_si(f, g, l, MpFrC::get_rnd()); }
+  static void eval(mpfr_ptr f, mpfr_srcptr g, mpz_srcptr z)
+  { mpfr_pow_z(f, g, z, MpFrC::get_rnd()); }
+  static void eval(mpfr_ptr f, unsigned long int l, mpfr_srcptr h)
+  { mpfr_ui_pow(f, l, h, MpFrC::get_rnd()); }
+  static void eval(mpfr_ptr f, unsigned long int l, unsigned long int h)
+  { mpfr_ui_pow_ui(f, l, h, MpFrC::get_rnd()); }
 };
 
 struct __gmp_log_function // not in gmpxx
@@ -1258,10 +1304,19 @@ struct __gmp_lngamma_function // not in gmpxx
   { mpfr_lngamma(f, g, MpFrC::get_rnd()); }
 };
 
+struct __gmp_lgamma_function // not in gmpxx
+{
+  static void eval(mpfr_ptr f, mpfr_srcptr g)
+  { int sgnp; // discarded
+    mpfr_lgamma(f, &sgnp, g, MpFrC::get_rnd()); }
+};
+
 struct __gmp_zeta_function // not in gmpxx
 {
   static void eval(mpfr_ptr f, mpfr_srcptr g)
   { mpfr_zeta(f, g, MpFrC::get_rnd()); }
+  static void eval(mpfr_ptr f, unsigned long int l)
+  { mpfr_zeta_ui(f, l, MpFrC::get_rnd()); }
 };
 
 struct __gmp_erf_function // not in gmpxx
@@ -1274,6 +1329,46 @@ struct __gmp_erfc_function // not in gmpxx
 {
   static void eval(mpfr_ptr f, mpfr_srcptr g)
   { mpfr_erfc(f, g, MpFrC::get_rnd()); }
+};
+
+struct __gmp_j0_function // not in gmpxx
+{
+  static void eval(mpfr_ptr f, mpfr_srcptr g)
+  { mpfr_j0(f, g, MpFrC::get_rnd()); }
+};
+
+struct __gmp_j1_function // not in gmpxx
+{
+  static void eval(mpfr_ptr f, mpfr_srcptr g)
+  { mpfr_j1(f, g, MpFrC::get_rnd()); }
+};
+
+struct __gmp_jn_function // not in gmpxx
+{
+//  static void eval(mpfr_ptr f, mpfr_srcptr g, long h)
+//  { mpfr_jn(f, h, g, MpFrC::get_rnd()); }
+  static void eval(mpfr_ptr f, long h, mpfr_srcptr g)
+  { mpfr_jn(f, h, g, MpFrC::get_rnd()); }
+};
+
+struct __gmp_y0_function // not in gmpxx
+{
+  static void eval(mpfr_ptr f, mpfr_srcptr g)
+  { mpfr_y0(f, g, MpFrC::get_rnd()); }
+};
+
+struct __gmp_y1_function // not in gmpxx
+{
+  static void eval(mpfr_ptr f, mpfr_srcptr g)
+  { mpfr_y1(f, g, MpFrC::get_rnd()); }
+};
+
+struct __gmp_yn_function // not in gmpxx
+{
+//  static void eval(mpfr_ptr f, mpfr_srcptr g, long h)
+//  { mpfr_yn(f, h, g, MpFrC::get_rnd()); }
+  static void eval(mpfr_ptr f, long h, mpfr_srcptr g)
+  { mpfr_yn(f, h, g, MpFrC::get_rnd()); }
 };
 
 struct __gmp_agm_function // not in gmpxx
@@ -1304,6 +1399,18 @@ struct __gmp_const_catalan_function // not in gmpxx
 {
   static void eval(mpfr_ptr f)
   { mpfr_const_catalan(f, MpFrC::get_rnd()); }
+};
+
+struct __gmp_max_function // not in gmpxx
+{
+  static void eval(mpfr_ptr f, mpfr_srcptr g, mpfr_srcptr h)
+  { mpfr_max(f, g, h, MpFrC::get_rnd()); }
+};
+
+struct __gmp_min_function // not in gmpxx
+{
+  static void eval(mpfr_ptr f, mpfr_srcptr g, mpfr_srcptr h)
+  { mpfr_min(f, g, h, MpFrC::get_rnd()); }
 };
 
 struct __gmp_hypot_function
@@ -1343,6 +1450,18 @@ struct __gmp_hypot_function
     mpfr_set_d(f, d, MpFrC::get_rnd());
     mpfr_hypot(f, g, f, MpFrC::get_rnd());
   }
+};
+
+struct __gmp_frac_function // not in gmpxx
+{
+  static void eval(mpfr_ptr f, mpfr_srcptr g)
+  { mpfr_frac(f, g, MpFrC::get_rnd()); }
+};
+
+struct __gmp_remainder_function // not in gmpxx
+{
+  static void eval(mpfr_ptr f, mpfr_srcptr g, mpfr_srcptr h)
+  { mpfr_remainder(f, g, h, MpFrC::get_rnd()); }
 };
 
 struct __gmp_sgn_function
@@ -2073,7 +2192,8 @@ public:
   { mpfr_prec_round(mp, prec, MpFrC::get_rnd()); }
 
   // constructors and destructor
-  __gmp_expr() { mpfr_init(mp); }
+  // note that I have the default constructor be zero rather than NaN
+  __gmp_expr() { mpfr_init(mp); mpfr_set_d(mp, 0.0, MpFrC::get_rnd()); }
 
   __gmp_expr(const __gmp_expr &f)
   { mpfr_init2(mp, f.get_prec()); mpfr_set(mp, f.mp, MpFrC::get_rnd()); }
@@ -2461,6 +2581,7 @@ public:
   void eval(typename __gmp_resolve_expr<T>::ptr_type p,
 	    unsigned long int = 0) const
   { Op::eval(p); }
+  unsigned long int get_prec() const { return mpfr_get_default_prec(); }
 };
 
 
@@ -2504,6 +2625,7 @@ public:
 	    unsigned long int = 0) const
   { Op::eval(p, expr.val); }
   const val_type & get_val() const { return expr.val; }
+  unsigned long int get_prec() const { return mpfr_get_default_prec(); }
 };
 
 
@@ -2604,6 +2726,27 @@ public:
   const val1_type & get_val1() const { return expr.val1; }
   const val2_type & get_val2() const { return expr.val2; }
   unsigned long int get_prec() const { return expr.val2.get_prec(); }
+};
+
+// not in gmpxx (both arguments are built-in type)
+template <class T, class U, class V, class Op>
+class __gmp_expr<T, __gmp_binary_expr<U, V, Op> >
+{
+private:
+  typedef U val1_type;
+  typedef V val2_type;
+
+  __gmp_binary_expr<val1_type, val2_type, Op> expr;
+
+public:
+  __gmp_expr(const val1_type &val1, const val2_type &val2)
+    : expr(val1, val2) { }
+  void eval(typename __gmp_resolve_expr<T>::ptr_type p,
+	    unsigned long int = 0) const
+  { Op::eval(p, expr.val1, expr.val2); }
+  const val1_type & get_val1() const { return expr.val1; }
+  const val2_type & get_val2() const { return expr.val2; }
+  unsigned long int get_prec() const { return mpfr_get_default_prec(); }
 };
 
 
@@ -3562,6 +3705,9 @@ fun(unsigned long int l)                                               \
 
 
 // non-member binary operators and functions
+// the second (more specialized) template was not in gmpxx
+// but seems to be necessary to avoid ambiguity with e.g. the
+// max template in <algorithm>
 
 #define __GMPP_DEFINE_BINARY_FUNCTION(fun, eval_fun)                   \
                                                                        \
@@ -3572,6 +3718,16 @@ fun(const __gmp_expr<T, U> &expr1, const __gmp_expr<V, W> &expr2)      \
 {                                                                      \
   return __gmp_expr<typename __gmp_resolve_expr<T, V>::value_type,     \
      __gmp_binary_expr<__gmp_expr<T, U>, __gmp_expr<V, W>, eval_fun> > \
+    (expr1, expr2);                                                    \
+}                                                                      \
+                                                                       \
+template <class T, class U>                                            \
+inline __gmp_expr<typename __gmp_resolve_expr<T, T>::value_type,       \
+__gmp_binary_expr<__gmp_expr<T, U>, __gmp_expr<T, U>, eval_fun> >      \
+fun(const __gmp_expr<T, U> &expr1, const __gmp_expr<T, U> &expr2)      \
+{                                                                      \
+  return __gmp_expr<typename __gmp_resolve_expr<T, T>::value_type,     \
+     __gmp_binary_expr<__gmp_expr<T, U>, __gmp_expr<T, U>, eval_fun> > \
     (expr1, expr2);                                                    \
 }
 
@@ -3624,7 +3780,8 @@ __GMPNLD_DEFINE_BINARY_FUNCTION(fun, eval_fun, long double)
 __GMPP_DEFINE_BINARY_FUNCTION(fun, eval_fun)        \
 __GMPN_DEFINE_BINARY_FUNCTION(fun, eval_fun)
 
-
+// the UI version is in gmpxx, but doesn't seem to be necessary unless
+// the point is to generate a warning if you pass a negative integer
 #define __GMP_DEFINE_BINARY_FUNCTION_UI(fun, eval_fun)                 \
                                                                        \
 template <class T, class U>                                            \
@@ -3634,6 +3791,17 @@ fun(const __gmp_expr<T, U> &expr, unsigned long int l)                 \
 {                                                                      \
   return __gmp_expr<T, __gmp_binary_expr                               \
     <__gmp_expr<T, U>, unsigned long int, eval_fun> >(expr, l);        \
+}
+
+// not in gmpxx.   I needed it for pow_ui
+#define __GMP_DEFINE_BINARY_FUNCTION_UI_UI(T, fun, eval_fun)	       \
+							               \
+inline __gmp_expr                                                      \
+<T, __gmp_binary_expr<unsigned long int, unsigned long int, eval_fun> > \
+fun(unsigned long int r, unsigned long int l)                          \
+{                                                                      \
+  return __gmp_expr<T, __gmp_binary_expr                               \
+    <unsigned long int, unsigned long int, eval_fun> >(r, l);          \
 }
 
 
@@ -3839,12 +4007,20 @@ __GMP_DEFINE_BINARY_TYPE_FUNCTION(bool, operator>, __gmp_binary_greater)
 __GMP_DEFINE_BINARY_TYPE_FUNCTION(bool, operator>=, \
                                   __gmp_binary_greater_equal)
 
+__GMP_DEFINE_BINARY_TYPE_FUNCTION(int, cmpabs, __gmp_cmpabs_function) // not in gmpxx.h
+
 __GMP_DEFINE_UNARY_FUNCTION(abs, __gmp_abs_function)
+__GMP_DEFINE_BINARY_FUNCTION(dim, __gmp_dim_function) // not in gmpxx.h
 __GMP_DEFINE_UNARY_FUNCTION(rint, __gmp_rint_function) // not in gmpxx.h
 __GMP_DEFINE_UNARY_FUNCTION(trunc, __gmp_trunc_function)
 __GMP_DEFINE_UNARY_FUNCTION(floor, __gmp_floor_function)
 __GMP_DEFINE_UNARY_FUNCTION(ceil, __gmp_ceil_function)
+__GMP_DEFINE_UNARY_FUNCTION(sqr, __gmp_sqr_function) // not in gmpxx.h
 __GMP_DEFINE_UNARY_FUNCTION(sqrt, __gmp_sqrt_function)
+__GMP_DEFINE_UNARY_FUNCTION(cbrt, __gmp_cbrt_function) // not in gmpxx.h
+__GMP_DEFINE_BINARY_FUNCTION_UI(root, __gmp_root_function) // not in gmpxx.h
+__GMP_DEFINE_BINARY_FUNCTION(pow, __gmp_pow_function) // not in gmpxx.h
+__GMP_DEFINE_BINARY_FUNCTION_UI_UI(mpfr_t, pow_ui, __gmp_pow_function) // not in gmpxx.h
 __GMP_DEFINE_UNARY_FUNCTION(log, __gmp_log_function) // not in gmpxx.h
 __GMP_DEFINE_UNARY_FUNCTION(log2, __gmp_log2_function) // not in gmpxx.h
 __GMP_DEFINE_UNARY_FUNCTION(log10, __gmp_log10_function) // not in gmpxx.h
@@ -3876,15 +4052,28 @@ __GMP_DEFINE_UNARY_FUNCTION(expm1, __gmp_expm1_function) // not in gmpxx.h
 __GMP_DEFINE_UNARY_FUNCTION(eint, __gmp_eint_function) // not in gmpxx.h
 __GMP_DEFINE_UNARY_FUNCTION(gamma, __gmp_gamma_function) // not in gmpxx.h
 __GMP_DEFINE_UNARY_FUNCTION(lngamma, __gmp_lngamma_function) // not in gmpxx.h
+__GMP_DEFINE_UNARY_FUNCTION(lgamma, __gmp_lgamma_function) // not in gmpxx.h
 __GMP_DEFINE_UNARY_FUNCTION(zeta, __gmp_zeta_function) // not in gmpxx.h
+__GMP_DEFINE_UNARY_FUNCTION_UI(mpfr_t, zeta_ui, __gmp_zeta_function) // not in gmpxx.h
 __GMP_DEFINE_UNARY_FUNCTION(erf, __gmp_erf_function) // not in gmpxx.h
 __GMP_DEFINE_UNARY_FUNCTION(erfc, __gmp_erfc_function) // not in gmpxx.h
+__GMP_DEFINE_UNARY_FUNCTION(j0, __gmp_j0_function) // not in gmpxx.h
+__GMP_DEFINE_UNARY_FUNCTION(j1, __gmp_j1_function) // not in gmpxx.h
+__GMP_DEFINE_BINARY_FUNCTION(jn, __gmp_jn_function) // not in gmpxx.h
+__GMP_DEFINE_UNARY_FUNCTION(y0, __gmp_y0_function) // not in gmpxx.h
+__GMP_DEFINE_UNARY_FUNCTION(y1, __gmp_y1_function) // not in gmpxx.h
+__GMP_DEFINE_BINARY_FUNCTION(yn, __gmp_yn_function) // not in gmpxx.h
 __GMP_DEFINE_BINARY_FUNCTION(agm, __gmp_agm_function) // not in gmpxx.h
 __GMP_DEFINE_VOID_FUNCTION(mpfr_t, const_log2, __gmp_const_log2_function) // not gmpxx.h
 __GMP_DEFINE_VOID_FUNCTION(mpfr_t, const_pi, __gmp_const_pi_function) // not gmpxx.h
 __GMP_DEFINE_VOID_FUNCTION(mpfr_t, const_euler, __gmp_const_euler_function) // not gmpxx.h
 __GMP_DEFINE_VOID_FUNCTION(mpfr_t, const_catalan, __gmp_const_catalan_function) // not gmpxx.h
+__GMP_DEFINE_BINARY_FUNCTION(max, __gmp_max_function) // not in gmpxx.h
+__GMP_DEFINE_BINARY_FUNCTION(min, __gmp_min_function) // not in gmpxx.h
 __GMP_DEFINE_BINARY_FUNCTION(hypot, __gmp_hypot_function)
+
+__GMP_DEFINE_UNARY_FUNCTION(frac, __gmp_frac_function) // not in gmpxx.h
+__GMP_DEFINE_BINARY_FUNCTION(remainder, __gmp_remainder_function) // not in gmpxx.h
 
 __GMP_DEFINE_UNARY_TYPE_FUNCTION(int, sgn, __gmp_sgn_function)
 __GMP_DEFINE_BINARY_TYPE_FUNCTION(int, cmp, __gmp_cmp_function)

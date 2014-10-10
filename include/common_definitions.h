@@ -13,7 +13,4 @@ typedef double Real;
 // -9.4489927222288222340758013830322e-01L
 std::string fix_string(const mpfr_class& x);
 
-// Helper function to raise an arbitrary precision parameter to an integer power
-mpfr_class pow(const mpfr_class& x, unsigned power);
-
 #endif

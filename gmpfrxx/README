@@ -1,7 +1,24 @@
 [JWP]: Download this code from http://math.berkeley.edu/~wilken/code/gmpfrxx/
-[JWP]: Modify the INC and LIBS variables in the associated Makefile
-[JWP]: 
 -----------------------------------------------------------------------------
+Copyright 1991, 1996, 1999, 2000, 2007 Free Software Foundation, Inc.
+
+gmpfrxx is an extension the GNU MP Library and the MPFR Library.
+
+gmpfrxx is free software; you can redistribute it and/or modify it
+under the terms of the GNU Lesser General Public License as published
+by the Free Software Foundation; either version 3 of the License, or
+(at your option) any later version.
+
+gmpfrxx is distributed in the hope that it will be useful, but WITHOUT
+ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or
+FITNESS FOR A PARTICULAR PURPOSE.  See the GNU Lesser General Public
+License for more details.
+
+You should have received a copy of the GNU Lesser General Public License
+along with gmpfrxx.  If not, see http://www.gnu.org/licenses/.
+
+
+----  about gmpfrxx  ----
 
 This code allows one to freely combine integer, rational and
 floating point objects in arbitrarily complex algebraic expressions.
@@ -37,19 +54,25 @@ We added the following mpfr routines not in gmpxx:
   fac_ui, log1p, expm1, eint, gamma, lngamma, zeta, erf,
   erfc, agm, const_log2, const_pi, const_euler, const_catalan
 
+on 11/16/08 we added
+  sqr, cbrt, root, pow, pow_ui, fac_ui, max, min, dim, cmpabs,
+  lgamma, zeta_ui, j0, j1, jn, y0, y1, yn, frac, remainder
+
 please e-mail Jon Wilkening <wilken at math berkeley edu>
 to report bugs or make suggestions (especially if the gmpxx
 behavior is different than what my code does)
+
+last modified: 11/16/2008
+tested with  mpfr-2.3.1, gmp-4.2.2
+(should work with other versions as well.
+ no changes were needed for mpfr-2.3.2)
 
 ---
 
 to compile the example file:
 
 (1) install or update mpfr and gmp.  see notes below.
-I wrote the code using
-
-  mpfr-2.2.1  <-- my code probaly won't work with an earlier version
-  gmp-4.2.1   <-- my code may work with an earlier version (not sure)
+I have tested the code with  mpfr-2.3.1,  gmp-4.2.2
 
 
 (2) edit the Makefile and add paths to the libraries (if they
@@ -62,6 +85,8 @@ aren't in the usual library search path)
 installing mpfr and gmp:
 
 I found the installation procedure for both codes to be straightforward.
+The notes below were for mpfr-2.2.1, which was current at the time of
+the first release of gmpfrxx.h
 
 ---
 for gmp, I unpacked the source files and installed via

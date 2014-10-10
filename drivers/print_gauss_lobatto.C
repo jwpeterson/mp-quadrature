@@ -1,4 +1,4 @@
-#include <stdlib.h> // atoi
+#include <cstdlib> // atoi, std::abort
 #include <iostream>
 #include <limits>
 #include <cmath>

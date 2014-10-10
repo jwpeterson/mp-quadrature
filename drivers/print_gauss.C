@@ -1,3 +1,4 @@
+#include <cstdlib> // std::abort
 #include <iostream>
 #include <limits>
 #include <cmath>
