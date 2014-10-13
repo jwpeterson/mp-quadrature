@@ -105,5 +105,23 @@ int main(int argc, char** argv)
 
   std::cout << "Sum of weights = " << fix_string(sumweights) << std::endl;
 
+  // Maple has a lot of trouble computing this integral exactly. Try for yourself:
+  // assume(a, integer, a, nonnegative);
+  // assume(b, integer, b, nonnegative);
+  // assume(c, integer, c, nonnegative);
+  // int(int(int(x^a * y^b * z^c, z=0..1-x-y), y=0..1-x), x=0..1);
+  //
+  // The main trick is to perform a change of variables to get the
+  // second integral into the form of the beta function integral...
+  //
+  // 1.) Integrate in z: result is I = int(int((x^a * y^b * (1-x-y)^(c+1))/(c+1), y=0..1-x), x=0..1)
+  // 2.) Introduce change of variables eta = y/(1-x)
+  //     Then I = Beta(b+1, c+2) / (c+1) * int(x^a * (1-x)^(b+c+2), x=0..1)
+  // 3.) I can now be computed using the Beta function integral again to get:
+  //     I = Beta(b+1, c+2) / (c+1) * Beta(a+1, b+c+3)
+  // 4.) Substituting in the Beta function definition,
+  //     Beta(p,q) := (p-1)! (q-1)! / (p+q-1)!,
+  //     and canceling terms, we finally obtain:
+  //     I = a! b! c! / (a + b + c + 3)!
   return 0;
 }
