@@ -123,5 +123,77 @@ int main(int argc, char** argv)
   //     Beta(p,q) := (p-1)! (q-1)! / (p+q-1)!,
   //     and canceling terms, we finally obtain:
   //     I = a! b! c! / (a + b + c + 3)!
+
+  // The rule with n^3 points should be able to integrate a polynomial of _total_ degree 2*n-1
+  std::cout << "\nVerifying rule..." << std::endl;
+  unsigned max_order = 2*n-1;
+  for (unsigned x_power=0; x_power<max_order; ++x_power)
+    for (unsigned y_power=0; y_power<max_order; ++y_power)
+      for (unsigned z_power=0; z_power<max_order; ++z_power)
+        {
+          // Only try to integrate polynomials we can integrate exactly
+          if (x_power + y_power + z_power > max_order)
+            continue;
+
+          // conical_w, conical_x, and conical_y use 0-based array access!
+          mpfr_class sum = 0.;
+          for (unsigned n_qp=0; n_qp<conical_x.size(); ++n_qp)
+            sum += conical_w[n_qp] * pow(conical_x[n_qp], x_power) * pow(conical_y[n_qp], y_power) * pow(conical_z[n_qp], z_power);
+
+          // std::cout << "quadrature = " << sum << std::endl;
+
+          // Compute the exact solution as described above, divide
+          // term-by-term to avoid huge numbers/overflows (even though
+          // this is GMP).
+          mpfr_class analytical = 1.0;
+          {
+            // Sort the a, b, c values
+            unsigned sorted_powers[3] = {x_power, y_power, z_power};
+            std::sort(sorted_powers, sorted_powers+3);
+
+            // Cancel the largest power with the denominator, fill in the
+            // entries for the remaining numerator terms and the denominator.
+            std::vector<unsigned>
+              numerator_1(sorted_powers[0] > 1 ? sorted_powers[0]-1 : 0),
+              numerator_2(sorted_powers[1] > 1 ? sorted_powers[1]-1 : 0),
+              denominator(3 + sorted_powers[0] + sorted_powers[1]);
+
+            // Fill up the vectors with sequences starting at the right values.
+            iota(numerator_1.begin(), numerator_1.end(), 2);
+            iota(numerator_2.begin(), numerator_2.end(), 2);
+            iota(denominator.begin(), denominator.end(), sorted_powers[2]+1);
+
+            // The denominator is guaranteed to have the most terms...
+            for (unsigned i=0; i<denominator.size(); ++i)
+              {
+                if (i < numerator_1.size())
+                  analytical *= numerator_1[i];
+
+                if (i < numerator_2.size())
+                  analytical *= numerator_2[i];
+
+                analytical /= denominator[i];
+              }
+          }
+
+          // std::cout << "analytical = " << analytical << std::endl;
+
+          // Compute the absolute error:
+          mpfr_class abs_err = abs(sum-analytical);
+
+          // Print message.  In 3D, this is just way too much output.
+          //std::cout << "Computing integral of: x^" << x_power << " y^" << y_power << " z^" << z_power
+          //          << ", abs_err = " << abs_err << std::endl;
+
+          // Abort if error is too large.
+          if (abs_err > mpfr_class(1.e-30))
+            {
+              std::cerr << "Quadrature error too large, possible problem with points and weights!" << std::endl;
+              std::abort();
+            }
+        }
+
+  std::cout << "... Verification complete!" << std::endl;
+
   return 0;
 }
