@@ -132,26 +132,29 @@ int main(int argc, char** argv)
         // term-by-term to avoid huge numbers/overflows (even though
         // this is GMP).
         mpfr_class analytical = 1.0;
-        unsigned
-          numerator_1 = x_power,
-          numerator_2 = y_power,
-          denominator = x_power + y_power + 2;
-        while (true)
-          {
-            // If a factor is nonzero, multiply/divide by it and decrement
-            if (numerator_1)
-              analytical *= numerator_1--;
+        {
+          // Cancel the larger of the two numerator terms with the
+          // denominator, and fill in the remaining entries.
+          std::vector<unsigned> numerator, denominator;
 
-            if (numerator_2)
-              analytical *= numerator_2--;
+          unsigned
+            larger_power = std::max(x_power, y_power),
+            smaller_power = std::min(x_power, y_power);
 
-            if (denominator)
-              analytical /= denominator--;
+          for (unsigned i=2; i<=smaller_power; ++i)
+            numerator.push_back(i);
 
-            // When all the factors are zero, we're done!
-            if (numerator_1==0 && numerator_2==0 && denominator==0)
-              break;
-          }
+          for (unsigned i=larger_power+1; i<=x_power+y_power+2; ++i)
+            denominator.push_back(i);
+
+          // The denominator is guaranteed to have more terms...
+          for (unsigned i=0; i<denominator.size(); ++i)
+            {
+              if (i < numerator.size())
+                analytical *= numerator[i];
+              analytical /= denominator[i];
+            }
+        }
 
         // std::cout << "analytical = " << analytical << std::endl;
 
