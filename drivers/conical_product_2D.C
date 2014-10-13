@@ -133,19 +133,19 @@ int main(int argc, char** argv)
         // this is GMP).
         mpfr_class analytical = 1.0;
         {
-          // Cancel the larger of the two numerator terms with the
-          // denominator, and fill in the remaining entries.
-          std::vector<unsigned> numerator, denominator;
-
           unsigned
             larger_power = std::max(x_power, y_power),
             smaller_power = std::min(x_power, y_power);
 
-          for (unsigned i=2; i<=smaller_power; ++i)
-            numerator.push_back(i);
+          // Cancel the larger of the two numerator terms with the
+          // denominator, and fill in the remaining entries.
+          std::vector<unsigned>
+            numerator(smaller_power > 1 ? smaller_power-1 : 0),
+            denominator(2+smaller_power);
 
-          for (unsigned i=larger_power+1; i<=x_power+y_power+2; ++i)
-            denominator.push_back(i);
+          // Fill up the vectors with sequences starting at the right values.
+          iota(numerator.begin(), numerator.end(), 2);
+          iota(denominator.begin(), denominator.end(), larger_power+1);
 
           // The denominator is guaranteed to have more terms...
           for (unsigned i=0; i<denominator.size(); ++i)
