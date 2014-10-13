@@ -1,4 +1,4 @@
-#include <stdlib.h> // atoi
+#include <cstdlib> // std::abort, atoi
 #include <iomanip>
 #include "gauss.h"
 #include "jacobi.h"
