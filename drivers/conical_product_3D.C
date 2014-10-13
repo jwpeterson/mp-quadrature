@@ -1,5 +1,6 @@
-#include <stdlib.h> // atoi
+#include <cstdlib> // std::abort, atoi
 #include <iomanip>
+#include <algorithm> // std::sort
 #include "gauss.h"
 #include "jacobi.h"
 
