@@ -3,6 +3,7 @@ drivers/conical_product_3D
 drivers/jacobi_rule
 drivers/print_gauss
 drivers/print_gauss_lobatto
+drivers/gm_rule
 lib/
 *.a
 *.o

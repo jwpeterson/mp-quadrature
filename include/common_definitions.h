@@ -41,6 +41,16 @@ public:
     _coords[2] = z;
   }
 
+  const mpfr_class & operator()(unsigned i) const
+  {
+    return _coords[i];
+  }
+
+  mpfr_class & operator()(unsigned i)
+  {
+    return _coords[i];
+  }
+
 private:
   mpfr_class _coords[3];
 };
