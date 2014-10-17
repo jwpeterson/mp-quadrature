@@ -25,4 +25,24 @@ void iota (ForwardIter first, ForwardIter last, T value)
     }
 }
 
+/**
+ * A simple class representing an arbitrary-precision point in
+ * three-dimensional space.
+ */
+class Point
+{
+public:
+  Point(const mpfr_class & x = 0.0,
+        const mpfr_class & y = 0.0,
+        const mpfr_class & z = 0.0)
+  {
+    _coords[0] = x;
+    _coords[1] = y;
+    _coords[2] = z;
+  }
+
+private:
+  mpfr_class _coords[3];
+};
+
 #endif
