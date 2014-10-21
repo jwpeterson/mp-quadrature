@@ -23,16 +23,17 @@ public:
   // only odd-order GM rules exist.
   void rule(unsigned s);
 
-  // Constant access to the points and weights vectors
-  const std::vector<Point>& get_points()  { return x; }
-  const std::vector<mpfr_class>& get_weights() { return w; }
+  // The points and weights of the GM rules are rational numbers, so
+  // it is possible to use the mpq_class type here.
+  const std::vector<Point<mpq_class> >& get_points()  { return x; }
+  const std::vector<mpq_class>& get_weights() { return w; }
 
 private:
   // Roots of the Jacobi polynomial of degree n.
-  std::vector<Point> x;
+  std::vector<Point<mpq_class> > x;
 
   // Weights for a Jacobi quadrature rule of degree n.
-  std::vector<mpfr_class> w;
+  std::vector<mpq_class> w;
 
   /**
    * Helper function for computing compositions

@@ -33,11 +33,6 @@ void GrundmannMoller::rule(unsigned s)
   // Index into the vector where we should start adding the next round of points/weights
   std::size_t offset=0;
 
-  // Used to form a string for constructing the multi-precision
-  // numbers since this should work with real and rational number
-  // representations.
-  std::ostringstream number_stream;
-
   // Implement the GM formula 4.1 on page 286 of the paper
   for (unsigned i=0; i<=s; ++i)
     {
@@ -51,26 +46,8 @@ void GrundmannMoller::rule(unsigned s)
           // construct an integration point.
           for (unsigned int j=0; j<3; ++j)
             {
-              // Reset the stream
-              number_stream.str("");
-
-              // Create a string with numerator/denominator
-              number_stream << 2*permutations[p][j] + 1 << "/" << degree + dim - 2*i;
-
-              // Debugging
-              // std::cout << "number_stream.str()=" << number_stream.str() << std::endl;
-
-              // Assign the multi-precision value using a string.
-              // Only an mpq_class can be constructed from this type
-              // of string, the mpfr_class constructor throws an
-              // exception...
-              mpq_class rational(number_stream.str());
-
-              // Debugging
-              // std::cout << "rational = " << rational << std::endl;
-
-              // But it is valid to assign a rational number into a real number.
-              x[offset+p](j) = rational;
+              x[offset+p](j) = 2*permutations[p][j] + 1;
+              x[offset+p](j) /= degree + dim - 2*i;
             }
         }
 
@@ -80,7 +57,7 @@ void GrundmannMoller::rule(unsigned s)
         std::max(dim, std::max(degree, degree+dim-i))+1;
 
       // Compute the weight for this i
-      mpfr_class weight = one_pm;
+      mpq_class weight = one_pm;
 
       for (unsigned int j=1; j<weight_loop_index; ++j)
         {
@@ -96,6 +73,9 @@ void GrundmannMoller::rule(unsigned s)
           if (j <= degree+dim-i) // Accumulate ( (d+n-i)! )^{-1}
             weight /= j;
         }
+
+      // Debugging
+      // std::cout << "weight=" << weight << std::endl;
 
       // This is the weight for each of the points computed previously
       for (unsigned int j=0; j<permutations.size(); ++j)

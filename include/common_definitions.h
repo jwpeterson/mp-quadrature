@@ -27,32 +27,34 @@ void iota (ForwardIter first, ForwardIter last, T value)
 
 /**
  * A simple class representing an arbitrary-precision point in
- * three-dimensional space.
+ * three-dimensional space.  Templated on the underlying type, which
+ * in this application is typically either mpfr_class or mpq_class.
  */
+template <class T>
 class Point
 {
 public:
-  Point(const mpfr_class & x = 0.0,
-        const mpfr_class & y = 0.0,
-        const mpfr_class & z = 0.0)
+  Point(const T & x = 0,
+        const T & y = 0,
+        const T & z = 0)
   {
     _coords[0] = x;
     _coords[1] = y;
     _coords[2] = z;
   }
 
-  const mpfr_class & operator()(unsigned i) const
+  const T & operator()(unsigned i) const
   {
     return _coords[i];
   }
 
-  mpfr_class & operator()(unsigned i)
+  T & operator()(unsigned i)
   {
     return _coords[i];
   }
 
 private:
-  mpfr_class _coords[3];
+  T _coords[3];
 };
 
 #endif
