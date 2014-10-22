@@ -116,6 +116,56 @@ private:
 
 
 /**
+ * A binary less-than comparison object which compares absolute values instead of values.
+ */
+template <class RandomAccessIterator>
+struct indirect_abs_less_than
+{
+  // ctor
+  indirect_abs_less_than(RandomAccessIterator r) :
+    _iterator(r)
+  {}
+
+  // comparison operator - calls the user's comparison function on
+  // v[lhs] and v[rhs]
+  bool operator()(size_t lhs, size_t rhs)
+    {
+      // Note: operator[] is defined for random access iterators!
+      return abs(_iterator[lhs]) < abs(_iterator[rhs]);
+    }
+
+private:
+  RandomAccessIterator _iterator;
+};
+
+
+
+/**
+ * A binary greater-than comparison object which compares absolute values.
+ */
+template <class RandomAccessIterator>
+struct indirect_abs_greater_than
+{
+  // ctor
+  indirect_abs_greater_than(RandomAccessIterator r) :
+    _iterator(r)
+  {}
+
+  // comparison operator - calls the user's comparison function on
+  // v[lhs] and v[rhs]
+  bool operator()(size_t lhs, size_t rhs)
+    {
+      // Note: operator[] is defined for random access iterators!
+      return abs(_iterator[lhs]) > abs(_iterator[rhs]);
+    }
+
+private:
+  RandomAccessIterator _iterator;
+};
+
+
+
+/**
  * Calls std::partition() using an indirect comparison operator so
  * that we can partition multiple vectors at the same time.
  */
@@ -149,11 +199,34 @@ void indirect_sort(RandomAccessIterator beg,
   indices.resize(std::distance(beg, end));
   iota(indices.begin(), indices.end(), 0);
 
-  // Construct comparator object
+  // Construct comparator object.  There are a couple available to
+  // choose from...
   indirect_less_than<RandomAccessIterator> comp(beg);
+  // indirect_abs_less_than<RandomAccessIterator> comp(beg);
+  // indirect_abs_greater_than<RandomAccessIterator> comp(beg);
 
   // Sort the indices, based on the data
   std::sort(indices.begin(), indices.end(), comp);
+}
+
+
+
+// Interleave the entries of a vector (a,b,c,d,e) such that the result is (a,e,b,d,c)
+template <typename T>
+void interleave(std::vector<T> & v)
+{
+  std::vector<T> result(v.size());
+
+  unsigned n = v.size();
+  for (unsigned i=0, c=0; i<n; i+=2, ++c)
+    {
+      result[i] = v[c];
+      if (i+1 < n)
+        result[i+1] = v[n-1-c];
+    }
+
+  // Copy result into the input vector
+  v = result;
 }
 
 #endif // __common_definitions__
