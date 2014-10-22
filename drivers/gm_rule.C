@@ -41,6 +41,15 @@ std::string format_rational(const mpq_class & number)
 void usage();
 
 
+// Function which verifies a given quadrature rule defined by the
+// points x and weights w.  The third argument is a vector defining
+// the order in which to evaluate the rule.
+template <class T>
+void verify(unsigned rule_index,
+            const std::vector<Point<T> >& x,
+            const std::vector<T>& w,
+            const std::vector<size_t>& indices);
+
 
 int main(int argc, char** argv)
 {
@@ -120,12 +129,14 @@ int main(int argc, char** argv)
   const std::vector<Point<mpq_class> >& x = gm.get_points();
   const std::vector<mpq_class>& w = gm.get_weights();
 
-  // Use the custom indirect_partition() or indirect_sort() functions
-  // define an ordering of the points and weights without actually
-  // moving data around in those vectors.
-  std::vector<size_t> indices;
-  //indirect_partition(w.begin(), w.end(), indices); // partitions weights on either side of zero
-  indirect_sort(w.begin(), w.end(), indices); // sorts the weights
+  // Initialize the indices array.  This will be used to access into
+  // the x and w arrays from now on...
+  std::vector<size_t> indices(w.size());
+  iota(indices.begin(), indices.end(), 0);
+
+  // If requested, indirect sort the points and weights vectors
+  if (print_sorted)
+    indirect_sort(w.begin(), w.end(), indices);
 
   std::cout << "Index " << s
             << " rule has degree " << 2*s+1
@@ -158,7 +169,7 @@ int main(int argc, char** argv)
   for (unsigned i=0; i<x.size(); ++i)
     {
       // Choose the sorted or "natural" ordering
-      unsigned mapped_index = print_sorted ? indices[i] : i;
+      unsigned mapped_index = indices[i];
 
       // Print points in C++ code that can be used in libmesh
       std::cout << "_points[" << std::setw(print_width) << i << "](0) = " << std::setw(widest_x) << format_rational(x[mapped_index](0)) << ";  "
@@ -176,88 +187,29 @@ int main(int argc, char** argv)
 
   if (do_verification)
     {
-      // Mostly copied from conical_product_3D.C, the verification code
-      // for tets should probably be factored out into a common
-      // function...
-      std::cout << "\nVerifying rule..." << std::endl;
-      unsigned max_order = 2*s+1;
-      for (unsigned x_power=0; x_power<max_order; ++x_power)
-        for (unsigned y_power=0; y_power<max_order; ++y_power)
-          for (unsigned z_power=0; z_power<max_order; ++z_power)
-            {
-              // Only try to integrate polynomials we can integrate exactly
-              if (x_power + y_power + z_power > max_order)
-                continue;
+      // We can run the verification for the rational values, but the
+      // error is always identically zero (though it's good to verify
+      // this).  The more interesting thing is what happens when we
+      // convert the rational points and weights to real-valued
+      // numbers with a fixed precision and see how the ordering
+      // affects the maximum error.
+      // std::cout << "\nVerifying rule..." << std::endl;
+      // verify(s, x, w, indices);
+      // std::cout << "... Verification complete!" << std::endl;
 
-              // Compute the quadrature result
-              mpq_class sum = 0;
-              for (unsigned n_qp=0; n_qp<x.size(); ++n_qp)
-                {
-                  // Choose the sorted or "natural" ordering
-                  unsigned mapped_index = print_sorted ? indices[n_qp] : n_qp;
+      // Convert the rational point/weight values to finite precision
+      // real-valued numbers with b binary digits.  Compare the error in
+      // the quadrature approximations for the sorted vs. unsorted rules.
+      std::vector<mpfr_class> w_real(w.begin(), w.end());
+      std::vector<Point<mpfr_class> > x_real(x.size());
+      for (unsigned i=0; i<x_real.size(); ++i)
+        for (unsigned j=0; j<3; ++j)
+          x_real[i](j) = x[i](j);
 
-                  sum +=
-                    w[mapped_index] *
-                    pow(x[mapped_index](0), x_power) *
-                    pow(x[mapped_index](1), y_power) *
-                    pow(x[mapped_index](2), z_power);
-                }
-
-              // std::cout << "quadrature = " << sum << std::endl;
-
-              // Compute the exact solution as described above, divide
-              // term-by-term to avoid huge numbers/overflows (even though
-              // this is GMP).
-              mpq_class analytical = 1.0;
-              {
-                // Sort the a, b, c values
-                unsigned sorted_powers[3] = {x_power, y_power, z_power};
-                std::sort(sorted_powers, sorted_powers+3);
-
-                // Cancel the largest power with the denominator, fill in the
-                // entries for the remaining numerator terms and the denominator.
-                std::vector<unsigned>
-                  numerator_1(sorted_powers[0] > 1 ? sorted_powers[0]-1 : 0),
-                  numerator_2(sorted_powers[1] > 1 ? sorted_powers[1]-1 : 0),
-                  denominator(3 + sorted_powers[0] + sorted_powers[1]);
-
-                // Fill up the vectors with sequences starting at the right values.
-                iota(numerator_1.begin(), numerator_1.end(), 2);
-                iota(numerator_2.begin(), numerator_2.end(), 2);
-                iota(denominator.begin(), denominator.end(), sorted_powers[2]+1);
-
-                // The denominator is guaranteed to have the most terms...
-                for (unsigned i=0; i<denominator.size(); ++i)
-                  {
-                    if (i < numerator_1.size())
-                      analytical *= numerator_1[i];
-
-                    if (i < numerator_2.size())
-                      analytical *= numerator_2[i];
-
-                    analytical /= denominator[i];
-                  }
-              }
-
-              // std::cout << "analytical = " << analytical << std::endl;
-
-              // Compute the absolute error:
-              mpq_class abs_err = abs(sum-analytical);
-
-              // Print message.  In 3D, this is just way too much output.
-              //std::cout << "Computing integral of: x^" << x_power << " y^" << y_power << " z^" << z_power
-              //          << ", abs_err = " << abs_err << std::endl;
-
-              // Abort if error is too large.
-              if (abs_err > mpq_class(1.e-30))
-                {
-                  std::cerr << "Quadrature error too large, possible problem with points and weights!" << std::endl;
-                  std::abort();
-                }
-            }
-
+      std::cout << "\nVerifying real-valued rule..." << std::endl;
+      verify(s, x_real, w_real, indices);
       std::cout << "... Verification complete!" << std::endl;
-    } // end if (do_verification)
+    }
 
   return 0;
 }
@@ -276,4 +228,98 @@ void usage()
   std::cout << "--binary-digits, -b # = Default number of binary digits to use for mpfr_class variables.\n";
   std::cout << "--help, -h            = Print this message.\n";
   std::cout << "\n";
+}
+
+
+
+template <class T>
+void verify(unsigned rule_index,
+            const std::vector<Point<T> >& x,
+            const std::vector<T>& w,
+            const std::vector<size_t>& indices)
+{
+  // Keep track of the max error encountered
+  T max_error = 0;
+
+  // Mostly copied from conical_product_3D.C, the verification code
+  // for tets should probably be factored out into a common
+  // function...
+  unsigned max_order = 2*rule_index + 1;
+  for (unsigned x_power=0; x_power<max_order; ++x_power)
+    for (unsigned y_power=0; y_power<max_order; ++y_power)
+      for (unsigned z_power=0; z_power<max_order; ++z_power)
+        {
+          // Only try to integrate polynomials we can integrate exactly
+          if (x_power + y_power + z_power > max_order)
+            continue;
+
+          // Compute the quadrature result
+          T sum = 0;
+          for (unsigned n_qp=0; n_qp<x.size(); ++n_qp)
+            {
+              unsigned mapped_index = indices[n_qp];
+
+              sum +=
+                w[mapped_index] *
+                pow(x[mapped_index](0), x_power) *
+                pow(x[mapped_index](1), y_power) *
+                pow(x[mapped_index](2), z_power);
+            }
+
+          // std::cout << "quadrature = " << sum << std::endl;
+
+          // Compute the exact solution as described above, divide
+          // term-by-term to avoid huge numbers/overflows (even though
+          // this is GMP).
+          T analytical = 1;
+          {
+            // Sort the a, b, c values
+            unsigned sorted_powers[3] = {x_power, y_power, z_power};
+            std::sort(sorted_powers, sorted_powers+3);
+
+            // Cancel the largest power with the denominator, fill in the
+            // entries for the remaining numerator terms and the denominator.
+            std::vector<unsigned>
+              numerator_1(sorted_powers[0] > 1 ? sorted_powers[0]-1 : 0),
+              numerator_2(sorted_powers[1] > 1 ? sorted_powers[1]-1 : 0),
+              denominator(3 + sorted_powers[0] + sorted_powers[1]);
+
+            // Fill up the vectors with sequences starting at the right values.
+            iota(numerator_1.begin(), numerator_1.end(), 2);
+            iota(numerator_2.begin(), numerator_2.end(), 2);
+            iota(denominator.begin(), denominator.end(), sorted_powers[2]+1);
+
+            // The denominator is guaranteed to have the most terms...
+            for (unsigned i=0; i<denominator.size(); ++i)
+              {
+                if (i < numerator_1.size())
+                  analytical *= numerator_1[i];
+
+                if (i < numerator_2.size())
+                  analytical *= numerator_2[i];
+
+                analytical /= denominator[i];
+              }
+          }
+
+          // std::cout << "analytical = " << analytical << std::endl;
+
+          // Compute the absolute error:
+          T abs_err = abs(sum-analytical);
+
+          max_error = max(abs_err, max_error);
+
+          // Print message.  In 3D, this is just way too much output.
+          // std::cout << "Computing integral of: x^" << x_power << " y^" << y_power << " z^" << z_power
+          //           << ", abs_err = " << abs_err << std::endl;
+
+          // Abort if error is too large.
+          // if (abs_err > T(1.e-30))
+          //   {
+          //     std::cerr << "Quadrature error too large, possible problem with points and weights!" << std::endl;
+          //     std::abort();
+          //   }
+        } // end triple-nested for loop
+
+  std::cout << "max_error = " << max_error << std::endl;
 }
