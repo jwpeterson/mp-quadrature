@@ -1,6 +1,9 @@
 #include <iomanip>
 #include <algorithm> // std::sort
 #include <cstdlib> // std::abort
+#include <getopt.h> // getopt_long()
+#include <cmath> // log10
+
 #include "grundmann_moller.h"
 
 // An unoptimized pow function for mpq_class objects
@@ -33,6 +36,10 @@ std::string format_rational(const mpq_class & number)
   return number_string;
 }
 
+// Function explaining command line options that gets called when the
+// program is run with --help.
+void usage();
+
 
 
 int main(int argc, char** argv)
@@ -40,14 +47,71 @@ int main(int argc, char** argv)
   std::cout.precision(32);
   std::cout.setf(std::ios_base::scientific);
 
-  // # of binary digits
-  // 53 binary digits is about what you normally get with a double.
-  mpfr_set_default_prec(256);
+  // If false, print the points and weights in the order they are
+  // computed, if true print them in the weight-sorted order.
+  // Eventually make this selectable on the command line.
+  bool print_sorted = true;
+
+  // If false, will not compute all the verification integrals.  This
+  // can be nice for high-order rules which take an extremely long
+  // time to verify.  Eventually make this selectable on the command
+  // line.
+  bool do_verification = true;
 
   // Read rule index, s, from command line.  Any integer s>=0 is valid.
   unsigned s = 0;
-  if (argc > 1)
-    s = atoi(argv[1]);
+
+  // # of binary digits
+  // 53 binary digits is about what you normally get with a double.
+  unsigned b = 256;
+
+  // options descriptor - this associates several "long" and "short"
+  // command line options.  The last element of the longopts array has
+  // to be filled with zeros.
+  static struct option longopts[] =
+    {
+      {"no-verify",      no_argument,       NULL, 'x'},
+      {"rule-index",     required_argument, NULL, 's'},
+      {"print-unsorted", no_argument,       NULL, 'p'},
+      {"binary-digits",  required_argument, NULL, 'b'},
+      {"help",           no_argument,       NULL, 'h'},
+      { NULL,            0,                 NULL,  0 }
+    };
+
+  // Parse command line options using getopt_long()
+  int ch = -1;
+  while ((ch = getopt_long(argc, argv, "xs:pb:h", longopts, NULL)) != -1)
+    {
+      switch (ch)
+        {
+        case 'x':
+          do_verification = false;
+          break;
+
+        case 's':
+          s = atoi(optarg);
+          break;
+
+        case 'p':
+          print_sorted = false;
+          break;
+
+        case 'b':
+          b = atoi(optarg);
+          break;
+
+        case 'h':
+          usage();
+          return 0;
+
+        default:
+          usage();
+        }
+    } // end while
+
+  // Set the default precision for real-valued numbers
+  // std::cout << "Using " << b << " binary digits for mpfr_class objects." << std::endl;
+  mpfr_set_default_prec(b);
 
   GrundmannMoller gm;
   gm.rule(s);
@@ -74,7 +138,7 @@ int main(int argc, char** argv)
   std::cout << "_weights.resize(" << x.size() << ");\n" << std::endl;
 
   // Determine how many spaces to use to make everything line up in the printout
-  unsigned print_width = (x.size() > 10) ? 2 : 1;
+  unsigned print_width = 1 + static_cast<unsigned>(std::log10(static_cast<double>(x.size())));
 
   // Pre-compute the widest entry of each column.  We don't have to sort to do this...
   size_t
@@ -89,23 +153,6 @@ int main(int argc, char** argv)
       widest_z = std::max(widest_z, format_rational(x[i](2)).size());
       widest_w = std::max(widest_w, format_rational(w[i]).size());
     }
-
-  // std::cout << "widest_x = " << widest_x << " "
-  //           << "widest_y = " << widest_y << " "
-  //           << "widest_z = " << widest_z << " "
-  //           << "widest_w = " << widest_w << " "
-  //           << std::endl;
-
-  // If false, print the points and weights in the order they are
-  // computed, if true print them in the weight-sorted order.
-  // Eventually make this selectable on the command line.
-  const bool print_sorted = true;
-
-  // If false, will not compute all the verification integrals.  This
-  // can be nice for high-order rules which take an extremely long
-  // time to verify.  Eventually make this selectable on the command
-  // line.
-  const bool do_verification = true;
 
   // Print the points and weights
   for (unsigned i=0; i<x.size(); ++i)
@@ -213,4 +260,20 @@ int main(int argc, char** argv)
     } // end if (do_verification)
 
   return 0;
+}
+
+
+
+void usage()
+{
+  std::cout << "\n";
+  std::cout << "This program generates the points and weights for a 3D Grundmann-Moller quadrature rule.\n";
+  std::cout << "\n";
+  std::cout << "Valid command line options are:\n";
+  std::cout << "--rule-index, -s #    = Build GM rule with index s, degree 2*s+1.\n";
+  std::cout << "--no-verify, -x       = Skip verifying that the rule exactly integrates polynomials with degree<=2*s+1.\n";
+  std::cout << "--print-unsorted, -p  = Print the points and weights in unsorted order.\n";
+  std::cout << "--binary-digits, -b # = Default number of binary digits to use for mpfr_class variables.\n";
+  std::cout << "--help, -h            = Print this message.\n";
+  std::cout << "\n";
 }
