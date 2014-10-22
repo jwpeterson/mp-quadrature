@@ -56,6 +56,7 @@ int main(int argc, char** argv)
       {"beta",    required_argument, NULL, 'b'},
       {"npoints", required_argument, NULL, 'n'},
       {"help",    no_argument,       NULL, 'h'},
+      { NULL,     0,                 NULL,  0 }
     };
 
   // Parse command line options using getopt_long()
