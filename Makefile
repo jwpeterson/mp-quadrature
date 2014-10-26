@@ -44,7 +44,7 @@ ALL_LIBS=$(MPQ_LIB) $(GMPFRXX_LIBS) $(MPFR_LIBS) $(GMP_LIBS)
 
 # Flags to turn on extra debugging and print routines.
 #EXTRA_FLAGS=-g -DDEBUG
-EXTRA_FLAGS=-Wall
+EXTRA_FLAGS=-Wall -O2
 
 all:
 	make -C gmpfrxx
