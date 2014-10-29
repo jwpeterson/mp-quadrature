@@ -137,6 +137,11 @@ int main(int argc, char** argv)
   // point/weight permutations for the desired rule.
   bool do_permutations = false;
 
+  // If true, attempt to find the best permutation of points and
+  // weights by using an optimization algorithm.
+  bool do_optimize = false;
+  unsigned n_optimization_trials = 10;
+
   // If false, will not compute all the verification integrals.  This
   // can be nice for high-order rules which take an extremely long
   // time to verify.  Eventually make this selectable on the command
@@ -166,6 +171,7 @@ int main(int argc, char** argv)
       {"n-random-trials", optional_argument, NULL, 'r'},
       {"random-seed",     required_argument, NULL, 'e'},
       {"interleave",      no_argument,       NULL, 'i'},
+      {"optimize",        optional_argument, NULL, 'o'},
       {"permute",         no_argument,       NULL, 'p'},
       {"help",            no_argument,       NULL, 'h'},
       { NULL,             0,                 NULL,  0 }
@@ -173,7 +179,7 @@ int main(int argc, char** argv)
 
   // Parse command line options using getopt_long()
   int ch = -1;
-  while ((ch = getopt_long(argc, argv, "xs:ub:r:e:iph", longopts, NULL)) != -1)
+  while ((ch = getopt_long(argc, argv, "xs:ub:r:e:io:ph", longopts, NULL)) != -1)
     {
       switch (ch)
         {
@@ -203,13 +209,19 @@ int main(int argc, char** argv)
 
         case 'e':
           {
-            do_random_shuffle = true;
             if (optarg != NULL)
               random_seed = atoi(optarg);
             break;
           }
+
         case 'i':
           do_interleave = true;
+          break;
+
+        case 'o':
+          do_optimize = true;
+          if (optarg != NULL)
+            n_optimization_trials = atoi(optarg);
           break;
 
         case 'p':
@@ -225,12 +237,11 @@ int main(int argc, char** argv)
         }
     } // end while
 
+  std::cout << "Using random seed " << random_seed << std::endl;
+  srandom(random_seed);
+
   if (do_random_shuffle)
-    {
-      std::cout << "Using random seed " << random_seed << std::endl;
-      srandom(random_seed);
-      std::cout << "Performing " << n_random_trials << " random trials." << std::endl;
-    }
+    std::cout << "Performing " << n_random_trials << " random trials." << std::endl;
 
   // Set the default precision for real-valued numbers
   // std::cout << "Using " << b << " binary digits for mpfr_class objects." << std::endl;
@@ -429,6 +440,134 @@ int main(int argc, char** argv)
       return 0;
     }
 
+  if (do_optimize)
+    {
+      // Convert the rational point/weight values to real values.
+      std::vector<mpfr_class> w_real(w.begin(), w.end());
+      std::vector<Point<mpfr_class> > x_real(x.size());
+      for (unsigned i=0; i<x_real.size(); ++i)
+        for (unsigned j=0; j<3; ++j)
+          x_real[i](j) = x[i](j);
+
+      // Keep track of the best max error and best average error found.
+      mpfr_class
+        best_max_error(1., /*precision=*/2*b),
+        best_avg_error(1., /*precision=*/2*b);
+
+      // Keep track of the best ordering
+      std::vector<size_t> best_indices = indices;
+
+      for (unsigned restart=0; restart<n_optimization_trials; ++restart)
+        {
+          // Start the optimization routine from a random configuration
+          std::random_shuffle(indices.begin(), indices.end(), myrandom);
+
+          // std::cout << "Initial configuration:" << std::endl;
+          // print_ordered_rule(x, w, indices);
+
+          // Have the user hit a key after inspecting the initial configuration
+          // std::cout << "Press enter to continue..." << std::endl;
+          // std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+
+          // For each entry in the vector, swap it with every other entry
+          // and compute the error each time, then pick the swap that most
+          // reduces the error, if one exists.
+          //
+          // I typically see some swaps during the second sweep, but not
+          // as many as during the first one.  I'm undecided on whether
+          // multiple sweeps are worth doing...
+          for (unsigned sweep=0; sweep<4; ++sweep)
+            for (unsigned outer=0; outer<x_real.size(); ++outer)
+              {
+                std::vector<mpfr_class>
+                  max_configuration_errors(x_real.size()),
+                  avg_configuration_errors(x_real.size());
+
+                for (unsigned inner=0; inner<x_real.size(); ++inner)
+                  {
+                    // When outer==inner, this is a no-op... but that's OK,
+                    // we want to compute the error in the unswapped
+                    // configuration too...
+                    std::swap(indices[outer], indices[inner]);
+
+                    // Compute and store the error for this set of indices
+                    verify(s, x_real, w_real, indices, max_configuration_errors[inner], avg_configuration_errors[inner]);
+
+                    // Swap back so we can compute the next error
+                    std::swap(indices[outer], indices[inner]);
+                  }
+
+                // Report the error for all configurations
+                // std::cout << "Max errors" << std::endl;
+                // for (unsigned i=0; i<x_real.size(); ++i)
+                //   std::cout << max_configuration_errors[i] << std::endl;
+
+                // std::cout << "Avg errors" << std::endl;
+                // for (unsigned i=0; i<x_real.size(); ++i)
+                //   std::cout << avg_configuration_errors[i] << std::endl;
+
+                // Get an iterator to the min avg error entry
+                std::vector<mpfr_class>::iterator it =
+                  std::min_element(avg_configuration_errors.begin(),
+                                   avg_configuration_errors.end());
+
+                // Get an index from this iterator
+                unsigned swap_index = std::distance(avg_configuration_errors.begin(), it);
+                // std::cout << "Swapping indices " << outer << " and " << swap_index << std::endl;
+
+                // Make the swap with this entry permanent
+                std::swap(indices[outer], indices[swap_index]);
+
+                // Print the re-ordered rule at each iteration
+                // std::cout << "Re-ordered rule." << std::endl;
+                // print_ordered_rule(x, w, indices);
+              }
+
+          // Print the final for this iteration of the algorithm.
+          mpfr_class
+            max_error = 0.,
+            avg_error = 0.;
+
+          verify(s, x_real, w_real, indices, max_error, avg_error);
+
+          // Keep track of the best_indices and print the result if it is a new best
+          if (avg_error < best_avg_error)
+            {
+              best_avg_error = avg_error;
+              best_max_error = max_error;
+
+              best_indices = indices;
+
+              std::cout << "\nNew optimal rule found: " << std::endl;
+              std::cout << "max_error = " << max_error << std::endl;
+              std::cout << "avg_error = " << avg_error << std::endl;
+
+              print_ordered_rule(x, w, indices);
+
+              // Print the indices
+              for (unsigned i=0; i<indices.size(); ++i)
+                std::cout << indices[i] << " ";
+              std::cout << std::endl;
+            }
+        } // end for (restart)
+
+
+      // Print the best overall result that we found
+      std::cout << "\nBest overall rule: " << std::endl;
+      std::cout << "best_max_error = " << best_max_error << std::endl;
+      std::cout << "best_avg_error = " << best_avg_error << std::endl;
+
+      print_ordered_rule(x, w, best_indices);
+
+      // Print the best_indices
+      for (unsigned i=0; i<best_indices.size(); ++i)
+        std::cout << best_indices[i] << " ";
+      std::cout << std::endl;
+
+      // We are done with the optimization algorithm, so exit from main
+      return 0;
+    }
+
   // The next options are not mutually exclusive, for example, we can
   // sort and interleave, but not do verification, etc.
   if (do_sort)
@@ -505,6 +644,7 @@ void usage()
   std::cout << "--n-random-trials, -r # = Specify the number of random trials to attempt.  If>0, --unsorted is implied.\n";
   std::cout << "--random-seed, -e       = Specify a random seed for use with --n-random-trials>0.\n";
   std::cout << "--interleave, -i        = Use in conjunction with less-than sorting to interleave the entries of the sorted array.\n";
+  std::cout << "--optimize, -o #        = Specify the number of optimization trials to attempt.  The --random-seed is used to initialize the algorithm.\n";
   std::cout << "--permute, -p           = Compute the sum of weights for all possible permutations of the weights vector.\n";
   std::cout << "--help, -h              = Print this message.\n";
   std::cout << "\n";
