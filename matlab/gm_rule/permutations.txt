@@ -199,46 +199,46 @@ Index 3 rule has degree 7, and 35 point(s).
 
 New optimal rule found:
 max_error = 9.2518585385429721973595675739493e-18
-avg_error = 5.6809675581798204035739821041588e-19
+avg_error = 5.3152874579387158153919485589464e-19
 _points.resize(35);
 _weights.resize(35);
 
-_points[ 0](0) =  1.L/6.L;  _points[ 0](1) =  1.L/6.L;  _points[ 0](2) =  1.L/2.L;  _weights[ 0] =   243.L/4480.L;
-_points[ 1](0) =  5.L/8.L;  _points[ 1](1) =  1.L/8.L;  _points[ 1](2) =  1.L/8.L;  _weights[ 1] =  -256.L/2835.L;
-_points[ 2](0) = 3.L/10.L;  _points[ 2](1) =  1.L/2.L;  _points[ 2](2) = 1.L/10.L;  _weights[ 2] = 3125.L/72576.L;
-_points[ 3](0) = 3.L/10.L;  _points[ 3](1) = 3.L/10.L;  _points[ 3](2) = 3.L/10.L;  _weights[ 3] = 3125.L/72576.L;
-_points[ 4](0) = 3.L/10.L;  _points[ 4](1) = 1.L/10.L;  _points[ 4](2) = 1.L/10.L;  _weights[ 4] = 3125.L/72576.L;
-_points[ 5](0) = 3.L/10.L;  _points[ 5](1) = 3.L/10.L;  _points[ 5](2) = 1.L/10.L;  _weights[ 5] = 3125.L/72576.L;
-_points[ 6](0) =  1.L/2.L;  _points[ 6](1) =  1.L/6.L;  _points[ 6](2) =  1.L/6.L;  _weights[ 6] =   243.L/4480.L;
-_points[ 7](0) =  1.L/2.L;  _points[ 7](1) = 1.L/10.L;  _points[ 7](2) = 3.L/10.L;  _weights[ 7] = 3125.L/72576.L;
-_points[ 8](0) = 7.L/10.L;  _points[ 8](1) = 1.L/10.L;  _points[ 8](2) = 1.L/10.L;  _weights[ 8] = 3125.L/72576.L;
-_points[ 9](0) = 1.L/10.L;  _points[ 9](1) =  1.L/2.L;  _points[ 9](2) = 1.L/10.L;  _weights[ 9] = 3125.L/72576.L;
-_points[10](0) =  1.L/6.L;  _points[10](1) =  1.L/6.L;  _points[10](2) =  1.L/6.L;  _weights[10] =   243.L/4480.L;
-_points[11](0) = 1.L/10.L;  _points[11](1) = 3.L/10.L;  _points[11](2) = 1.L/10.L;  _weights[11] = 3125.L/72576.L;
-_points[12](0) = 1.L/10.L;  _points[12](1) = 7.L/10.L;  _points[12](2) = 1.L/10.L;  _weights[12] = 3125.L/72576.L;
+_points[ 0](0) = 3.L/10.L;  _points[ 0](1) = 1.L/10.L;  _points[ 0](2) = 3.L/10.L;  _weights[ 0] = 3125.L/72576.L;
+_points[ 1](0) =  1.L/2.L;  _points[ 1](1) = 1.L/10.L;  _points[ 1](2) = 3.L/10.L;  _weights[ 1] = 3125.L/72576.L;
+_points[ 2](0) =  1.L/2.L;  _points[ 2](1) = 3.L/10.L;  _points[ 2](2) = 1.L/10.L;  _weights[ 2] = 3125.L/72576.L;
+_points[ 3](0) = 1.L/10.L;  _points[ 3](1) = 3.L/10.L;  _points[ 3](2) =  1.L/2.L;  _weights[ 3] = 3125.L/72576.L;
+_points[ 4](0) = 1.L/10.L;  _points[ 4](1) = 7.L/10.L;  _points[ 4](2) = 1.L/10.L;  _weights[ 4] = 3125.L/72576.L;
+_points[ 5](0) = 1.L/10.L;  _points[ 5](1) =  1.L/2.L;  _points[ 5](2) = 3.L/10.L;  _weights[ 5] = 3125.L/72576.L;
+_points[ 6](0) = 1.L/10.L;  _points[ 6](1) = 3.L/10.L;  _points[ 6](2) = 1.L/10.L;  _weights[ 6] = 3125.L/72576.L;
+_points[ 7](0) = 3.L/10.L;  _points[ 7](1) = 3.L/10.L;  _points[ 7](2) = 3.L/10.L;  _weights[ 7] = 3125.L/72576.L;
+_points[ 8](0) = 3.L/10.L;  _points[ 8](1) = 1.L/10.L;  _points[ 8](2) = 1.L/10.L;  _weights[ 8] = 3125.L/72576.L;
+_points[ 9](0) = 1.L/10.L;  _points[ 9](1) = 3.L/10.L;  _points[ 9](2) = 3.L/10.L;  _weights[ 9] = 3125.L/72576.L;
+_points[10](0) =  1.L/6.L;  _points[10](1) =  1.L/2.L;  _points[10](2) =  1.L/6.L;  _weights[10] =   243.L/4480.L;
+_points[11](0) =  1.L/6.L;  _points[11](1) =  1.L/6.L;  _points[11](2) =  1.L/2.L;  _weights[11] =   243.L/4480.L;
+_points[12](0) = 1.L/10.L;  _points[12](1) = 1.L/10.L;  _points[12](2) =  1.L/2.L;  _weights[12] = 3125.L/72576.L;
 _points[13](0) = 1.L/10.L;  _points[13](1) = 1.L/10.L;  _points[13](2) = 7.L/10.L;  _weights[13] = 3125.L/72576.L;
-_points[14](0) = 1.L/10.L;  _points[14](1) = 3.L/10.L;  _points[14](2) =  1.L/2.L;  _weights[14] = 3125.L/72576.L;
-_points[15](0) = 1.L/10.L;  _points[15](1) = 1.L/10.L;  _points[15](2) = 1.L/10.L;  _weights[15] = 3125.L/72576.L;
+_points[14](0) =  3.L/8.L;  _points[14](1) =  1.L/8.L;  _points[14](2) =  3.L/8.L;  _weights[14] =  -256.L/2835.L;
+_points[15](0) =  1.L/8.L;  _points[15](1) =  3.L/8.L;  _points[15](2) =  1.L/8.L;  _weights[15] =  -256.L/2835.L;
 _points[16](0) =  1.L/8.L;  _points[16](1) =  5.L/8.L;  _points[16](2) =  1.L/8.L;  _weights[16] =  -256.L/2835.L;
-_points[17](0) =  1.L/2.L;  _points[17](1) = 3.L/10.L;  _points[17](2) = 1.L/10.L;  _weights[17] = 3125.L/72576.L;
-_points[18](0) = 3.L/10.L;  _points[18](1) = 1.L/10.L;  _points[18](2) =  1.L/2.L;  _weights[18] = 3125.L/72576.L;
-_points[19](0) =  1.L/6.L;  _points[19](1) =  1.L/2.L;  _points[19](2) =  1.L/6.L;  _weights[19] =   243.L/4480.L;
-_points[20](0) =  1.L/8.L;  _points[20](1) =  1.L/8.L;  _points[20](2) =  3.L/8.L;  _weights[20] =  -256.L/2835.L;
-_points[21](0) =  1.L/8.L;  _points[21](1) =  3.L/8.L;  _points[21](2) =  3.L/8.L;  _weights[21] =  -256.L/2835.L;
-_points[22](0) =  1.L/8.L;  _points[22](1) =  1.L/8.L;  _points[22](2) =  1.L/8.L;  _weights[22] =  -256.L/2835.L;
-_points[23](0) =  1.L/8.L;  _points[23](1) =  1.L/8.L;  _points[23](2) =  5.L/8.L;  _weights[23] =  -256.L/2835.L;
-_points[24](0) =  3.L/8.L;  _points[24](1) =  3.L/8.L;  _points[24](2) =  1.L/8.L;  _weights[24] =  -256.L/2835.L;
-_points[25](0) =  1.L/8.L;  _points[25](1) =  3.L/8.L;  _points[25](2) =  1.L/8.L;  _weights[25] =  -256.L/2835.L;
-_points[26](0) =  3.L/8.L;  _points[26](1) =  1.L/8.L;  _points[26](2) =  1.L/8.L;  _weights[26] =  -256.L/2835.L;
-_points[27](0) =  1.L/2.L;  _points[27](1) = 1.L/10.L;  _points[27](2) = 1.L/10.L;  _weights[27] = 3125.L/72576.L;
-_points[28](0) = 1.L/10.L;  _points[28](1) = 1.L/10.L;  _points[28](2) = 3.L/10.L;  _weights[28] = 3125.L/72576.L;
-_points[29](0) = 1.L/10.L;  _points[29](1) =  1.L/2.L;  _points[29](2) = 3.L/10.L;  _weights[29] = 3125.L/72576.L;
-_points[30](0) =  3.L/8.L;  _points[30](1) =  1.L/8.L;  _points[30](2) =  3.L/8.L;  _weights[30] =  -256.L/2835.L;
-_points[31](0) = 1.L/10.L;  _points[31](1) = 3.L/10.L;  _points[31](2) = 3.L/10.L;  _weights[31] = 3125.L/72576.L;
-_points[32](0) = 1.L/10.L;  _points[32](1) = 1.L/10.L;  _points[32](2) =  1.L/2.L;  _weights[32] = 3125.L/72576.L;
-_points[33](0) =  1.L/4.L;  _points[33](1) =  1.L/4.L;  _points[33](2) =  1.L/4.L;  _weights[33] =     -8.L/945.L;
-_points[34](0) = 3.L/10.L;  _points[34](1) = 1.L/10.L;  _points[34](2) = 3.L/10.L;  _weights[34] = 3125.L/72576.L;
-32 20 2 5 16 11 30 4 0 12 33 17 3 9 8 19 22 1 7 31 28 24 29 25 21 27 26 10 18 6 23 14 15 34 13
+_points[17](0) = 3.L/10.L;  _points[17](1) =  1.L/2.L;  _points[17](2) = 1.L/10.L;  _weights[17] = 3125.L/72576.L;
+_points[18](0) =  1.L/8.L;  _points[18](1) =  1.L/8.L;  _points[18](2) =  1.L/8.L;  _weights[18] =  -256.L/2835.L;
+_points[19](0) = 1.L/10.L;  _points[19](1) = 1.L/10.L;  _points[19](2) = 1.L/10.L;  _weights[19] = 3125.L/72576.L;
+_points[20](0) =  1.L/8.L;  _points[20](1) =  1.L/8.L;  _points[20](2) =  5.L/8.L;  _weights[20] =  -256.L/2835.L;
+_points[21](0) =  1.L/8.L;  _points[21](1) =  1.L/8.L;  _points[21](2) =  3.L/8.L;  _weights[21] =  -256.L/2835.L;
+_points[22](0) =  1.L/2.L;  _points[22](1) =  1.L/6.L;  _points[22](2) =  1.L/6.L;  _weights[22] =   243.L/4480.L;
+_points[23](0) = 7.L/10.L;  _points[23](1) = 1.L/10.L;  _points[23](2) = 1.L/10.L;  _weights[23] = 3125.L/72576.L;
+_points[24](0) =  3.L/8.L;  _points[24](1) =  1.L/8.L;  _points[24](2) =  1.L/8.L;  _weights[24] =  -256.L/2835.L;
+_points[25](0) =  1.L/6.L;  _points[25](1) =  1.L/6.L;  _points[25](2) =  1.L/6.L;  _weights[25] =   243.L/4480.L;
+_points[26](0) =  3.L/8.L;  _points[26](1) =  3.L/8.L;  _points[26](2) =  1.L/8.L;  _weights[26] =  -256.L/2835.L;
+_points[27](0) =  5.L/8.L;  _points[27](1) =  1.L/8.L;  _points[27](2) =  1.L/8.L;  _weights[27] =  -256.L/2835.L;
+_points[28](0) =  1.L/8.L;  _points[28](1) =  3.L/8.L;  _points[28](2) =  3.L/8.L;  _weights[28] =  -256.L/2835.L;
+_points[29](0) = 3.L/10.L;  _points[29](1) = 3.L/10.L;  _points[29](2) = 1.L/10.L;  _weights[29] = 3125.L/72576.L;
+_points[30](0) = 1.L/10.L;  _points[30](1) = 1.L/10.L;  _points[30](2) = 3.L/10.L;  _weights[30] = 3125.L/72576.L;
+_points[31](0) =  1.L/2.L;  _points[31](1) = 1.L/10.L;  _points[31](2) = 1.L/10.L;  _weights[31] = 3125.L/72576.L;
+_points[32](0) =  1.L/4.L;  _points[32](1) =  1.L/4.L;  _points[32](2) =  1.L/4.L;  _weights[32] =     -8.L/945.L;
+_points[33](0) = 1.L/10.L;  _points[33](1) =  1.L/2.L;  _points[33](2) = 1.L/10.L;  _weights[33] = 3125.L/72576.L;
+_points[34](0) = 3.L/10.L;  _points[34](1) = 1.L/10.L;  _points[34](2) =  1.L/2.L;  _weights[34] = 3125.L/72576.L;
+13 4 1 8 3 6 17 5 16 14 31 32 15 9 23 27 22 2 29 19 25 28 30 0 26 33 21 20 24 11 18 10 34 12 7
 
 
 
