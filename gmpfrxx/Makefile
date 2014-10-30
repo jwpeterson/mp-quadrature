@@ -36,7 +36,7 @@ echo:
 
 clean:
 	@echo "Cleaning in gmpfrxx..."
-	@rm -rf .libs *.lo example *.a *.so *~ *.d *.dylib *.la *.o
+	@rm -rf .libs *.lo example *.a *.so *.so.* *~ *.d *.dylib *.la *.o
 
 # Include dependency files for all the C++ and C source files
 -include example.d gmpfrxx.d mpfr_mul_d.d

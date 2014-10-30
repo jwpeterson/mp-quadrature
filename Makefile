@@ -46,9 +46,12 @@ ALL_LIBS=$(MPQ_LIB) $(GMPFRXX_LIBS) $(MPFR_LIBS) $(GMP_LIBS)
 #EXTRA_FLAGS=-g -DDEBUG
 EXTRA_FLAGS=-Wall -O2
 
+# The plus signs on these recursive make calls were required for Linux, otherwise I was getting:
+# warning: jobserver unavailable: using -j1.  Add `+' to parent make rule.
+# Not sure how standard this is beyond GNU make...
 all:
-	make -C gmpfrxx
-	make $(drivers)
+	+make -C gmpfrxx
+	+make $(drivers)
 
 
 # Use GNU libtool for linking.  Note: if the name of the output file
