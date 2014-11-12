@@ -1,6 +1,7 @@
 #ifndef GENERATOR_H
 #define GENERATOR_H
 
+#include "common_definitions.h"
 #include "gmpfrxx.h"
 
 /**
@@ -52,6 +53,11 @@ public:
   mpfr_class & get_w() { return w; }
   mpfr_class & get_a() { return a; }
   mpfr_class & get_b() { return b; }
+
+  // Generate the points and weights associated with this Generator
+  // and store them in the passed-in vectors.
+  void generate_points_and_weights(std::vector<Point<mpfr_class> > & generated_points,
+                                   std::vector<mpfr_class> & generated_weights);
 
 protected:
   GeneratorType type;
