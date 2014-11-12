@@ -90,6 +90,21 @@ int main(int argc, char** argv)
         }
     }
 
+  // Test generating points and weights vectors for this Rule
+  std::vector<Point<mpfr_class> > generated_points;
+  std::vector<mpfr_class> generated_weights;
+  rule.generate_points_and_weights(generated_points, generated_weights);
+  for (unsigned i=0; i<generated_points.size(); ++i)
+    {
+      std::cout << "Point " << i
+                << ": (" << generated_points[i](0)
+                << ", " << generated_points[i](1)
+                << "), weight: "
+                << generated_weights[i]
+                << std::endl;
+    }
+
+
   return 0;
 }
 
