@@ -31,21 +31,7 @@ public:
 
   // A generator is defined to be valid when its required parameters
   // are non-zero
-  bool is_valid()
-  {
-    if (type == CENTROID && w != mpfr_class(0.))
-      return true;
-
-    if (type == MEDIAN && w != mpfr_class(0.) && a != mpfr_class(0.))
-      return true;
-
-    if (type == ARBITRARY && w != mpfr_class(0.) && a != mpfr_class(0.) && b != mpfr_class(0.))
-      return true;
-
-    // If we made it here, we're not valid
-    std::cout << "Generator type " << type << " not valid: weight = " << w << ", a = " << a << ", b = " << b << std::endl;
-    return false;
-  }
+  bool is_valid() const;
 
   virtual ~Generator() {}
 
@@ -57,7 +43,7 @@ public:
   // Generate the points and weights associated with this Generator
   // and store them in the passed-in vectors.
   void generate_points_and_weights(std::vector<Point<mpfr_class> > & generated_points,
-                                   std::vector<mpfr_class> & generated_weights);
+                                   std::vector<mpfr_class> & generated_weights) const;
 
 protected:
   GeneratorType type;

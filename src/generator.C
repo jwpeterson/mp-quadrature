@@ -1,7 +1,25 @@
 #include "generator.h"
 
+bool Generator::is_valid() const
+{
+  if (type == CENTROID && w != mpfr_class(0.))
+    return true;
+
+  if (type == MEDIAN && w != mpfr_class(0.) && a != mpfr_class(0.))
+    return true;
+
+  if (type == ARBITRARY && w != mpfr_class(0.) && a != mpfr_class(0.) && b != mpfr_class(0.))
+    return true;
+
+  // If we made it here, we're not valid
+  std::cout << "Generator type " << type << " not valid: weight = " << w << ", a = " << a << ", b = " << b << std::endl;
+  return false;
+}
+
+
+
 void Generator::generate_points_and_weights(std::vector<Point<mpfr_class> > & generated_points,
-                                            std::vector<mpfr_class> & generated_weights)
+                                            std::vector<mpfr_class> & generated_weights) const
 {
   // Refuse to generate points and weights if the Generator is not valid
   if (!this->is_valid())
