@@ -12,17 +12,6 @@ void Rule::generate_points_and_weights(std::vector<Point<mpfr_class> > & generat
       generators[i].generate_points_and_weights(single_generator_points,
                                                 single_generator_weights);
 
-      // std::cout << "Single generator points: " << std::endl;
-      // for (unsigned i=0; i<single_generator_points.size(); ++i)
-      //   {
-      //     std::cout << "Point " << i
-      //               << ": (" << single_generator_points[i](0)
-      //               << ", " << single_generator_points[i](1)
-      //               << "), weight: "
-      //               << single_generator_weights[i]
-      //               << std::endl;
-      //   }
-
       // Append the points and weights to the end of the user's vectors
       generated_points.insert(/*pos=*/generated_points.end(),
                               /*first=*/single_generator_points.begin(),
