@@ -1,5 +1,33 @@
 #include "rule.h"
 
+unsigned Rule::n_generators() const
+{
+  return generators.size();
+}
+
+
+
+void Rule::push_back(const Generator & generator)
+{
+  generators.push_back(generator);
+}
+
+
+
+// Writeable reference to the ith generator, if it exists
+Generator& Rule::operator[](unsigned i)
+{
+  if (i >= generators.size())
+    {
+      std::cerr << "Invalid index " << i << " requested!" << std::endl;
+      std::abort();
+    }
+
+  return generators[i];
+}
+
+
+
 void Rule::generate_points_and_weights(std::vector<Point<mpfr_class> > & generated_points,
                                        std::vector<mpfr_class> & generated_weights) const
 {
