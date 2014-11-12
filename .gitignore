@@ -4,6 +4,7 @@ drivers/jacobi_rule
 drivers/print_gauss
 drivers/print_gauss_lobatto
 drivers/gm_rule
+drivers/test_read_rule
 lib/
 *.a
 *.o

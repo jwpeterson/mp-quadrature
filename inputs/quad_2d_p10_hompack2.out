@@ -1,0 +1,31 @@
+Solving non-square system, m=36 (rows), n=14 (unknowns), lda=36 (lda=max(m,n)).
+Solving non-square system, m=36 (rows), n=14 (unknowns), lda=36 (lda=max(m,n)).
+Solving non-square system, m=36 (rows), n=14 (unknowns), lda=36 (lda=max(m,n)).
+Solving non-square system, m=36 (rows), n=14 (unknowns), lda=36 (lda=max(m,n)).
+Solving non-square system, m=36 (rows), n=14 (unknowns), lda=36 (lda=max(m,n)).
+Warning: Weights are not scaled by volume, they should add up to ref. elt. volume!
+static FLOAT QUAD_2D_P10_wts[] = {
+    Dup3(4.1609868493225070762642754792228837e-02L),
+    Dup21(2.6325974734122296911522738999531051e-02L),
+    Dup21(5.4756441701342055601142879115358037e-03L),
+    Dup111(1.4661432047826118069562955656937941e-02L),
+    Dup111(2.8138639855405590068913566909800330e-02L),
+    Dup111(1.7697473895769195498597838179023495e-02L)
+};
+static FLOAT QUAD_2D_P10_pts[Length(QUAD_2D_P10_wts) * 3] = {
+    Perm3(3.3333333333333333333333333333333333e-01L),
+    Perm21(1.6291311787409475623716947924172765e-01L),
+    Perm21(2.8503500288387835618166446311944846e-02L),
+    Perm111(1.5330305516956136820097278855413484e-01L,3.3685698680610287094802519682754496e-02L),
+    Perm111(1.4681150539393041392325020563240025e-01L,5.1649261932783793852160480271042097e-01L),
+    Perm111(2.9307604504579472045051834893484181e-02L,6.0732977850084999871916709718628202e-01L)
+};
+QUAD QUAD_2D_P10_ = {
+    "2D P10",			/* name */
+    2,				/* dim */
+    10,				/* order */
+    Length(QUAD_2D_P10_wts),	/* npoints = 25 */
+    QUAD_2D_P10_pts,		/* points */
+    QUAD_2D_P10_wts,		/* weights */
+    -1				/* id */
+};

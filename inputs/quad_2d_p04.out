@@ -1,0 +1,19 @@
+Solving non-square system, m=9 (rows), n=4 (unknowns), lda=9 (lda=max(m,n)).
+Warning: Weights are not scaled by volume, they should add up to ref. elt. volume!
+static FLOAT QUAD_2D_P4_wts[] = {
+    Dup21(1.1169079483900573284750350421656140e-01L),
+    Dup21(5.4975871827660933819163162450105264e-02L)
+};
+static FLOAT QUAD_2D_P4_pts[Length(QUAD_2D_P4_wts) * 3] = {
+    Perm21(4.4594849091596488631832925388305199e-01L),
+    Perm21(9.1576213509770743459571463402201508e-02L)
+};
+QUAD QUAD_2D_P4_ = {
+    "2D P4",			/* name */
+    2,				/* dim */
+    4,				/* order */
+    Length(QUAD_2D_P4_wts),	/* npoints = 6 */
+    QUAD_2D_P4_pts,		/* points */
+    QUAD_2D_P4_wts,		/* weights */
+    -1				/* id */
+};

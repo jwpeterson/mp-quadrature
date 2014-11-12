@@ -1,0 +1,22 @@
+Solving non-square system, m=20 (rows), n=8 (unknowns), lda=20 (lda=max(m,n)).
+Solving non-square system, m=20 (rows), n=8 (unknowns), lda=20 (lda=max(m,n)).
+Warning: Weights are not scaled by volume, they should add up to ref. elt. volume!
+static FLOAT QUAD_2D_P7_wts[] = {
+    Dup21(2.6538900895116205835977487499847719e-02L),
+    Dup111(3.5426541846066783659206291623201826e-02L),
+    Dup111(3.4637341039708446756138297960207647e-02L)
+};
+static FLOAT QUAD_2D_P7_pts[Length(QUAD_2D_P7_wts) * 3] = {
+    Perm21(6.4930513159164863078379776030396538e-02L),
+    Perm111(1.9838447668150671917987659863332941e-01L,2.8457558424917033519741605734978046e-01L),
+    Perm111(4.3863471792372471511798695971295936e-02L,3.1355918438493150795585190219862865e-01L)
+};
+QUAD QUAD_2D_P7_ = {
+    "2D P7",			/* name */
+    2,				/* dim */
+    7,				/* order */
+    Length(QUAD_2D_P7_wts),	/* npoints = 15 */
+    QUAD_2D_P7_pts,		/* points */
+    QUAD_2D_P7_wts,		/* weights */
+    -1				/* id */
+};
