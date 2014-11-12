@@ -1,0 +1,29 @@
+Reading quadrature rule from quad_2d_p05.in ...
+Done.
+dim: 2, points: 7, equations: 12, unknowns: 5, symmetry: true
+Newton step 0, error = 5.937884533738e-34, residual = 10.000000
+Newton step 1, error = 4.210000000000e-62, residual = 4.983785e-35
+
+========================== the output ==========================
+Solving non-square system, m=12 (rows), n=5 (unknowns), lda=12 (lda=max(m,n)).
+Warning: Weights are not scaled by volume, they should add up to ref. elt. volume!
+static FLOAT QUAD_2D_P5_wts[] = {
+    Dup21(6.2969590272413576297841972750090667e-02L),
+    Dup21(6.6197076394253090368824693916576000e-02L),
+    Dup3(1.1250000000000000000000000000000000e-01L)
+};
+static FLOAT QUAD_2D_P5_pts[Length(QUAD_2D_P5_wts) * 3] = {
+    Perm21(1.0128650732345633880098736191512383e-01L),
+    Perm21(4.7014206410511508977044120951344760e-01L),
+    Perm3(3.3333333333333333333333333333333333e-01L)
+};
+QUAD QUAD_2D_P5_ = {
+    "2D P5",			/* name */
+    2,				/* dim */
+    5,				/* order */
+    Length(QUAD_2D_P5_wts),	/* npoints = 7 */
+    QUAD_2D_P5_pts,		/* points */
+    QUAD_2D_P5_wts,		/* weights */
+    -1				/* id */
+};
+
