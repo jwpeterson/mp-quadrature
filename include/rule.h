@@ -47,6 +47,9 @@ public:
     return generators[i];
   }
 
+  void generate_points_and_weights(std::vector<Point<mpfr_class> > & generated_points,
+                                   std::vector<mpfr_class> & generated_weights) const;
+
 protected:
   std::vector<Generator> generators;
 };
