@@ -3,6 +3,7 @@
 #include <algorithm> // std::sort
 #include "gauss.h"
 #include "jacobi.h"
+#include "exact.h"
 
 // In this program we compute multi-precision
 // points and weights to be used in 3D Conical Product
@@ -106,25 +107,6 @@ int main(int argc, char** argv)
 
   std::cout << "Sum of weights = " << fix_string(sumweights) << std::endl;
 
-  // Maple has a lot of trouble computing this integral exactly. Try for yourself:
-  // assume(a, integer, a, nonnegative);
-  // assume(b, integer, b, nonnegative);
-  // assume(c, integer, c, nonnegative);
-  // int(int(int(x^a * y^b * z^c, z=0..1-x-y), y=0..1-x), x=0..1);
-  //
-  // The main trick is to perform a change of variables to get the
-  // second integral into the form of the beta function integral...
-  //
-  // 1.) Integrate in z: result is I = int(int((x^a * y^b * (1-x-y)^(c+1))/(c+1), y=0..1-x), x=0..1)
-  // 2.) Introduce change of variables eta = y/(1-x)
-  //     Then I = Beta(b+1, c+2) / (c+1) * int(x^a * (1-x)^(b+c+2), x=0..1)
-  // 3.) I can now be computed using the Beta function integral again to get:
-  //     I = Beta(b+1, c+2) / (c+1) * Beta(a+1, b+c+3)
-  // 4.) Substituting in the Beta function definition,
-  //     Beta(p,q) := (p-1)! (q-1)! / (p+q-1)!,
-  //     and canceling terms, we finally obtain:
-  //     I = a! b! c! / (a + b + c + 3)!
-
   // The rule with n^3 points should be able to integrate a polynomial of _total_ degree 2*n-1
   std::cout << "\nVerifying rule..." << std::endl;
   unsigned max_order = 2*n-1;
@@ -143,39 +125,8 @@ int main(int argc, char** argv)
 
           // std::cout << "quadrature = " << sum << std::endl;
 
-          // Compute the exact solution as described above, divide
-          // term-by-term to avoid huge numbers/overflows (even though
-          // this is GMP).
-          mpfr_class analytical = 1.0;
-          {
-            // Sort the a, b, c values
-            unsigned sorted_powers[3] = {x_power, y_power, z_power};
-            std::sort(sorted_powers, sorted_powers+3);
-
-            // Cancel the largest power with the denominator, fill in the
-            // entries for the remaining numerator terms and the denominator.
-            std::vector<unsigned>
-              numerator_1(sorted_powers[0] > 1 ? sorted_powers[0]-1 : 0),
-              numerator_2(sorted_powers[1] > 1 ? sorted_powers[1]-1 : 0),
-              denominator(3 + sorted_powers[0] + sorted_powers[1]);
-
-            // Fill up the vectors with sequences starting at the right values.
-            iota(numerator_1.begin(), numerator_1.end(), 2);
-            iota(numerator_2.begin(), numerator_2.end(), 2);
-            iota(denominator.begin(), denominator.end(), sorted_powers[2]+1);
-
-            // The denominator is guaranteed to have the most terms...
-            for (unsigned i=0; i<denominator.size(); ++i)
-              {
-                if (i < numerator_1.size())
-                  analytical *= numerator_1[i];
-
-                if (i < numerator_2.size())
-                  analytical *= numerator_2[i];
-
-                analytical /= denominator[i];
-              }
-          }
+          // Compute the analytical integral value.
+          mpfr_class analytical = exact_tet(x_power, y_power, z_power);
 
           // std::cout << "analytical = " << analytical << std::endl;
 
