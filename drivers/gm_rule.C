@@ -6,6 +6,7 @@
 #include <cmath> // log10
 
 #include "grundmann_moller.h"
+#include "exact.h"
 
 // An unoptimized pow function for mpq_class objects
 mpq_class pow(const mpq_class & base, unsigned power)
@@ -740,35 +741,9 @@ void verify(unsigned rule_index,
           // this is GMP).  Use higher precision when computing the
           // analytical solution.
           T analytical(/*value=*/1, /*precision=*/double_input_precision);
-          {
-            // Sort the a, b, c values
-            unsigned sorted_powers[3] = {x_power, y_power, z_power};
-            std::sort(sorted_powers, sorted_powers+3);
 
-            // Cancel the largest power with the denominator, fill in the
-            // entries for the remaining numerator terms and the denominator.
-            std::vector<unsigned>
-              numerator_1(sorted_powers[0] > 1 ? sorted_powers[0]-1 : 0),
-              numerator_2(sorted_powers[1] > 1 ? sorted_powers[1]-1 : 0),
-              denominator(3 + sorted_powers[0] + sorted_powers[1]);
-
-            // Fill up the vectors with sequences starting at the right values.
-            iota(numerator_1.begin(), numerator_1.end(), 2);
-            iota(numerator_2.begin(), numerator_2.end(), 2);
-            iota(denominator.begin(), denominator.end(), sorted_powers[2]+1);
-
-            // The denominator is guaranteed to have the most terms...
-            for (unsigned i=0; i<denominator.size(); ++i)
-              {
-                if (i < numerator_1.size())
-                  analytical *= numerator_1[i];
-
-                if (i < numerator_2.size())
-                  analytical *= numerator_2[i];
-
-                analytical /= denominator[i];
-              }
-          }
+          // Compute the analytical integral value.
+          analytical = exact_tet(x_power, y_power, z_power);
 
           // Debugging
           // std::cout << "analytical = " << analytical << std::endl;
