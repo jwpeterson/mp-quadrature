@@ -17,7 +17,9 @@ void read_rule(const std::string & filename, Rule & rule)
   unsigned
     centroid_count  = 0,
     median_count    = 0,
-    arbitrary_count = 0;
+    arbitrary_count = 0,
+    single_count    = 0,
+    Ro3_count       = 0;
 
   while (true)
     {
@@ -43,6 +45,14 @@ void read_rule(const std::string & filename, Rule & rule)
                    (s.find("Perm111(") != std::string::npos))
             arbitrary_count++;
 
+          else if ((s.find("Dup0(") != std::string::npos) ||
+                   (s.find("Perm0(") != std::string::npos))
+            single_count++;
+
+          else if ((s.find("DupRo3(") != std::string::npos) ||
+                   (s.find("PermRo3(") != std::string::npos))
+            Ro3_count++;
+
           continue;
         } // if (in)
 
@@ -61,9 +71,11 @@ void read_rule(const std::string & filename, Rule & rule)
     } // while
 
   // There should be two lines for each generator, so ensure that happened
-  if ((centroid_count % 2 != 0) ||
-      (median_count % 2 != 0)   ||
-      (arbitrary_count % 2 != 0))
+  if ((centroid_count % 2 != 0)  ||
+      (median_count % 2 != 0)    ||
+      (arbitrary_count % 2 != 0) ||
+      (single_count % 2 != 0)    ||
+      (Ro3_count % 2 != 0))
     {
       std::cerr << "Error reading the generators file." << std::endl;
       std::abort();
@@ -73,12 +85,16 @@ void read_rule(const std::string & filename, Rule & rule)
       centroid_count /= 2;
       median_count /= 2;
       arbitrary_count /= 2;
+      single_count /= 2;
+      Ro3_count /= 2;
     }
 
   std::cout << "Rule has "
             << centroid_count << " centroid generator(s), "
-            << median_count << " median generator(s), and "
-            << arbitrary_count << " arbitrary generator(s)."
+            << median_count << " median generator(s), "
+            << arbitrary_count << " arbitrary generator(s), "
+            << single_count << " single point generator(s), and"
+            << Ro3_count << " Ro3 generators."
             << std::endl;
 
   // We now know how many of each type of generator there are, so we can prepare the Rule object.
@@ -90,6 +106,12 @@ void read_rule(const std::string & filename, Rule & rule)
 
   for (unsigned i=0; i<arbitrary_count; ++i)
     rule.push_back(Generator(Generator::ARBITRARY));
+
+  for (unsigned i=0; i<single_count; ++i)
+    rule.push_back(Generator(Generator::SINGLEPOINT));
+
+  for (unsigned i=0; i<Ro3_count; ++i)
+    rule.push_back(Generator(Generator::RO3));
 
   // OK, now that the Rule is set up, let's read the file again and
   // extract values.  When you rewind, you also have to call clear()
@@ -107,7 +129,11 @@ void read_rule(const std::string & filename, Rule & rule)
     median_weight_index    = centroid_count,
     median_point_index     = centroid_count,
     arbitrary_weight_index = centroid_count + median_count,
-    arbitrary_point_index  = centroid_count + median_count;
+    arbitrary_point_index  = centroid_count + median_count,
+    single_weight_index    = centroid_count + median_count + arbitrary_count,
+    single_point_index     = centroid_count + median_count + arbitrary_count,
+    Ro3_weight_index       = centroid_count + median_count + arbitrary_count + single_count,
+    Ro3_point_index        = centroid_count + median_count + arbitrary_count + single_count;
 
   while (true)
     {
@@ -137,15 +163,47 @@ void read_rule(const std::string & filename, Rule & rule)
 
           else if (s.find("Perm111(") != std::string::npos)
             {
-              // Get a reference to the next CentroidGenerator that needs a weight
+              // Get a reference to the next ArbitraryGenerator that needs a point
               Generator & generator = rule[arbitrary_point_index];
 
-              // Set the weight
+              // Set the a and b parameters
               generator.get_a() = extract_number(s, '(', ',');
               generator.get_b() = extract_number(s, ',', ')');
 
               // Get ready to assign the next arbitrary generator points
               arbitrary_point_index++;
+            }
+
+          else if (s.find("Dup0(") != std::string::npos)
+            rule[single_weight_index++].get_w() = extract_number(s, '(', ')');
+
+          else if (s.find("Perm0(") != std::string::npos)
+            {
+              // Get a reference to the next SinglePointGenerator that needs a point
+              Generator & generator = rule[single_point_index];
+
+              // Set the x and y values
+              generator.get_a() = extract_number(s, '(', ',');
+              generator.get_b() = extract_number(s, ',', ')');
+
+              // Get ready to assign the next arbitrary generator points
+              single_point_index++;
+            }
+
+          else if (s.find("DupRo3(") != std::string::npos)
+            rule[Ro3_weight_index++].get_w() = extract_number(s, '(', ')');
+
+          else if (s.find("PermRo3(") != std::string::npos)
+            {
+              // Get a reference to the next Ro3 Generator that needs a point
+              Generator & generator = rule[Ro3_point_index];
+
+              // Set the a and b parameters
+              generator.get_a() = extract_number(s, '(', ',');
+              generator.get_b() = extract_number(s, ',', ')');
+
+              // Get ready to assign the next arbitrary generator points
+              Ro3_point_index++;
             }
 
           continue;

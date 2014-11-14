@@ -2,7 +2,8 @@
 
 #include "common_definitions.h"
 
-std::string fix_string(const mpfr_class& x)
+std::string fix_string(const mpfr_class& x,
+                       bool append_L)
 {
   // Go to some extra trouble to print e-01L instead of e-1
   std::ostringstream number_stream;
@@ -12,7 +13,7 @@ std::string fix_string(const mpfr_class& x)
   std::string number = number_stream.str();
 
   // We almost always want to append an L (long double literal) but not always
-  bool append_L = true;
+  bool do_append_L = append_L;
 
   // Find the exponent 'e'.
   size_t e_pos = number.find('e');
@@ -24,7 +25,7 @@ std::string fix_string(const mpfr_class& x)
         {
           // if number == "0", append a decimal point
           number.append(".");
-          append_L = false;
+          do_append_L = false;
         }
       else
         {
@@ -34,16 +35,24 @@ std::string fix_string(const mpfr_class& x)
     }
   else
     {
-      // If 'e' is found, insert a leading zero to be consistent
-      // with the Gauss rules in libmesh.  The number of digits
-      // used in the exponent is implementation-dependent.  To be
-      // totally general, we should check to see how many zeros
-      // there are, and only insert exactly as many as we need...
-      number.insert(e_pos+2, "0");
+      // If 'e' is found, insert a leading zero to be consistent with
+      // the Gauss rules in libmesh.  The number of digits used in the
+      // exponent is implementation-dependent.  To be totally general,
+      // we should check to see how many zeros there are, and only
+      // insert exactly as many as we need...  We also need to handle
+      // the case where a positive exponent is written as e1 instead
+      // of does not have e+1 (i.e. no + sign).
+      size_t pm_pos = number.find_first_of("+-", e_pos);
+
+      // If no plus or minus was found, insert '+0', otherwise insert just a zero after the +/-
+      if (pm_pos == std::string::npos)
+        number.insert(e_pos+1, "+0");
+      else
+        number.insert(pm_pos+1, "0");
     }
 
   // The L suffix in C/C++ makes the compiler treat a number literal as 'long double'
-  if (append_L)
+  if (do_append_L)
     number.append("L");
 
   return number;

@@ -10,13 +10,15 @@
 class Generator
 {
 public:
-  // There are three different types of generators
+  // The list of different Generator types.
   enum GeneratorType
     {
-      CENTROID  =  0,
-      MEDIAN    =  1,
-      ARBITRARY =  2,
-      INVALID   = 99
+      CENTROID    =  0,
+      MEDIAN      =  1,
+      ARBITRARY   =  2,
+      SINGLEPOINT =  3,
+      RO3         =  4,
+      INVALID     = 99
     };
 
   Generator(GeneratorType type_in = INVALID,
