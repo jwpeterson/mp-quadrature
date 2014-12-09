@@ -142,6 +142,8 @@ int main(int argc, char** argv)
   Integrand integrand(/*x0=*/0., alpha);
 
   // Output file to write the abs_err and err_bound values to
+  // TODO: if the plots/ directory does not exist, we must create it first, otherwise nothing
+  // will be written.
   std::ostringstream oss;
   oss << "plots/" << filebase << "_alpha_" << std::setprecision(5) << alpha << "_err_bounds.csv";
 
