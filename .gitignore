@@ -4,7 +4,9 @@ drivers/jacobi_rule
 drivers/print_gauss
 drivers/print_gauss_lobatto
 drivers/gm_rule
-drivers/test_read_rule
+drivers/tri_rule
+drivers/test_dubiner
+drivers/compute_residuals_1D
 lib/
 *.a
 *.o
@@ -24,3 +26,5 @@ libtool
 gmpfrxx/example
 *.so
 *.so.*
+drivers/lu
+plots

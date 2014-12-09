@@ -144,9 +144,10 @@ void Jacobi::constants(unsigned int n)
       b.push_back( (mp_alpha+mp_beta) / (mp_alpha+mp_beta+2.*ireal) *
                    (mp_beta-mp_alpha) / (mp_alpha+mp_beta+2.*ireal-2.) );
 
-      c.push_back( 4.*(ireal-1.) / (mp_alpha+mp_beta+2.*ireal-1.) * (mp_alpha+ireal-1.) /
-                   (mp_alpha+mp_beta+2.*ireal-2.)/(mp_alpha+mp_beta+2.*ireal-2.) *
-                   (mp_beta+ireal-1.) / (mp_alpha+mp_beta+2.*ireal-3.) * (mp_alpha+mp_beta+ireal-1.) );
+      c.push_back( 4.*(ireal-1.) / (mp_alpha+mp_beta+2.*ireal-1.) *
+                   (mp_alpha+ireal-1.) / (mp_alpha+mp_beta+2.*ireal-2.) *
+                   (mp_alpha+mp_beta+ireal-1.) / (mp_alpha+mp_beta+2.*ireal-2.) *
+                   (mp_beta+ireal-1.) / (mp_alpha+mp_beta+2.*ireal-3.)  );
     }
 
   // Debugging

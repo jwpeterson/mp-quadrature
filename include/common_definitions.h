@@ -13,7 +13,10 @@ typedef double Real;
 
 // Returns a string which contains the 32 decimal digits of x in the form:
 // -9.4489927222288222340758013830322e-01L
-std::string fix_string(const mpfr_class& x);
+// The user can optionally turn off the appending of a trailing L by passing
+// 'false' for the second argument.
+std::string fix_string(const mpfr_class& x,
+                       bool append_L = true);
 
 // iota fills up a range with the entries (value, value+1, value+2, ...)
 // and is a handy way to initialize an array.
