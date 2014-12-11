@@ -1,6 +1,7 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
+#include <memory> // std::auto_ptr
 #include <getopt.h> // getopt_long()
 #include "legendre.h"
 #include "gauss.h"
@@ -13,13 +14,50 @@ mpfr_class compute_rn_norms(const std::vector<mpfr_class> & x,
                             const std::vector<mpfr_class> & w,
                             const std::string & filebase);
 
-// Class representing a function and its exact integral, to be passed
-// to the test_integral function.  The function is in H1 if alpha>1/2.
+
+// Class representing a function, its exact integral, L2, and H1 norms.
+// We assume that the integrand has at least one parameter named x0.
 struct Integrand
 {
-  Integrand(const mpfr_class & x0_in,
-            const mpfr_class & alpha_in) :
-    x0(x0_in),
+  // Constructor
+  Integrand(const mpfr_class & x0_in) :
+    x0(x0_in)
+  {}
+
+  // Destructor
+  virtual ~Integrand() {}
+
+  // The parameter
+  mpfr_class x0;
+
+  // Returns the value of f at the point x
+  virtual mpfr_class f(const mpfr_class & x) const = 0;
+
+  // Returns the exact integral f
+  virtual mpfr_class exact() const = 0;
+
+  // Returns the L2-norm, squared
+  virtual mpfr_class L2_norm_squared() const = 0;
+
+  // Returns the H1-semi norm, squared
+  virtual mpfr_class H1_semi_norm_squared() const = 0;
+
+  // Returns the H1-norm.
+  mpfr_class H1_norm() const
+  {
+    return sqrt(this->L2_norm_squared() + this->H1_semi_norm_squared());
+  }
+};
+
+
+
+// Class representing the function |x-x_0|^{alpha}. The function is in
+// H1 if alpha>1/2.
+struct AlphaSingularity : Integrand
+{
+  AlphaSingularity(const mpfr_class & x0_in,
+                   const mpfr_class & alpha_in) :
+    Integrand(x0_in),
     alpha(alpha_in)
   {
     if (alpha <= mpfr_class(1.)/2.)
@@ -29,39 +67,85 @@ struct Integrand
       }
   }
 
-  mpfr_class x0;
   mpfr_class alpha;
 
-    // f = abs(x-x_0)^{\alpha}, \alpha > \frac{1}{2}
-  mpfr_class f(const mpfr_class & x) const
+  // f = abs(x-x_0)^{\alpha}, \alpha > \frac{1}{2}
+  virtual mpfr_class f(const mpfr_class & x) const
   {
     return pow(abs(x - x0), alpha);
   }
 
   // I(f) = 1/(\alpha+1) [ (1+x_0)^{\alpha+1} + (1-x_0)^{\alpha+1} ]
-  mpfr_class exact() const
+  virtual mpfr_class exact() const
   {
     return mpfr_class(1.)/(alpha+1.) * (pow(1+x0, alpha+1) + pow(1-x0, alpha+1));
   }
 
   // Compute the L2-norm, squared
-  mpfr_class L2_norm_squared() const
+  virtual mpfr_class L2_norm_squared() const
   {
     return mpfr_class(1.)/(2.*alpha+1.) * (pow(1+x0, 2.*alpha+1) + pow(1-x0, 2.*alpha+1));
   }
 
   // Compute the H1-semi norm, squared
-  mpfr_class H1_semi_norm_squared() const
+  virtual mpfr_class H1_semi_norm_squared() const
   {
     return alpha*alpha/(2.*alpha - 1.) * (pow(1+x0, 2.*alpha-1) + pow(1-x0, 2.*alpha-1));
   }
+};
 
-  // Compute the H1-norm
-  mpfr_class H1_norm() const
+
+
+
+// Class representing the piecewise integrand
+// { 1 + (x-x0)/(1+x0)
+// { 1 - (x-x0)/(1-x0)
+struct Piecewise : Integrand
+{
+  Piecewise(const mpfr_class & x0_in) :
+    Integrand(x0_in)
+  {}
+
+  // Return the function value
+  virtual mpfr_class f(const mpfr_class & x) const
   {
-    return sqrt(this->L2_norm_squared() + this->H1_semi_norm_squared());
+    // Handle edge cases without dividing by zero.
+    if (x0 == -1.)
+      return 0.5*(1.-x);
+    if (x0 == 1.)
+      return 0.5*(1.+x);
+
+    // Handle in-between cases
+    if (x <= x0)
+      return mpfr_class(1.) + (x-x0)/(1.+x0);
+    else
+      return mpfr_class(1.) - (x-x0)/(1.-x0);
+  }
+
+  // I(f) = 1
+  virtual mpfr_class exact() const
+  {
+    return 1.;
+  }
+
+  // Compute the L2-norm, squared
+  virtual mpfr_class L2_norm_squared() const
+  {
+    return mpfr_class(2.)/3.;
+  }
+
+  // Compute the H1-semi norm, squared
+  virtual mpfr_class H1_semi_norm_squared() const
+  {
+    // Handle edge cases without dividing by zero.
+    if (x0 == -1. || x0 == 1.)
+      return 0.5;
+
+    return mpfr_class(1.)/(1. + x0) + mpfr_class(1.)/(1. - x0);
   }
 };
+
+
 
 
 
@@ -136,16 +220,35 @@ int main(int argc, char** argv)
   mpfr_class norm_rN = compute_rn_norms(x, w, filebase);
   std::cout << "Final ||r_N||_1 value = " << norm_rN << std::endl;
 
-  // Compute the value of a test integral.  The function is in
-  // H1 for alpha > 1/2
-  mpfr_class alpha = mpfr_class(2.)/3.;
-  Integrand integrand(/*x0=*/0., alpha);
+  // Set up the integrand, we have a couple to choose from...
+  std::auto_ptr<Integrand> integrand;
 
-  // Output file to write the abs_err and err_bound values to
+  // To build up the name of the output file to write the abs_err and err_bound values to
   // TODO: if the plots/ directory does not exist, we must create it first, otherwise nothing
   // will be written.
   std::ostringstream oss;
-  oss << "plots/" << filebase << "_alpha_" << std::setprecision(5) << alpha << "_err_bounds.csv";
+
+  unsigned integrand_type = 1;
+  switch (integrand_type)
+    {
+    case 0:
+      {
+        mpfr_class alpha = mpfr_class(2.)/3.;
+        integrand.reset(new AlphaSingularity(/*x0=*/0., alpha));
+        oss << "plots/" << filebase << "_alpha_" << std::setprecision(5) << alpha << "_err_bounds.csv";
+        break;
+      }
+
+    case 1:
+      {
+        integrand.reset(new Piecewise(/*x0=*/0.));
+        oss << "plots/" << filebase << "_piecewise_err_bounds.csv";
+        break;
+      }
+
+    default:
+      std::abort();
+    }
 
   // Open file. We don't need crazy precision on the err bounds.
   std::ofstream out(oss.str().c_str());
@@ -158,17 +261,14 @@ int main(int argc, char** argv)
   for (unsigned i=0; i<n_plot_points; ++i)
     {
       // Move the singularity to the next point
-      integrand.x0 = -1. + i*dx;
+      integrand->x0 = -1. + i*dx;
 
-      mpfr_class abs_err = test_integral(x, w, integrand);
-      // std::cout << "abs_err=" << abs_err << std::endl;
+      mpfr_class abs_err = test_integral(x, w, *integrand);
 
       // Compute the product ||f||_1 * ||r_N||_1.  Our a priori estimate
       // says |E(f)| must be less than this (plus some other terms we hope
       // are small).
-      mpfr_class norm_f = integrand.H1_norm();
-      // mpfr_class err_bound = integrand.H1_norm() * norm_rN;
-      // std::cout << "err_bound=" << err_bound << std::endl;
+      mpfr_class norm_f = integrand->H1_norm();
 
       if (abs_err > norm_f*norm_rN)
         {
@@ -176,15 +276,8 @@ int main(int argc, char** argv)
           std::abort();
         }
 
-      // Compute the effectivity index, the ratio of the true error to the error bound
-      // mpfr_class effectivity = abs_err / err_bound;
-      // std::cout << "effectivity=" << effectivity << std::endl;
-
-      // Print x0, abs_err, err_bound, effectivity to file, omit L suffix
-      // out << integrand.x0 << ", " << abs_err << ", " << err_bound << ", " << effectivity << ",\n";
-
       // Print x0, abs_err, ||f||_1, ||r_N||_1 (note: last column is a constant)
-      out << integrand.x0 << ", " << abs_err << ", " << norm_f << ", " << norm_rN << ",\n";
+      out << integrand->x0 << ", " << abs_err << ", " << norm_f << ", " << norm_rN << ",\n";
     }
 
   return 0;
