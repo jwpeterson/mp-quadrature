@@ -96,7 +96,6 @@ struct AlphaSingularity : Integrand
 
 
 
-
 // Class representing the piecewise integrand
 // { 1 + (x-x0)/(1+x0)
 // { 1 - (x-x0)/(1-x0)
@@ -142,6 +141,46 @@ struct Piecewise : Integrand
       return 0.5;
 
     return mpfr_class(1.)/(1. + x0) + mpfr_class(1.)/(1. - x0);
+  }
+};
+
+
+
+
+// Class representing the exponential integrand
+// exp(-alpha*|x-x0|)
+struct Exponential : Integrand
+{
+  Exponential(const mpfr_class & x0_in,
+              const mpfr_class & alpha_in) :
+    Integrand(x0_in),
+    alpha(alpha_in)
+  {}
+
+  mpfr_class alpha;
+
+  // Return the function value
+  virtual mpfr_class f(const mpfr_class & x) const
+  {
+    return exp(-alpha*abs(x-x0));
+  }
+
+  // True integral
+  virtual mpfr_class exact() const
+  {
+    return 2./alpha * (1. - exp(-alpha)*cosh(alpha*x0));
+  }
+
+  // Compute the L2-norm, squared
+  virtual mpfr_class L2_norm_squared() const
+  {
+    return 1./alpha * (1. - exp(-2.*alpha)*cosh(2.*alpha*x0));
+  }
+
+  // Compute the H1-semi norm, squared
+  virtual mpfr_class H1_semi_norm_squared() const
+  {
+    return alpha * (1. - exp(-2.*alpha)*cosh(2.*alpha*x0));
   }
 };
 
@@ -228,7 +267,7 @@ int main(int argc, char** argv)
   // will be written.
   std::ostringstream oss;
 
-  unsigned integrand_type = 1;
+  unsigned integrand_type = 2;
   switch (integrand_type)
     {
     case 0:
@@ -243,6 +282,13 @@ int main(int argc, char** argv)
       {
         integrand.reset(new Piecewise(/*x0=*/0.));
         oss << "plots/" << filebase << "_piecewise_err_bounds.csv";
+        break;
+      }
+
+    case 2:
+      {
+        integrand.reset(new Exponential(/*x0=*/0., /*alpha=*/6.));
+        oss << "plots/" << filebase << "_exponential_err_bounds.csv";
         break;
       }
 
