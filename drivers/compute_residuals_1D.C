@@ -186,6 +186,45 @@ struct Exponential : Integrand
 
 
 
+// Class representing the sinusoidal integrand
+// sin(alpha*(x-x0))
+struct Sinusoidal : Integrand
+{
+  Sinusoidal(const mpfr_class & x0_in,
+             const mpfr_class & alpha_in) :
+    Integrand(x0_in),
+    alpha(alpha_in)
+  {}
+
+  mpfr_class alpha;
+
+  // Return the function value
+  virtual mpfr_class f(const mpfr_class & x) const
+  {
+    return sin(alpha*(x-x0));
+  }
+
+  // True integral
+  virtual mpfr_class exact() const
+  {
+    return -2./alpha * sin(alpha) * sin(alpha * x0);
+  }
+
+  // Compute the L2-norm, squared
+  virtual mpfr_class L2_norm_squared() const
+  {
+    return 1. - sin(2*alpha) * cos(2*alpha*x0) / (2.*alpha);
+  }
+
+  // Compute the H1-semi norm, squared
+  virtual mpfr_class H1_semi_norm_squared() const
+  {
+    return alpha*alpha * (1. + sin(2*alpha) * cos(2*alpha*x0) / (2.*alpha));
+  }
+};
+
+
+
 
 
 // Approximate the value of an integral on [-1,1] using the quadrature
@@ -267,7 +306,7 @@ int main(int argc, char** argv)
   // will be written.
   std::ostringstream oss;
 
-  unsigned integrand_type = 2;
+  unsigned integrand_type = 3;
   switch (integrand_type)
     {
     case 0:
@@ -289,6 +328,22 @@ int main(int argc, char** argv)
       {
         integrand.reset(new Exponential(/*x0=*/0., /*alpha=*/6.));
         oss << "plots/" << filebase << "_exponential_err_bounds.csv";
+        break;
+      }
+
+    case 3:
+      {
+        // If alpha=n*pi, then the integrand does not depend on x0.
+        // const_pi() is defined in gmpfrxx.h.  The choice alpha=3*pi
+        // is particularly interesting: it causes all 3 of the
+        // first-order quadrature rules to give *exactly* the same
+        // result.  The Gauss(1) and Closed Trap. rules always have
+        // exactly the same (abs) error when alpha=n*pi, although the
+        // closed-trap one flips back and forth in sign.  This is
+        // because the true integrand is zero when alpha=n*pi.
+        mpfr_class alpha = 5. * const_pi();
+        integrand.reset(new Sinusoidal(/*x0=*/0., alpha));
+        oss << "plots/" << filebase << "_sinusoidal_err_bounds.csv";
         break;
       }
 
