@@ -341,9 +341,16 @@ int main(int argc, char** argv)
         // exactly the same (abs) error when alpha=n*pi, although the
         // closed-trap one flips back and forth in sign.  This is
         // because the true integrand is zero when alpha=n*pi.
-        mpfr_class alpha = 5. * const_pi();
+        mpfr_class alpha = 2. * const_pi();
+
+        // The integrand I(f) is maximized (for x0 = +/-1) when alpha=atan(2)
+        // mpfr_class alpha = atan(mpfr_class(2.));
+
+        // A large number which is not an integer multiple of pi
+        // mpfr_class alpha = 100.;
+
         integrand.reset(new Sinusoidal(/*x0=*/0., alpha));
-        oss << "plots/" << filebase << "_sinusoidal_err_bounds.csv";
+        oss << "plots/" << filebase << "_sinusoidal_alpha_" << std::setprecision(5) << alpha << "_err_bounds.csv";
         break;
       }
 
