@@ -1,3 +1,4 @@
+#include <cstdlib> // std::abort()
 #include "integrand.h"
 
 Integrand::Integrand(const mpfr_class & x0_in) :
