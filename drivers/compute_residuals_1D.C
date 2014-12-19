@@ -5,6 +5,7 @@
 #include <getopt.h> // getopt_long()
 #include "legendre.h"
 #include "gauss.h"
+#include "do_mkdir.h"
 
 // Function which computes and prints ||r_N||_2 values for the 1D rule
 // defined by the points x and weights w.  The 'filebase' string is used
@@ -288,6 +289,13 @@ int main(int argc, char** argv)
           usage();
         }
     } // end while
+
+  // Make the "plots" directory for the output, if it doesn't already exist
+  if (do_mkdir("plots", 0755) == -1)
+    {
+      std::cerr << "Failed to create plots directory." << std::endl;
+      std::abort();
+    }
 
   // Set up the quadrature rule to use
   std::vector<mpfr_class> x, w;
