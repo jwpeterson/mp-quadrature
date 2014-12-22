@@ -187,9 +187,10 @@ void compute_rN(const std::vector<Point<mpfr_class> > & generated_points,
   Dubiner dubiner;
 
   // The degree of Dubiner polynomials to compute the residual with
-  const unsigned max_dubiner_degree = 30;
+  const unsigned max_dubiner_degree = 10;
 
-  for (unsigned dubiner_degree=0; dubiner_degree <= max_dubiner_degree; ++dubiner_degree)
+  // FIXME: This is hard-coded to only run for d=10
+  for (unsigned dubiner_degree=10; dubiner_degree <= max_dubiner_degree; ++dubiner_degree)
     {
       std::vector<mpfr_class> E, current_vals;
 
@@ -214,24 +215,38 @@ void compute_rN(const std::vector<Point<mpfr_class> > & generated_points,
       // one.
       E[0] -= 0.5;
 
-      // To be converted into the residuals, we now just need to scale by the
-      // "orthogonality coefficients" which we also get from the Dubiner object.
-      std::vector<mpq_class> coeffs;
-      dubiner.orthogonality_coeffs(dubiner_degree, coeffs);
+      // Build the H1-projection matrix
+      Matrix<mpfr_class> A;
+      dubiner.build_H1_projection_matrix(dubiner_degree, A);
 
       // Make sure they are the same size
-      if (E.size() != coeffs.size())
+      if (E.size() != A.n_rows())
         {
-          std::cerr << "E vector size does not match coeff size!" << std::endl;
+          std::cerr << "E vector size does not match matrix size!" << std::endl;
           std::abort();
         }
 
-      // To compute the l2-norm, sum up the squares of the E vector
-      // entries, scaling by the orthogonality coefficients.
-      mpfr_class residual_l2_norm = 0.;
-      for (unsigned i=0; i<E.size(); ++i)
-        residual_l2_norm += E[i] * E[i] / coeffs[i];
+      // The LU solve will destroy A, therefore make a copy
+      // of A first since we also need it to compute the H1-norm of r.
+      Matrix<mpfr_class> A_copy(A);
 
-      std::cout << fix_string(residual_l2_norm, /*append_L=*/false) << std::endl;
+      // Solve Ar = E for r.
+      std::vector<mpfr_class> r;
+      A.lu_solve(r, E);
+
+      // Compute the H1-norm (squared) of the residual.  This is simply
+      // r^T * A * r.
+      mpfr_class residual_h1_norm_squared = 0.;
+      for (unsigned i=0; i<r.size(); ++i)
+        for (unsigned j=0; j<r.size(); ++j)
+          residual_h1_norm_squared += r[i] * A_copy(i,j) * r[j];
+
+      // Print norm, squared
+      // std::cout << "||r_N||_1^2 = "
+      //           << fix_string(residual_h1_norm_squared, /*append_L=*/false) << std::endl;
+
+      // Print norm
+      std::cout << "||r_N||_1 = "
+                << fix_string(sqrt(residual_h1_norm_squared), /*append_L=*/false) << std::endl;
     }
 }
