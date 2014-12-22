@@ -23,3 +23,7 @@ void Dubiner::dubiner_16th(const mpfr_class & zeta0,
   /* (15,1) */ vals.push_back((33*zeta2 - 1)*(-pow(zeta0, 15) + 225*pow(zeta0, 14)*zeta1 - 11025*pow(zeta0, 13)*pow(zeta1, 2) + 207025*pow(zeta0, 12)*pow(zeta1, 3) - 1863225*pow(zeta0, 11)*pow(zeta1, 4) + 9018009*pow(zeta0, 10)*pow(zeta1, 5) - 25050025*pow(zeta0, 9)*pow(zeta1, 6) + 41409225*pow(zeta0, 8)*pow(zeta1, 7) - 41409225*pow(zeta0, 7)*pow(zeta1, 8) + 25050025*pow(zeta0, 6)*pow(zeta1, 9) - 9018009*pow(zeta0, 5)*pow(zeta1, 10) + 1863225*pow(zeta0, 4)*pow(zeta1, 11) - 207025*pow(zeta0, 3)*pow(zeta1, 12) + 11025*pow(zeta0, 2)*pow(zeta1, 13) - 225*zeta0*pow(zeta1, 14) + pow(zeta1, 15)));
   /* (16,0) */ vals.push_back(pow(zeta0, 16) - 256*pow(zeta0, 15)*zeta1 + 14400*pow(zeta0, 14)*pow(zeta1, 2) - 313600*pow(zeta0, 13)*pow(zeta1, 3) + 3312400*pow(zeta0, 12)*pow(zeta1, 4) - 19079424*pow(zeta0, 11)*pow(zeta1, 5) + 64128064*pow(zeta0, 10)*pow(zeta1, 6) - 130873600*pow(zeta0, 9)*pow(zeta1, 7) + 165636900*pow(zeta0, 8)*pow(zeta1, 8) - 130873600*pow(zeta0, 7)*pow(zeta1, 9) + 64128064*pow(zeta0, 6)*pow(zeta1, 10) - 19079424*pow(zeta0, 5)*pow(zeta1, 11) + 3312400*pow(zeta0, 4)*pow(zeta1, 12) - 313600*pow(zeta0, 3)*pow(zeta1, 13) + 14400*pow(zeta0, 2)*pow(zeta1, 14) - 256*zeta0*pow(zeta1, 15) + pow(zeta1, 16));
 }
+
+// Local Variables:
+// truncate-lines: t
+// End:

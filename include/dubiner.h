@@ -3,9 +3,8 @@
 
 #include <vector>
 
-#include "gmp.h"
-#include "mpfr.h"
 #include "gmpfrxx.h"
+#include "matrix.h"
 
 class Dubiner
 {
@@ -25,6 +24,12 @@ public:
   // integrals of phi_i^2 for each phi_i
   void orthogonality_coeffs(unsigned d,
                             std::vector<mpq_class> & coeffs);
+
+  // Builds the coefficient matrix K_{ij} = int(phi_i*phi_j +
+  // grad(phi_i)*grad(phi_j)) for the Dubiner polynomials of degree d.
+  // Currently only works for d=10...
+  void build_H1_projection_matrix(unsigned d,
+                                  Matrix<mpfr_class> & matrix);
 
 private:
   // I split the guts of the "p" function across several files so we
@@ -158,6 +163,9 @@ private:
                     const mpfr_class & zeta1,
                     const mpfr_class & zeta2,
                     std::vector<mpfr_class> & vals);
+
+  // Used to fill in the H1 projection matrix - this is only valid for d=10!
+  static const mpfr_class laplace_matrix[66][66];
 };
 
 #endif
