@@ -7,6 +7,7 @@ drivers/gm_rule
 drivers/tri_rule
 drivers/test_dubiner
 drivers/compute_residuals_1D
+drivers/dubiner_verify
 lib/
 *.a
 *.o
