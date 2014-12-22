@@ -19,12 +19,6 @@
 // program is run with --help.
 void usage();
 
-// Compute the error estimate "B_m" for the given points and weights.
-// An output filename is constructed from input_filename.
-void compute_Bm(const std::vector<Point<mpfr_class> > & generated_points,
-                const std::vector<mpfr_class> & generated_weights,
-                const std::string & input_filename);
-
 // Output the generated points and weights (which are assumed to be on
 // a reference right triangle) on an equilateral triangle with
 // vertices (0,0), (1,0), and (1/2,sqrt(3)/2).  An output filename is
@@ -119,9 +113,6 @@ int main(int argc, char** argv)
         generated_weights[i] /= (mpfr_class(2.) * weight_sum);
     }
 
-  // Estimate the error B_m for this rule for various m values
-  // compute_Bm(generated_points, generated_weights, filename);
-
   // Output points on the equilateral triangle
   // output_equilateral(generated_points, generated_weights, filename);
 
@@ -144,70 +135,6 @@ void usage()
   std::cout << "\n";
 }
 
-
-
-void compute_Bm(const std::vector<Point<mpfr_class> > & generated_points,
-                const std::vector<mpfr_class> & generated_weights,
-                const std::string & input_filename)
-{
-  // Compute all 2-compositions for each m=1..M
-  const unsigned M = 30;
-  std::vector<std::vector<unsigned> > result;
-
-  // Write to a file that is named similarly to the input filename
-  std::string output_filename = input_filename;
-
-  // Erase leading path
-  size_t slash_pos = output_filename.find_last_of('/');
-  if (slash_pos != std::string::npos)
-    output_filename.erase(0, slash_pos+1);
-
-  // Erase file extension
-  size_t dot_pos = output_filename.find_last_of('.');
-  output_filename.erase(dot_pos);
-  output_filename += ".dat";
-  std::cout << "output_filename=" << output_filename << std::endl;
-
-  // Open a stream for output
-  std::ofstream out(output_filename.c_str());
-
-  // Set precision flags on the output file
-  out.precision(32);
-  out.setf(std::ios_base::scientific);
-
-  for (unsigned m=0; m<M; ++m)
-    {
-      compose_all(m, 2, result);
-
-      // Compute analytical value of \int x^a * y^b where a, b are given by the composition.
-      // Compute the quadrature approximation.
-      // Compute the difference.
-      // Accumulate the sum "B_m".
-      mpfr_class B_m = 0.;
-      for (unsigned i=0; i<result.size(); ++i)
-        {
-          unsigned
-            x_power = result[i][0],
-            y_power = result[i][1];
-
-          mpq_class analytical = exact_tri(x_power, y_power);
-
-          // Compute the quadrature solution
-          mpfr_class qsum = 0.;
-          for (unsigned q=0; q<generated_points.size(); ++q)
-            qsum += generated_weights[q] * pow(generated_points[q](0), x_power) * pow(generated_points[q](1), y_power);
-
-          // Compute the difference
-          mpfr_class abs_err = abs(analytical - qsum);
-
-          // Accumulate the sum
-          B_m += abs_err;
-        }
-
-      // Print in a way suitable for plotting in Matplotlib.
-      out << std::setw(2) << m << ", " << B_m << std::endl;
-    }
-}
 
 
 
