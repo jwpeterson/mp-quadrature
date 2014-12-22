@@ -16,6 +16,11 @@ int main(int argc, char** argv)
 
   const unsigned max_dubiner_degree = 4;
 
+  enum DubinerImplementation {SYMBOLIC=0, NUMERIC};
+
+  // Pick an implementation to verify
+  DubinerImplementation dubiner_implementation = SYMBOLIC;
+
   // 1.) Compute integral(phi(i)) for each of the Dubiner
   // polynomials.  They should all be zero except the first one,
   // since they are all orthogonal to constants.
@@ -52,17 +57,19 @@ int main(int argc, char** argv)
           // Evaluate all the Dubiner polynomials at the current qp
           // using the "numerical" Dubiner polynomials.
           std::vector<mpfr_class> current_vals;
-          dubiner.p_numeric(dubiner_degree,
-                            /*xi=*/  conical_rule_points[q](0),
-                            /*eta=*/ conical_rule_points[q](1),
-                            current_vals);
+          if (dubiner_implementation == NUMERIC)
+            dubiner.p_numeric(dubiner_degree,
+                              /*xi=*/  conical_rule_points[q](0),
+                              /*eta=*/ conical_rule_points[q](1),
+                              current_vals);
 
           // Evaluate all the Dubiner polynomials at the current qp
           // using the "symbolic" Dubiner polynomials.
-          // dubiner.p(dubiner_degree,
-          //           /*xi=*/  conical_rule_points[q](0),
-          //           /*eta=*/ conical_rule_points[q](1),
-          //           current_vals);
+          else
+            dubiner.p(dubiner_degree,
+                      /*xi=*/  conical_rule_points[q](0),
+                      /*eta=*/ conical_rule_points[q](1),
+                      current_vals);
 
           // Compute the phi(i) integrals using conical product rule quadrature.
           for (unsigned i=0; i<Np; ++i)
@@ -100,17 +107,19 @@ int main(int argc, char** argv)
 
           // Evaluate all the Dubiner polynomials at the current qp
           // using the "numerical" Dubiner polynomials.
-          // dubiner.p_numeric(dubiner_degree,
-          //                   /*xi=*/  conical_rule_points[q](0),
-          //                   /*eta=*/ conical_rule_points[q](1),
-          //                   current_vals);
+          if (dubiner_implementation == NUMERIC)
+            dubiner.p_numeric(dubiner_degree,
+                              /*xi=*/  conical_rule_points[q](0),
+                              /*eta=*/ conical_rule_points[q](1),
+                              current_vals);
 
           // Evaluate all the Dubiner polynomials at the current qp
           // using the "symbolic" Dubiner polynomials.
-          dubiner.p(dubiner_degree,
-                    /*xi=*/  conical_rule_points[q](0),
-                    /*eta=*/ conical_rule_points[q](1),
-                    current_vals);
+          else
+            dubiner.p(dubiner_degree,
+                      /*xi=*/  conical_rule_points[q](0),
+                      /*eta=*/ conical_rule_points[q](1),
+                      current_vals);
 
           // Square each of the current_vals to represent phi(i)**2
           for (unsigned i=0; i<Np; ++i)
