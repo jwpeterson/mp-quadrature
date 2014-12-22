@@ -202,6 +202,20 @@ void compute_rN(const std::vector<Point<mpfr_class> > & generated_points,
                             /*eta=*/ generated_points[i](1),
                             current_vals);
 
+          // // Debugging: compare to the "generated code" results
+          // {
+          //   std::vector<mpfr_class> current_vals_verify(current_vals.size());
+          //
+          //   dubiner.p(dubiner_degree,
+          //             /*xi=*/ generated_points[i](0),
+          //             /*eta=*/ generated_points[i](1),
+          //             current_vals_verify);
+          //
+          //   for (unsigned j=0; j<current_vals.size(); ++j)
+          //     std::cout << abs(current_vals[j] - current_vals_verify[j]) << std::endl;
+          // }
+
+
           // After the first loop iteration, this resize() should do nothing
           E.resize(current_vals.size());
 
