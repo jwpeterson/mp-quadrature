@@ -14,3 +14,7 @@ void Dubiner::dubiner_7th(const mpfr_class & zeta0,
   /* (6,1) */ vals.push_back((15*zeta2 - 1)*(pow(zeta0, 6) - 36*pow(zeta0, 5)*zeta1 + 225*pow(zeta0, 4)*pow(zeta1, 2) - 400*pow(zeta0, 3)*pow(zeta1, 3) + 225*pow(zeta0, 2)*pow(zeta1, 4) - 36*zeta0*pow(zeta1, 5) + pow(zeta1, 6)));
   /* (7,0) */ vals.push_back(-pow(zeta0, 7) + 49*pow(zeta0, 6)*zeta1 - 441*pow(zeta0, 5)*pow(zeta1, 2) + 1225*pow(zeta0, 4)*pow(zeta1, 3) - 1225*pow(zeta0, 3)*pow(zeta1, 4) + 441*pow(zeta0, 2)*pow(zeta1, 5) - 49*zeta0*pow(zeta1, 6) + pow(zeta1, 7));
 }
+
+// Local Variables:
+// truncate-lines: t
+// End:
