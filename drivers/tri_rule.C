@@ -196,25 +196,15 @@ void compute_rN(const std::vector<Point<mpfr_class> > & generated_points,
 
       for (unsigned i=0; i<generated_points.size(); ++i)
         {
-          // Evaluate all the Dubiner polynomials at the current qp
-          dubiner.p_numeric(dubiner_degree,
-                            /*xi=*/ generated_points[i](0),
-                            /*eta=*/ generated_points[i](1),
-                            current_vals);
-
-          // // Debugging: compare to the "generated code" results
-          // {
-          //   std::vector<mpfr_class> current_vals_verify(current_vals.size());
-          //
-          //   dubiner.p(dubiner_degree,
-          //             /*xi=*/ generated_points[i](0),
-          //             /*eta=*/ generated_points[i](1),
-          //             current_vals_verify);
-          //
-          //   for (unsigned j=0; j<current_vals.size(); ++j)
-          //     std::cout << abs(current_vals[j] - current_vals_verify[j]) << std::endl;
-          // }
-
+          // TODO: Eventually use the dubiner.p_numeric()
+          // implementation here. We can't use this until the
+          // orthogonality coefficients and the derivatives are
+          // implemented for the numerical Dubiner polynomials as
+          // well.
+          dubiner.p(dubiner_degree,
+                    /*xi=*/ generated_points[i](0),
+                    /*eta=*/ generated_points[i](1),
+                    current_vals);
 
           // After the first loop iteration, this resize() should do nothing
           E.resize(current_vals.size());
