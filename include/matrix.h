@@ -149,6 +149,7 @@ void Matrix<T>::print(std::ostream& os) const
       // At least it does seem to follow the precision flag.
       for (unsigned j=0; j<_n_cols; j++)
         os << std::setprecision(6)
+           << std::showpos
            << A(i,j) << " ";
       os << std::endl;
     }
