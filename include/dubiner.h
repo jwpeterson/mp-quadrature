@@ -20,6 +20,17 @@ public:
          const mpfr_class & eta,
          std::vector<mpfr_class> & vals);
 
+  // Evaluate the Dubiner polynomials up to and including degree d at
+  // the point (xi, eta).  Fill up the vector vals with the polynomial
+  // values in the canonical ordering.  This routine evaluates the
+  // Dubiner polynomials "numerically" using the method in Burgers'
+  // paper, instead of using generated code.  Once this is working, it
+  // should be a lot less code than the generated code route...
+  void p_numeric(unsigned d,
+                 const mpfr_class & xi,
+                 const mpfr_class & eta,
+                 std::vector<mpfr_class> & vals);
+
   // Return a vector of the orthogonality coefficients, these are the
   // integrals of phi_i^2 for each phi_i
   void orthogonality_coeffs(unsigned d,
