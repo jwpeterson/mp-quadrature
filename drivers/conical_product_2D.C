@@ -1,8 +1,7 @@
 #include <cstdlib> // std::abort, atoi
 #include <iomanip>
-#include "gauss.h"
-#include "jacobi.h"
 #include "exact.h"
+#include "conical.h"
 
 // In this program we compute multi-precision
 // points and weights to be used in Conical Product
@@ -22,83 +21,29 @@ int main(int argc, char** argv)
     n=atoi(argv[1]);
   std::cout << "\nComputing conical product rule with n^2=" << n*n << " points." << std::endl;
 
-  // Compute the Gauss rule points/weights
-  std::vector<mpfr_class> gauss_x, gauss_w;
-  gauss_rule(n, gauss_x, gauss_w);
+  // Construct a conical product rule of order 2*n-1, where n is the requested number of points
+  Conical conical;
+  conical.rule2D(2*n-1);
 
-  // Scale the Gauss points so they lie in [0,1].  We should probably make
-  // a Gauss class and have this be a member. See eg: Jacobi
-  mpfr_class zero(0.0), one(1.0);
-  {
-    mpfr_class a ( 0.5*(one-zero) );
-    mpfr_class b ( 0.5*(zero+one) );
-    for (unsigned int j=1; j<gauss_x.size(); ++j)
-      {
-        gauss_x[j] = a*gauss_x[j] + b;
-        gauss_w[j] *= 0.5;
-      }
-  }
-
-  // Compute the Jacobi rule points/weights
-  const Real alpha=1.0, beta=0.0;
-  Jacobi p(alpha,beta);
-  p.rule(n);
-
-  // Scale Jacobi weights so they sum to 1/3 (alpha==2) or 1/2 (alpha==1)
-  if (alpha==2.0)
-    {
-      mpfr_class one_third(1.0);
-      one_third /= 3.0;
-      p.scale_weights(one_third);
-    }
-  else if (alpha==1.0)
-    {
-      p.scale_weights(0.5);
-    }
-  else
-    {
-      std::cout << "Warning: weights unscaled!" << std::endl;
-    }
-
-  // Scale Jacobi points so they lie on [0, 1]
-  p.scale_points(zero, one);
-
-  // Print the result
-  // p.printxw();
-
-  // Get const references to the jacobi points and weights vectors.
-  const std::vector<mpfr_class>& jacobi_x = p.get_points();
-  const std::vector<mpfr_class>& jacobi_w = p.get_weights();
-
-  // Compute the conical product rule, with space for n^2 entries.
-  // See also the code in LibMesh's src/quadrature/quadrature.C
-  std::vector<mpfr_class> conical_x(n*n), conical_y(n*n), conical_w(n*n);
-  unsigned int gp = 0;
-  for (unsigned int i=0; i<n; i++)
-    for (unsigned int j=0; j<n; j++)
-      {
-        // Note: Access the 1D arrays from [1] ... [n]
-        conical_x[gp] = jacobi_x[j+1];                     //s[j];
-        conical_y[gp] = gauss_x[i+1] * (1.-jacobi_x[j+1]); //r[i]*(1.-s[j]);
-        conical_w[gp] = gauss_w[i+1] * jacobi_w[j+1];      //A[i]*B[j];
-        gp++;
-      }
+  // Get a reference to the conical product rule points and weights
+  const std::vector<Point<mpfr_class> > & rule_points = conical.get_points();
+  const std::vector<mpfr_class> & rule_weights = conical.get_weights();
 
   // Print out the conical product points and weights in a form we can use
   for (unsigned int i=0; i<n*n; ++i)
     {
-      std::cout << "_points[" << std::setw(2) << i << "](0)=" << fix_string(conical_x[i]) << ";\n";
-      std::cout << "_points[" << std::setw(2) << i << "](1)=" << fix_string(conical_y[i]) << ";\n";
+      std::cout << "_points[" << std::setw(2) << i << "](0)=" << fix_string(rule_points[i](0)) << ";\n";
+      std::cout << "_points[" << std::setw(2) << i << "](1)=" << fix_string(rule_points[i](1)) << ";\n";
     }
 
   std::cout << "\n";
   for (unsigned int i=0; i<n*n; ++i)
-    std::cout << "_weights[" << std::setw(2) << i << "]=" << fix_string(conical_w[i]) << ";\n";
+    std::cout << "_weights[" << std::setw(2) << i << "]=" << fix_string(rule_weights[i]) << ";\n";
 
   // As a check of the method, compute the sum of the weights
   mpfr_class sumweights=0.0;
   for (unsigned int i=0; i<n*n; ++i)
-    sumweights += conical_w[i];
+    sumweights += rule_weights[i];
 
   std::cout << "Sum of weights = " << fix_string(sumweights) << std::endl;
 
@@ -112,10 +57,10 @@ int main(int argc, char** argv)
         if (x_power + y_power > max_order)
           continue;
 
-        // conical_w, conical_x, and conical_y use 0-based array access!
+        // Conical product rule uses 0-based array access!
         mpfr_class sum = 0.;
-        for (unsigned n_qp=0; n_qp<conical_x.size(); ++n_qp)
-          sum += conical_w[n_qp] * pow(conical_x[n_qp], x_power) * pow(conical_y[n_qp], y_power);
+        for (unsigned n_qp=0; n_qp<rule_weights.size(); ++n_qp)
+          sum += rule_weights[n_qp] * pow(rule_points[n_qp](0), x_power) * pow(rule_points[n_qp](1), y_power);
 
         // std::cout << "quadrature = " << sum << std::endl;
 

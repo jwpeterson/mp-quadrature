@@ -1,5 +1,49 @@
 #include <cstdlib> // std::abort
 #include "dubiner.h"
+#include "common_definitions.h"
+
+void Dubiner::p_numeric(unsigned d,
+                        const mpfr_class & xi,
+                        const mpfr_class & eta,
+                        std::vector<mpfr_class> & vals)
+{
+  // Make sure there are no old values in the vector.
+  vals.clear();
+
+  for (unsigned i=0; i<=d; ++i)
+    for (unsigned j=0; j<=d; ++j)
+      {
+        // If degree is too high, continue
+        if (i+j > d)
+          continue;
+
+        // Map (xi, eta) to barycentric coordinates
+        mpfr_class
+          zeta0 = xi,
+          zeta1 = eta,
+          zeta2 = 1 - xi - eta;
+
+        // Compute transformed coordinate for evaluating P_i
+        mpfr_class transformed1 = (zeta1-zeta0) / (zeta1+zeta0);
+
+        // Compute P_i^(0,0)
+        mpfr_class P_i = this->jacobi(/*n=*/i, /*alpha=*/0, /*beta=*/0, /*x=*/transformed1);
+
+        // Scale P_i appropriately
+        P_i *= pow(zeta1 + zeta0, i);
+
+        // Compute transformed coordinate for evaluating P_j
+        mpfr_class transformed2 = 2.*zeta2 - 1.;
+
+        // Compute P_j^(2*i+1,0)
+        mpfr_class P_j = this->jacobi(/*n=*/j, /*alpha=*/2*i+1, /*beta=*/0, /*x=*/transformed2);
+
+        // Finally, compute and store the value
+        vals.push_back(P_i * P_j);
+      }
+}
+
+
 
 void Dubiner::p(unsigned d,
                 const mpfr_class & xi,
@@ -139,6 +183,35 @@ void Dubiner::build_H1_projection_matrix(unsigned d,
         else
           matrix(i,j) += laplace_matrix[i][j];
       }
+}
+
+
+
+mpfr_class Dubiner::jacobi(unsigned n, unsigned alpha, unsigned beta, mpfr_class x)
+{
+  // We are using the Wikipedia summation formula rather than the
+  // 3-term recursion formula. No attempt is made to evaluate
+  // factorials carefully, instead we are just using mpq_class objects
+  // for this...
+  mpfr_class result = 0.;
+  for (unsigned s=0; s<=n; ++s)
+    {
+      // The coefficient of each term is:
+      //      (n+alpha)! (n+beta)!
+      // --------------------------------
+      // (n+alpha-s)! (beta+s)! s! (n-s)!
+      mpq_class coeff = 1;
+      coeff *= factorial(n+alpha);
+      coeff /= factorial(n+alpha-s);
+      coeff *= factorial(n+beta);
+      coeff /= factorial(beta+s);
+      coeff /= factorial(s);
+      coeff /= factorial(n-s);
+
+      result += coeff * pow(0.5*(x-1), n-s) * pow(0.5*(x+1), s);
+    }
+
+  return result;
 }
 
 // Local Variables:

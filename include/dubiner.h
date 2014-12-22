@@ -20,6 +20,17 @@ public:
          const mpfr_class & eta,
          std::vector<mpfr_class> & vals);
 
+  // Evaluate the Dubiner polynomials up to and including degree d at
+  // the point (xi, eta).  Fill up the vector vals with the polynomial
+  // values in the canonical ordering.  This routine evaluates the
+  // Dubiner polynomials "numerically" using the method in Burgers'
+  // paper, instead of using generated code.  Once this is working, it
+  // should be a lot less code than the generated code route...
+  void p_numeric(unsigned d,
+                 const mpfr_class & xi,
+                 const mpfr_class & eta,
+                 std::vector<mpfr_class> & vals);
+
   // Return a vector of the orthogonality coefficients, these are the
   // integrals of phi_i^2 for each phi_i
   void orthogonality_coeffs(unsigned d,
@@ -32,6 +43,16 @@ public:
                                   Matrix<mpfr_class> & matrix);
 
 private:
+  // Compute the value of the nth Jacobi polynomial, P_n^{alpha,beta}
+  // at x.  Note that this implementation has a slightly different
+  // normalization than the one in the Jacobi class, which is designed
+  // specifically to create conical product quadrture rules...  for
+  // P_1, the Jacobi class produces:
+  // x + (alpha-beta)/(alpha+beta+2)
+  // while this class produces:
+  // (1/2)*((alpha+beta+2)*x + (alpha-beta))
+  mpfr_class jacobi(unsigned n, unsigned alpha, unsigned beta, mpfr_class x);
+
   // I split the guts of the "p" function across several files so we
   // could compile it in parallel more easily.
   void dubiner_5th(const mpfr_class & zeta0,
