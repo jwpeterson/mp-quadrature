@@ -1,3 +1,4 @@
+#include <cstdlib> // std::abort
 #include "dubiner.h"
 
 void Dubiner::p(unsigned d,
@@ -693,6 +694,44 @@ void Dubiner::orthogonality_coeffs(unsigned d,
       /* 29 */ coeffs.push_back(mpq_class("1/3658"));
       /* 30 */ coeffs.push_back(mpq_class("1/3782"));
     }
+}
+
+void Dubiner::build_H1_projection_matrix(unsigned d,
+                                         Matrix<mpfr_class> & matrix)
+{
+  // Currently only works for d==10
+  if (d != 10)
+    {
+      std::cerr << "Can only build H1-projection matrix for d==10!" << std::endl;
+      std::abort();
+    }
+
+  // Get the "orthogonality coeffs", which are int(phi_i * phi_j) for
+  // the requested value of d.
+  std::vector<mpq_class> coeffs;
+  this->orthogonality_coeffs(d, coeffs);
+
+  // The number of rows/cols in the matrix
+  const unsigned N = coeffs.size();
+
+  // Resize the input matrix.
+  matrix.resize(coeffs.size(), coeffs.size());
+
+  // Fill in the diagonal entries
+  for (unsigned i=0; i<N; ++i)
+    matrix(i,i) = coeffs[i];
+
+  // Fill in the off-diagonal parts of the matrix.  These were
+  // pre-computed in Python...
+  for (unsigned i=0; i<N; ++i)
+    for (unsigned j=0; j<N; ++j)
+      {
+        // The upper triangle is empty
+        if (j > i)
+          matrix(i,j) += laplace_matrix[j][i];
+        else
+          matrix(i,j) += laplace_matrix[i][j];
+      }
 }
 
 // Local Variables:
