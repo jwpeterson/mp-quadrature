@@ -93,7 +93,7 @@ void read_rule(const std::string & filename, Rule & rule)
             << centroid_count << " centroid generator(s), "
             << median_count << " median generator(s), "
             << arbitrary_count << " arbitrary generator(s), "
-            << single_count << " single point generator(s), and"
+            << single_count << " single point generator(s), and "
             << Ro3_count << " Ro3 generators."
             << std::endl;
 
