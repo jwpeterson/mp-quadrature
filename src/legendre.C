@@ -110,11 +110,13 @@ void Legendre::build_H1_projection_matrix(unsigned d,
   // pre-computed in Python for the reference element and the Legendre polynomials.
   for (unsigned i=0; i<N; ++i)
     for (unsigned j=0; j<N; ++j)
-      // The upper triangle is empty
-      if (j > i)
-        matrix(i,j) += laplace_matrix[j][i];
-      else
-        matrix(i,j) += laplace_matrix[i][j];
+      {
+        // The upper triangle is empty
+        if (j > i)
+          matrix(i,j) += laplace_matrix[j][i];
+        else
+          matrix(i,j) += laplace_matrix[i][j];
+      }
 }
 
 
