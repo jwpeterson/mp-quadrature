@@ -158,6 +158,9 @@ private:
                     const mpfr_class & zeta1,
                     const mpfr_class & zeta2,
                     std::vector<mpfr_class> & vals);
+
+  // Used to fill in the H1 projection matrix - this is only valid for d=10!
+  static const mpfr_class laplace_matrix[66][66];
 };
 
 #endif

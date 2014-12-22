@@ -694,3 +694,7 @@ void Dubiner::orthogonality_coeffs(unsigned d,
       /* 30 */ coeffs.push_back(mpq_class("1/3782"));
     }
 }
+
+// Local Variables:
+// truncate-lines: t
+// End:
