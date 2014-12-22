@@ -1,5 +1,6 @@
 #include <cstdlib> // std::abort
 #include "dubiner.h"
+#include "common_definitions.h"
 
 void Dubiner::p(unsigned d,
                 const mpfr_class & xi,
@@ -139,6 +140,35 @@ void Dubiner::build_H1_projection_matrix(unsigned d,
         else
           matrix(i,j) += laplace_matrix[i][j];
       }
+}
+
+
+
+mpfr_class Dubiner::jacobi(unsigned n, unsigned alpha, unsigned beta, mpfr_class x)
+{
+  // We are using the Wikipedia summation formula rather than the
+  // 3-term recursion formula. No attempt is made to evaluate
+  // factorials carefully, instead we are just using mpq_class objects
+  // for this...
+  mpfr_class result = 0.;
+  for (unsigned s=0; s<=n; ++s)
+    {
+      // The coefficient of each term is:
+      //      (n+alpha)! (n+beta)!
+      // --------------------------------
+      // (n+alpha-s)! (beta+s)! s! (n-s)!
+      mpq_class coeff = 1;
+      coeff *= factorial(n+alpha);
+      coeff /= factorial(n+alpha-s);
+      coeff *= factorial(n+beta);
+      coeff /= factorial(beta+s);
+      coeff /= factorial(s);
+      coeff /= factorial(n-s);
+
+      result += coeff * pow(0.5*(x-1), n-s) * pow(0.5*(x+1), s);
+    }
+
+  return result;
 }
 
 // Local Variables:

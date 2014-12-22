@@ -31,6 +31,24 @@ void iota (ForwardIter first, ForwardIter last, T value)
 }
 
 
+/**
+ * Simple (non-recursive) factrial function implementation.
+ */
+inline
+unsigned int factorial(unsigned int n)
+{
+  unsigned int factorial_n = 1;
+
+  if (n==0)
+    return factorial_n;
+
+  for (unsigned int i=1; i<n; i++)
+    factorial_n *= i+1;
+
+  return factorial_n;
+}
+
+
 
 /**
  * A simple class representing an arbitrary-precision point in
