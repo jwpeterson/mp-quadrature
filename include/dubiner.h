@@ -53,6 +53,9 @@ private:
   // (1/2)*((alpha+beta+2)*x + (alpha-beta))
   mpfr_class jacobi(unsigned n, unsigned alpha, unsigned beta, mpfr_class x);
 
+  // Same as above, but the first derivative
+  mpfr_class djacobi(unsigned n, unsigned alpha, unsigned beta, mpfr_class x);
+
   // I split the guts of the "p" function across several files so we
   // could compile it in parallel more easily.
   void dubiner_5th(const mpfr_class & zeta0,

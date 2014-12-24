@@ -214,6 +214,41 @@ mpfr_class Dubiner::jacobi(unsigned n, unsigned alpha, unsigned beta, mpfr_class
   return result;
 }
 
+
+
+mpfr_class Dubiner::djacobi(unsigned n, unsigned alpha, unsigned beta, mpfr_class x)
+{
+  // We are using the Wikipedia summation formula rather than the
+  // 3-term recursion formula. No attempt is made to evaluate
+  // factorials carefully, instead we are just using mpq_class objects
+  // for this...
+  mpfr_class result = 0.;
+  for (unsigned s=0; s<=n; ++s)
+    {
+      // The coefficient of each term is:
+      //      (n+alpha)! (n+beta)!
+      // --------------------------------
+      // (n+alpha-s)! (beta+s)! s! (n-s)!
+      mpq_class coeff = 1;
+      coeff *= factorial(n+alpha);
+      coeff /= factorial(n+alpha-s);
+      coeff *= factorial(n+beta);
+      coeff /= factorial(beta+s);
+      coeff /= factorial(s);
+      coeff /= factorial(n-s);
+
+      mpfr_class x_term = 0.;
+      if (s != n)
+        x_term += mpfr_class(0.5)*(n-s) * pow(0.5*(x-1), n-s-1) * pow(0.5*(x+1), s);
+      if (s != 0)
+        x_term += pow(0.5*(x-1), n-s) * mpfr_class(0.5) * s * pow(0.5*(x+1), s-1);
+
+      result += coeff * x_term;
+    }
+
+  return result;
+}
+
 // Local Variables:
 // truncate-lines: t
 // End:
