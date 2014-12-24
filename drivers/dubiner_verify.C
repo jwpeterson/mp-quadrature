@@ -14,7 +14,11 @@ int main(int argc, char** argv)
   Dubiner dubiner;
   Conical conical;
 
-  const unsigned max_dubiner_degree = 4;
+  // Read max Dubiner polynomial degree from command line
+  unsigned int max_dubiner_degree = 4;
+  if (argc > 1)
+    max_dubiner_degree = atoi(argv[1]);
+  std::cout << "\nVerifying d=" << max_dubiner_degree << " Dubiner polynomials." << std::endl;
 
   enum DubinerImplementation {SYMBOLIC=0, NUMERIC};
 
