@@ -75,6 +75,9 @@ void Dubiner::dp(unsigned d,
         // Compute d/dx P_i
         mpfr_class dPi_dx = this->djacobi(/*n=*/i, /*alpha=*/0, /*beta=*/0, /*x=*/transformed1);
 
+        // Debugging:
+        // std::cout << "d/dx P_{i=" << i << "} = " << dPi_dx << std::endl;
+
         // Compute d/d(xi) P_i
         mpfr_class dPi_dxi = -2*eta/(xi + eta)/(xi + eta) * dPi_dx;
 
@@ -97,7 +100,7 @@ void Dubiner::dp(unsigned d,
         mpfr_class dPj = (-2.) * this->djacobi(/*n=*/j, /*alpha=*/2*i+1, /*beta=*/0, /*x=*/transformed2);
 
         // Debugging (undo dPj scaling):
-        std::cout << "d/dx P_{j=" << j << "}, alpha=" << 2*i+1 << " = " << -0.5*dPj << std::endl;
+        // std::cout << "d/dx P_{j=" << j << "}, alpha=" << 2*i+1 << " = " << -0.5*dPj << std::endl;
 
         // Finally, compute and store the derivatives
         vals.push_back(Point<mpfr_class>(Pi*scaling_term*dPj + Pj*(Pi*dscaling_term + scaling_term*dPi_dxi),

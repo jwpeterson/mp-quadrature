@@ -14,7 +14,7 @@ int main(int argc, char** argv)
   Dubiner dubiner;
   Conical conical;
 
-  const unsigned max_dubiner_degree = 3;
+  const unsigned max_dubiner_degree = 4;
 
   enum DubinerImplementation {SYMBOLIC=0, NUMERIC};
 
@@ -43,6 +43,8 @@ int main(int argc, char** argv)
 
       for (unsigned q=0; q<Nq; ++q)
         {
+          // std::cout << "\nq=" << q << std::endl;
+
           std::vector<mpfr_class> current_vals;
           std::vector<Point<mpfr_class> > current_derivs;
 
@@ -87,6 +89,13 @@ int main(int argc, char** argv)
           Matrix<mpfr_class>
             mass(Np, Np),
             laplace(Np, Np);
+
+          // // Extra debugging:
+          // for (unsigned i=0; i<Np; ++i)
+          //   {
+          //     std::cout << "current_derivs[" << i << "]=" << current_derivs[i](0) << ", " << current_derivs[i](1) << std::endl;
+          //     // std::cout << "current_vals[" << i << "]=" << current_vals[i] << std::endl;
+          //   }
 
           for (unsigned i=0; i<Np; ++i)
             for (unsigned j=0; j<Np; ++j)
