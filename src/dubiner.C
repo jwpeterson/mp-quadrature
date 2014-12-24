@@ -45,6 +45,66 @@ void Dubiner::p_numeric(unsigned d,
 
 
 
+void Dubiner::dp(unsigned d,
+                 const mpfr_class & xi,
+                 const mpfr_class & eta,
+                 std::vector<Point<mpfr_class> > & vals)
+{
+  // Make sure there are no old values in the vector.
+  vals.clear();
+
+  for (unsigned i=0; i<=d; ++i)
+    for (unsigned j=0; j<=d; ++j)
+      {
+        // If degree is too high, continue
+        if (i+j > d)
+          continue;
+
+        // Map (xi, eta) to barycentric coordinates
+        mpfr_class
+          zeta0 = xi,
+          zeta1 = eta,
+          zeta2 = 1 - xi - eta;
+
+        // Compute transformed coordinate for evaluating P_i
+        mpfr_class transformed1 = (zeta1-zeta0) / (zeta1+zeta0);
+
+        // Compute P_i^(0,0)
+        mpfr_class Pi = this->jacobi(/*n=*/i, /*alpha=*/0, /*beta=*/0, /*x=*/transformed1);
+
+        // Compute d/dx P_i
+        mpfr_class dPi_dx = this->djacobi(/*n=*/i, /*alpha=*/0, /*beta=*/0, /*x=*/transformed1);
+
+        // Compute d/d(xi) P_i
+        mpfr_class dPi_dxi = -2*eta/(xi*xi + eta*eta) * dPi_dx;
+
+        // Compute d/d(eta) P_i
+        mpfr_class dPi_deta = 2*xi/(xi*xi + eta*eta) * dPi_dx;
+
+        // Compute the "scaling" term
+        mpfr_class scaling_term = pow(zeta1 + zeta0, i);
+
+        // Compute derivative of scaling term
+        mpfr_class dscaling_term = i==0 ? mpfr_class(0.) : mpfr_class(i) * pow(zeta1 + zeta0, i-1);
+
+        // Compute transformed coordinate for evaluating P_j
+        mpfr_class transformed2 = 2.*zeta2 - 1.;
+
+        // Compute P_j^(2*i+1,0)
+        mpfr_class Pj = this->jacobi(/*n=*/j, /*alpha=*/2*i+1, /*beta=*/0, /*x=*/transformed2);
+
+        // Compute d/d(xi) P_j = d/d(eta) P_j = (-1) * d(P_j)/dx
+        mpfr_class dPj = (-1.) * this->djacobi(/*n=*/j, /*alpha=*/2*i+1, /*beta=*/0, /*x=*/transformed2);
+
+        // Finally, compute and store the derivatives
+        vals.push_back(Point<mpfr_class>(Pi*scaling_term*dPj + Pj*(Pi*dscaling_term + scaling_term*dPi_dxi),
+                                         Pi*scaling_term*dPj + Pj*(Pi*dscaling_term + scaling_term*dPi_deta)));
+      }
+}
+
+
+
+
 void Dubiner::p(unsigned d,
                 const mpfr_class & xi,
                 const mpfr_class & eta,

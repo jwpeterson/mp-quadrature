@@ -5,6 +5,7 @@
 
 #include "gmpfrxx.h"
 #include "matrix.h"
+#include "common_definitions.h"
 
 class Dubiner
 {
@@ -19,6 +20,12 @@ public:
          const mpfr_class & xi,
          const mpfr_class & eta,
          std::vector<mpfr_class> & vals);
+
+  // Same as above, but returns grad(p)
+  void dp(unsigned d,
+          const mpfr_class & xi,
+          const mpfr_class & eta,
+          std::vector<Point<mpfr_class> > & vals);
 
   // Evaluate the Dubiner polynomials up to and including degree d at
   // the point (xi, eta).  Fill up the vector vals with the polynomial
