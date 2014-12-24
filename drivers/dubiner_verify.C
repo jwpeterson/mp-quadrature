@@ -14,7 +14,7 @@ int main(int argc, char** argv)
   Dubiner dubiner;
   Conical conical;
 
-  const unsigned max_dubiner_degree = 4;
+  const unsigned max_dubiner_degree = 3;
 
   enum DubinerImplementation {SYMBOLIC=0, NUMERIC};
 
@@ -38,7 +38,7 @@ int main(int argc, char** argv)
 
       // Place to store the integrated mass and Laplace matrices.
       Matrix<mpfr_class>
-        quadrature_sums(Np, Np),
+        mass_sums(Np, Np),
         laplace_sums(Np, Np);
 
       for (unsigned q=0; q<Nq; ++q)
@@ -102,22 +102,22 @@ int main(int argc, char** argv)
           for (unsigned i=0; i<Np; ++i)
             for (unsigned j=0; j<Np; ++j)
               {
-                quadrature_sums(i,j) += conical_rule_weights[q] * mass(i,j);
+                mass_sums(i,j) += conical_rule_weights[q] * mass(i,j);
                 laplace_sums(i,j) += conical_rule_weights[q] * laplace(i,j);
               }
         }
 
       // Print the mass matrix
       std::cout << "\n int phi(i)*phi(j)" << std::endl;
-      quadrature_sums.print();
+      mass_sums.print();
 
       // Print an error message if an off-diagonal entry is too large
       for (unsigned i=0; i<Np; ++i)
         for (unsigned j=0; j<Np; ++j)
           {
-            if ((i != j) && (abs(quadrature_sums(i,j)) > 1.e-30))
+            if ((i != j) && (abs(mass_sums(i,j)) > 1.e-30))
               {
-                std::cerr << "Matrix entry " << i << "," << j << " should be zero, but is " << quadrature_sums(i,j) << std::endl;
+                std::cerr << "Matrix entry " << i << "," << j << " should be zero, but is " << mass_sums(i,j) << std::endl;
                 std::abort();
               }
           }
