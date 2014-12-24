@@ -57,6 +57,15 @@ int main(int argc, char** argv)
                                 /*eta=*/ conical_rule_points[q](1),
                                 current_vals);
 
+              // Debugging: symbolic polynomial values with numeric
+              // derivative values... the order doesn't match, but we
+              // can still check the orthogonality.
+              // dubiner.p(dubiner_degree,
+              //           /*xi=*/  conical_rule_points[q](0),
+              //           /*eta=*/ conical_rule_points[q](1),
+              //           current_vals);
+
+
               dubiner.dp(dubiner_degree,
                          /*xi=*/  conical_rule_points[q](0),
                          /*eta=*/ conical_rule_points[q](1),
