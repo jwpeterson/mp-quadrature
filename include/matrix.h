@@ -148,9 +148,17 @@ void Matrix<T>::print(std::ostream& os) const
       // just does a dynamic mix of scientific and fixed-point formatting.
       // At least it does seem to follow the precision flag.
       for (unsigned j=0; j<_n_cols; j++)
-        os << std::setprecision(6)
-           << std::showpos
-           << A(i,j) << " ";
+        {
+          // Don't print values smaller than epsilon=1.e-30
+          T val = A(i,j);
+
+          if (abs(val) < 1.e-30)
+            val = 0.;
+
+          os << std::setprecision(6)
+             << std::showpos
+             << val << " ";
+        }
       os << std::endl;
     }
 
