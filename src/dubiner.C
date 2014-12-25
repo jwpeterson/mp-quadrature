@@ -1,6 +1,7 @@
 #include <cstdlib> // std::abort
 #include "dubiner.h"
 #include "common_definitions.h"
+#include "conical.h"
 
 void Dubiner::p_numeric(unsigned d,
                         const mpfr_class & xi,
@@ -216,39 +217,53 @@ void Dubiner::p(unsigned d,
 void Dubiner::build_H1_projection_matrix(unsigned d,
                                          Matrix<mpfr_class> & matrix)
 {
-  // Currently only works for d==10
-  if (d != 10)
+  // The number of polynomials in the Dubiner basis of degree 'd'
+  const unsigned Np = (d+1)*(d+2)/2;
+
+  // Resize the input matrix.  Clear it too?
+  matrix.resize(Np, Np);
+
+  // We use conical product quadrature of order 2*d to construct the
+  // H1 projection matrix.
+  Conical conical;
+  conical.rule2D(2*d);
+  const std::vector<Point<mpfr_class> > & conical_rule_points = conical.get_points();
+  const std::vector<mpfr_class> & conical_rule_weights = conical.get_weights();
+
+  // Nq is the number of points in the quadrature rule
+  const unsigned Nq = conical_rule_points.size();
+
+  // Fill in the diagonal entries.  We've already independently verified that
+  // the off-diagonal entries of the mass matrix are zero.
+  for (unsigned q=0; q<Nq; ++q)
     {
-      std::cerr << "Can only build H1-projection matrix for d==10!" << std::endl;
-      std::abort();
+      std::vector<mpfr_class> current_vals;
+
+      // Evaluate the Dubiner polynomials at the current qp
+      this->p_numeric(d,
+                      /*xi=*/  conical_rule_points[q](0),
+                      /*eta=*/ conical_rule_points[q](1),
+                      current_vals);
+
+      // Evaluate the Dubiner polynomial derivatives at the current qp
+      std::vector<Point<mpfr_class> > current_derivs;
+      this->dp(d,
+               /*xi=*/  conical_rule_points[q](0),
+               /*eta=*/ conical_rule_points[q](1),
+               current_derivs);
+
+      // Accumulate the mass and Laplace matrix entries.  TODO: only
+      // fill in the lower triangle, then copy to the upper triangle.
+      for (unsigned i=0; i<Np; ++i)
+        for (unsigned j=0; j<Np; ++j)
+          {
+            matrix(i,j) +=
+              conical_rule_weights[q] *
+              (current_vals[i]*current_vals[j] +
+               current_derivs[i](0)*current_derivs[j](0) +
+               current_derivs[i](1)*current_derivs[j](1));
+          }
     }
-
-  // Get the "orthogonality coeffs", which are int(phi_i * phi_j) for
-  // the requested value of d.
-  std::vector<mpq_class> coeffs;
-  this->orthogonality_coeffs(d, coeffs);
-
-  // The number of rows/cols in the matrix
-  const unsigned N = coeffs.size();
-
-  // Resize the input matrix.
-  matrix.resize(coeffs.size(), coeffs.size());
-
-  // Fill in the diagonal entries
-  for (unsigned i=0; i<N; ++i)
-    matrix(i,i) = coeffs[i];
-
-  // Fill in the off-diagonal parts of the matrix.  These were
-  // pre-computed in Python...
-  for (unsigned i=0; i<N; ++i)
-    for (unsigned j=0; j<N; ++j)
-      {
-        // The upper triangle is empty
-        if (j > i)
-          matrix(i,j) += laplace_matrix[j][i];
-        else
-          matrix(i,j) += laplace_matrix[i][j];
-      }
 }
 
 
