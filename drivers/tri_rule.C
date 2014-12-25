@@ -189,7 +189,7 @@ void compute_rN(const std::vector<Point<mpfr_class> > & generated_points,
   // The degree of Dubiner polynomials to compute the residual with
   const unsigned max_dubiner_degree = 30;
 
-  for (unsigned dubiner_degree=0; dubiner_degree <= max_dubiner_degree; ++dubiner_degree)
+  for (unsigned dubiner_degree=0; dubiner_degree <= max_dubiner_degree; dubiner_degree+=2)
     {
       std::vector<mpfr_class> E, current_vals;
 
