@@ -187,24 +187,18 @@ void compute_rN(const std::vector<Point<mpfr_class> > & generated_points,
   Dubiner dubiner;
 
   // The degree of Dubiner polynomials to compute the residual with
-  const unsigned max_dubiner_degree = 10;
+  const unsigned max_dubiner_degree = 30;
 
-  // FIXME: This is hard-coded to only run for d=10
-  for (unsigned dubiner_degree=10; dubiner_degree <= max_dubiner_degree; ++dubiner_degree)
+  for (unsigned dubiner_degree=0; dubiner_degree <= max_dubiner_degree; dubiner_degree+=2)
     {
       std::vector<mpfr_class> E, current_vals;
 
       for (unsigned i=0; i<generated_points.size(); ++i)
         {
-          // TODO: Eventually use the dubiner.p_numeric()
-          // implementation here. We can't use this until the
-          // orthogonality coefficients and the derivatives are
-          // implemented for the numerical Dubiner polynomials as
-          // well.
-          dubiner.p(dubiner_degree,
-                    /*xi=*/ generated_points[i](0),
-                    /*eta=*/ generated_points[i](1),
-                    current_vals);
+          dubiner.p_numeric(dubiner_degree,
+                            /*xi=*/ generated_points[i](0),
+                            /*eta=*/ generated_points[i](1),
+                            current_vals);
 
           // After the first loop iteration, this resize() should do nothing
           E.resize(current_vals.size());
@@ -250,7 +244,8 @@ void compute_rN(const std::vector<Point<mpfr_class> > & generated_points,
       //           << fix_string(residual_h1_norm_squared, /*append_L=*/false) << std::endl;
 
       // Print norm
-      std::cout << "||r_N||_1 = "
+      std::cout << std::setw(2) << dubiner_degree
+                << ", "
                 << fix_string(sqrt(residual_h1_norm_squared), /*append_L=*/false) << std::endl;
     }
 }

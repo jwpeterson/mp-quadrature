@@ -32,12 +32,14 @@ void iota (ForwardIter first, ForwardIter last, T value)
 
 
 /**
- * Simple (non-recursive) factrial function implementation.
+ * Simple (non-recursive) factrial function implementation.  Using big
+ * ints so we hopefully don't have to worry about integer overflow for
+ * large n...
  */
 inline
-unsigned int factorial(unsigned int n)
+mpz_class factorial(mpz_class n)
 {
-  unsigned int factorial_n = 1;
+  mpz_class factorial_n = 1;
 
   if (n==0)
     return factorial_n;
