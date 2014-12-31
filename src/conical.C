@@ -20,39 +20,23 @@ void Conical::rule3D(unsigned int order)
 
   // Scale the Gauss points so they lie in [0,1].  We should probably make
   // a Gauss class and have this be a member. See eg: Jacobi
-  mpfr_class zero(0.0), one(1.0);
-  {
-    mpfr_class a (0.5*(one-zero));
-    mpfr_class b (0.5*(zero+one));
-    for (unsigned int j=1; j<gauss_x.size(); ++j)
-      {
-        gauss_x[j] = a*gauss_x[j] + b;
-        gauss_w[j] *= 0.5;
-      }
-  }
+  for (unsigned int j=1; j<gauss_x.size(); ++j)
+    {
+      gauss_x[j] = 0.5*(gauss_x[j] + 1.);
+      gauss_w[j] *= 0.5;
+    }
 
-  // Compute the Jacobi rules' points/weights:
-  //
-  // p1 := alpha=1, beta=0
-  const Real alpha1=1.0, beta1=0.0;
-  Jacobi p1(alpha1, beta1);
+  // Compute the first Jacobi rule's points/weights:
+  Jacobi p1(/*alpha=*/1., /*beta=*/0.);
   p1.rule(n_points);
   p1.scale_weights(0.5);
-  p1.scale_points(zero, one);
-  // p1.printxw();  // Print the result
+  p1.scale_points(0., 1.);
 
-
-  // p2 := alpha=2, beta=0
-  const Real alpha2=2.0, beta2=0.0;
-  Jacobi p2(alpha2, beta2);
+  // Compute the second Jacobi rule's points/weights:
+  Jacobi p2(/*alpha=*/2., /*beta=*/0.);
   p2.rule(n_points);
-  {
-    mpfr_class one_third(1.0);
-    one_third /= 3.0;
-    p2.scale_weights(one_third);
-  }
-  p2.scale_points(zero, one);
-  // p2.printxw(); // Print the result
+  p2.scale_weights(mpfr_class(1.)/3.);
+  p2.scale_points(0., 1.);
 
   // Get const references to the jacobi points and weights vectors.
   const std::vector<mpfr_class>& jacobi1_x = p1.get_points();
@@ -70,10 +54,10 @@ void Conical::rule3D(unsigned int order)
       for (unsigned int k=0; k<n_points; k++)
         {
           // Note: Access the 1D arrays from [1] ... [n]
-          x[gp](0) = jacobi2_x[k+1]; // jacB1D.qp(k)(0);
-          x[gp](1) = jacobi1_x[j+1] * (1.-jacobi2_x[k+1]); // jacA1D.qp(j)(0) * (1.-jacB1D.qp(k)(0));
+          x[gp](0) = jacobi2_x[k+1];                                           // jacB1D.qp(k)(0);
+          x[gp](1) = jacobi1_x[j+1] * (1.-jacobi2_x[k+1]);                     // jacA1D.qp(j)(0) * (1.-jacB1D.qp(k)(0));
           x[gp](2) = gauss_x[i+1] * (1.-jacobi1_x[j+1]) * (1.-jacobi2_x[k+1]); // gauss1D.qp(i)(0) * (1.-jacA1D.qp(j)(0)) * (1.-jacB1D.qp(k)(0));
-          w[gp] = gauss_w[i+1] * jacobi1_w[j+1] * jacobi2_w[k+1]; //gauss1D.w(i) * jacA1D.w(j) * jacB1D.w(k);
+          w[gp] = gauss_w[i+1] * jacobi1_w[j+1] * jacobi2_w[k+1];              // gauss1D.w(i) * jacA1D.w(j) * jacB1D.w(k);
           gp++;
         }
 }
