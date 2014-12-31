@@ -20,11 +20,6 @@ int main(int argc, char** argv)
     max_dubiner_degree = atoi(argv[1]);
   std::cout << "\nVerifying d=" << max_dubiner_degree << " Dubiner polynomials." << std::endl;
 
-  enum DubinerImplementation {SYMBOLIC=0, NUMERIC};
-
-  // Pick an implementation to verify
-  DubinerImplementation dubiner_implementation = NUMERIC;
-
   // Compute integral(phi(i)*phi(j)) for each of the Dubiner polynomials.
   for (unsigned dubiner_degree=/*0*/max_dubiner_degree; dubiner_degree <= max_dubiner_degree; ++dubiner_degree)
     {
@@ -52,42 +47,15 @@ int main(int argc, char** argv)
           std::vector<mpfr_class> current_vals;
           std::vector<Point<mpfr_class> > current_derivs;
 
-          // Evaluate all the Dubiner polynomials at the current qp
-          // using the "numerical" Dubiner polynomials.
-          if (dubiner_implementation == NUMERIC)
-            {
-              dubiner.p_numeric(dubiner_degree,
-                                /*xi=*/  conical_rule_points[q](0),
-                                /*eta=*/ conical_rule_points[q](1),
-                                current_vals);
+          dubiner.p_numeric(dubiner_degree,
+                            /*xi=*/  conical_rule_points[q](0),
+                            /*eta=*/ conical_rule_points[q](1),
+                            current_vals);
 
-              // Debugging: symbolic polynomial values with numeric
-              // derivative values... the order doesn't match, but we
-              // can still check the orthogonality.
-              // dubiner.p(dubiner_degree,
-              //           /*xi=*/  conical_rule_points[q](0),
-              //           /*eta=*/ conical_rule_points[q](1),
-              //           current_vals);
-
-
-              dubiner.dp(dubiner_degree,
-                         /*xi=*/  conical_rule_points[q](0),
-                         /*eta=*/ conical_rule_points[q](1),
-                         current_derivs);
-            }
-
-          // Evaluate all the Dubiner polynomials at the current qp
-          // using the "symbolic" Dubiner polynomials.
-          else
-            {
-              dubiner.p(dubiner_degree,
-                        /*xi=*/  conical_rule_points[q](0),
-                        /*eta=*/ conical_rule_points[q](1),
-                        current_vals);
-
-              std::cerr << "Symbolic Dubiner polynomial derivatives not available!" << std::endl;
-              std::abort();
-            }
+          dubiner.dp(dubiner_degree,
+                     /*xi=*/  conical_rule_points[q](0),
+                     /*eta=*/ conical_rule_points[q](1),
+                     current_derivs);
 
           if (current_vals.size() != Np || current_derivs.size() != Np)
             {
