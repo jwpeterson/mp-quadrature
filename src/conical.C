@@ -84,23 +84,18 @@ void Conical::rule2D(unsigned int order)
 
   // Scale the Gauss points so they lie in [0,1].  We should probably make
   // a Gauss class and have this be a member. See eg: Jacobi
-  mpfr_class zero(0.0), one(1.0);
-  {
-    mpfr_class a (0.5*(one-zero));
-    mpfr_class b (0.5*(zero+one));
-    for (unsigned int j=1; j<gauss_x.size(); ++j)
-      {
-        gauss_x[j] = a*gauss_x[j] + b;
-        gauss_w[j] *= 0.5;
-      }
-  }
+  for (unsigned int j=1; j<gauss_x.size(); ++j)
+    {
+      gauss_x[j] = 0.5*(gauss_x[j] + 1.);
+      gauss_w[j] *= 0.5;
+    }
 
   // Compute the 'n_points' Jacobi rule points/weights for alpha=1 and
   // scale the points and weights.
   Jacobi jacobi(/*alpha=*/1., /*beta=*/0.);
   jacobi.rule(n_points);
   jacobi.scale_weights(0.5);
-  jacobi.scale_points(zero, one);
+  jacobi.scale_points(0., 1.);
 
   // Get const references to the jacobi points and weights vectors.
   const std::vector<mpfr_class>& jacobi_x = jacobi.get_points();
