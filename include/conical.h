@@ -15,6 +15,10 @@ public:
   // total order 'order' exactly.
   void rule2D(unsigned int order);
 
+  // Compute the 3D Conical quadrature rule which can integrate polynomials of
+  // total order 'order' exactly.
+  void rule3D(unsigned int order);
+
   // Constant access to the points and weights vectors
   const std::vector<Point<mpfr_class> >& get_points()  { return x; }
   const std::vector<mpfr_class>& get_weights() { return w; }
