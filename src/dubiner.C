@@ -61,9 +61,6 @@ void Dubiner::p(unsigned d,
         // Compute d/d(xi) P_j = d/d(eta) P_j = (-2) * d(P_j)/dx
         mpfr_class dPj = (-2.) * this->djacobi(/*n=*/j, /*alpha=*/2*i+1, /*beta=*/0, /*x=*/transformed2);
 
-        // Debugging (undo dPj scaling):
-        // std::cout << "d/dx P_{j=" << j << "}, alpha=" << 2*i+1 << " = " << -0.5*dPj << std::endl;
-
         // Finally, compute and store the derivatives
         gradients.push_back(Point<mpfr_class>(P_i*scaling_term*dPj + P_j*(P_i*dscaling_term + scaling_term*dPi_dxi),
                                               P_i*scaling_term*dPj + P_j*(P_i*dscaling_term + scaling_term*dPi_deta)));
