@@ -47,15 +47,11 @@ int main(int argc, char** argv)
           std::vector<mpfr_class> current_vals;
           std::vector<Point<mpfr_class> > current_derivs;
 
-          dubiner.p_numeric(dubiner_degree,
-                            /*xi=*/  conical_rule_points[q](0),
-                            /*eta=*/ conical_rule_points[q](1),
-                            current_vals);
-
-          dubiner.dp(dubiner_degree,
-                     /*xi=*/  conical_rule_points[q](0),
-                     /*eta=*/ conical_rule_points[q](1),
-                     current_derivs);
+          dubiner.p(dubiner_degree,
+                    /*xi=*/  conical_rule_points[q](0),
+                    /*eta=*/ conical_rule_points[q](1),
+                    current_vals,
+                    current_derivs);
 
           if (current_vals.size() != Np || current_derivs.size() != Np)
             {

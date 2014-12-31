@@ -192,13 +192,15 @@ void compute_rN(const std::vector<Point<mpfr_class> > & generated_points,
   for (unsigned dubiner_degree=0; dubiner_degree <= max_dubiner_degree; dubiner_degree+=2)
     {
       std::vector<mpfr_class> E, current_vals;
+      std::vector<Point<mpfr_class> > current_derivs;
 
       for (unsigned i=0; i<generated_points.size(); ++i)
         {
-          dubiner.p_numeric(dubiner_degree,
-                            /*xi=*/ generated_points[i](0),
-                            /*eta=*/ generated_points[i](1),
-                            current_vals);
+          dubiner.p(dubiner_degree,
+                    /*xi=*/ generated_points[i](0),
+                    /*eta=*/ generated_points[i](1),
+                    current_vals,
+                    current_derivs);
 
           // After the first loop iteration, this resize() should do nothing
           E.resize(current_vals.size());
