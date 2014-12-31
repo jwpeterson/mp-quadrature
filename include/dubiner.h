@@ -30,18 +30,16 @@ public:
                                   Matrix<mpfr_class> & matrix);
 
 private:
-  // Compute the value of the nth Jacobi polynomial, P_n^{alpha,beta}
-  // at x.  Note that this implementation has a slightly different
-  // normalization than the one in the Jacobi class, which is designed
-  // specifically to create conical product quadrture rules...  for
-  // P_1, the Jacobi class produces:
+  // Compute the value and first derivative of the nth Jacobi
+  // polynomial, P_n^{alpha,beta}, at x.  Note that this
+  // implementation has a slightly different normalization than the
+  // one in the Jacobi class, which is designed specifically to create
+  // conical product quadrture rules...  for P_1, the Jacobi class
+  // produces:
   // x + (alpha-beta)/(alpha+beta+2)
   // while this class produces:
   // (1/2)*((alpha+beta+2)*x + (alpha-beta))
-  mpfr_class jacobi(unsigned n, unsigned alpha, unsigned beta, mpfr_class x);
-
-  // Same as above, but the first derivative
-  mpfr_class djacobi(unsigned n, unsigned alpha, unsigned beta, mpfr_class x);
+  std::pair<mpfr_class, mpfr_class> jacobi(unsigned n, unsigned alpha, unsigned beta, mpfr_class x);
 };
 
 #endif
