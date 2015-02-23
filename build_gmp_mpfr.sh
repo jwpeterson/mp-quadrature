@@ -15,16 +15,18 @@ install_dir=`pwd`
 
 # 1.) Build GMP
 
-# Start from a clean slate... don't try to deal with failed builds, etc.
-rm -rf gmp
-mkdir gmp
+# If the gmp/ directory doesn't exist, create it.
+if [ ! -d gmp ]; then
+  mkdir gmp
+fi
+
+# Change directories
 pushd gmp
 
-# Download the tarball
-curl -O https://ftp.gnu.org/gnu/gmp/gmp-5.1.3.tar.bz2
-
-# *or* Debugging: copy over a previously-downloaded tarball
-# cp /Users/petejw/software/gmp/5.1.3/gmp-5.1.3.tar.bz2 .
+# Download the tarball if necessary
+if [ ! -f gmp-5.1.3.tar.bz2 ]; then
+  curl -O https://ftp.gnu.org/gnu/gmp/gmp-5.1.3.tar.bz2
+fi
 
 # Unpack the tarball
 tar jxvf gmp-5.1.3.tar.bz2
@@ -45,13 +47,18 @@ popd
 
 # 2.) Build MPFR
 
-# Start from a clean slate... don't try to deal with failed builds, etc.
-rm -rf mpfr
-mkdir mpfr
+# If the mpfr/ directory doesn't exist, create it.
+if [ ! -d mpfr ]; then
+  mkdir mpfr
+fi
+
+# Change directories
 pushd mpfr
 
 # Download the tarball
-curl -O http://www.mpfr.org/mpfr-current/mpfr-3.1.2.tar.bz2
+if [ ! -f mpfr-3.1.2.tar.bz2 ]; then
+  curl -O http://www.mpfr.org/mpfr-current/mpfr-3.1.2.tar.bz2
+fi
 
 # Unpack the tarball
 tar jxvf mpfr-3.1.2.tar.bz2
