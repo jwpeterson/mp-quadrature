@@ -1,3 +1,19 @@
+0.) INTRODUCTION
+    The accurate calculation and tabulation of high-order quadrature
+    rules (eg Gauss-Legendre, Gauss-Jacobi, Gauss-Lobatto, etc.) is
+    essential in many areas of numerical analysis. Standard
+    double-precision arithmetic is typically only sufficient to obtain
+    14 (or fewer) digits of accuracy in the points and weights, and
+    therefore multiple-precision algebra libraries are required to
+    improve this scenario. Furthermore, while the standard techniques
+    for computing quadrature rules have been known for some time, some
+    methods are better than others for computing arbitrary precision
+    rules. Here we have collected a (hopefully growing) number of
+    algorithms based on the freely-available GMP, MPFR, and GMPFRXX
+    libraries for generating quadrature rules. This code was used to
+    tabulate some of the 1D quadrature rules in the libmesh
+    (github.com/libmesh/libmesh) finite element library.
+
 1.) INSTALLATION
 
   To build the library, type
