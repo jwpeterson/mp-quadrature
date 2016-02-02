@@ -57,7 +57,7 @@ pushd mpfr
 
 # Download the tarball
 if [ ! -f mpfr-3.1.2.tar.bz2 ]; then
-  curl -O http://www.mpfr.org/mpfr-current/mpfr-3.1.2.tar.bz2
+  curl -O http://www.mpfr.org/mpfr-3.1.2/mpfr-3.1.2.tar.bz2
 fi
 
 # Unpack the tarball
