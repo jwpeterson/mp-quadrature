@@ -52,47 +52,52 @@ int main(int argc, char** argv)
 
   std::cout << "Sum of weights = " << fix_string(sumweights) << std::endl;
 
-//  // The rule with n^3 points should be able to integrate a polynomial of _total_ degree 2*n-1
-//  std::cout << "\nVerifying rule..." << std::endl;
-//  unsigned max_order = 2*n-1;
-//  for (unsigned x_power=0; x_power<max_order; ++x_power)
-//    for (unsigned y_power=0; y_power<max_order; ++y_power)
-//      for (unsigned z_power=0; z_power<max_order; ++z_power)
-//        {
-//          // Only try to integrate polynomials we can integrate exactly
-//          if (x_power + y_power + z_power > max_order)
-//            continue;
-//
-//          mpfr_class sum = 0.;
-//          for (unsigned n_qp=0; n_qp<rule_points.size(); ++n_qp)
-//            sum += rule_weights[n_qp]
-//              * pow(rule_points[n_qp](0), x_power)
-//              * pow(rule_points[n_qp](1), y_power)
-//              * pow(rule_points[n_qp](2), z_power);
-//
-//          // std::cout << "quadrature = " << sum << std::endl;
-//
-//          // Compute the analytical integral value.
-//          mpfr_class analytical = exact_tet(x_power, y_power, z_power);
-//
-//          // std::cout << "analytical = " << analytical << std::endl;
-//
-//          // Compute the absolute error:
-//          mpfr_class abs_err = abs(sum-analytical);
-//
-//          // Print message.  In 3D, this is just way too much output.
-//          //std::cout << "Computing integral of: x^" << x_power << " y^" << y_power << " z^" << z_power
-//          //          << ", abs_err = " << abs_err << std::endl;
-//
-//          // Abort if error is too large.
-//          if (abs_err > mpfr_class(1.e-30))
-//            {
-//              std::cerr << "Quadrature error too large, possible problem with points and weights!" << std::endl;
-//              std::abort();
-//            }
-//        }
-//
-//  std::cout << "... Verification complete!" << std::endl;
+  // Print more stuff during verification.  This may be way too much stuff in 3D...
+  const bool verbose_verification = true;
+
+  // The rule with n^3 points should be able to integrate a polynomial of _total_ degree 2*n-1
+  std::cout << "\nVerifying rule..." << std::endl;
+  unsigned max_order = 2*n-1;
+  for (unsigned x_power=0; x_power<max_order; ++x_power)
+    for (unsigned y_power=0; y_power<1; ++y_power)
+      for (unsigned z_power=0; z_power<1; ++z_power)
+        {
+          // Only try to integrate polynomials we can integrate exactly
+          if (x_power + y_power + z_power > max_order)
+            continue;
+
+          mpfr_class sum = 0.;
+          for (unsigned n_qp=0; n_qp<rule_points.size(); ++n_qp)
+            sum += rule_weights[n_qp]
+              * pow(rule_points[n_qp](0), x_power)
+              * pow(rule_points[n_qp](1), y_power)
+              * pow(rule_points[n_qp](2), z_power);
+
+          if (verbose_verification)
+            std::cout << "quadrature = " << sum << std::endl;
+
+          // Compute the analytical integral value.
+          mpfr_class analytical = exact_pyr(x_power);
+
+          if (verbose_verification)
+            std::cout << "analytical = " << analytical << std::endl;
+
+          // Compute the absolute error:
+          mpfr_class abs_err = abs(sum-analytical);
+
+          // Print message.  In 3D, this is just way too much output.
+          //std::cout << "Computing integral of: x^" << x_power << " y^" << y_power << " z^" << z_power
+          //          << ", abs_err = " << abs_err << std::endl;
+
+          // Abort if error is too large.
+          if (abs_err > mpfr_class(1.e-30))
+            {
+              std::cerr << "Quadrature error too large, possible problem with points and weights!" << std::endl;
+              std::abort();
+            }
+        }
+
+  std::cout << "... Verification complete!" << std::endl;
 
   return 0;
 }
