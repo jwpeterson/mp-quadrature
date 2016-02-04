@@ -37,4 +37,9 @@ mpq_class exact_tri(unsigned a, unsigned b);
 //     I = a! b! c! / (a + b + c + 3)!
 mpq_class exact_tet(unsigned a, unsigned b, unsigned c);
 
+
+
+// The exact integral of x^p over the Pyramid reference element.
+mpq_class exact_pyr(unsigned p, unsigned q, unsigned r);
+
 #endif

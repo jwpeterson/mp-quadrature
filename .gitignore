@@ -8,6 +8,7 @@ drivers/tri_rule
 drivers/test_dubiner
 drivers/compute_residuals_1D
 drivers/dubiner_verify
+drivers/pyramid_conical_product
 lib/
 *.a
 *.o
