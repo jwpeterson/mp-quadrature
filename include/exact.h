@@ -40,6 +40,6 @@ mpq_class exact_tet(unsigned a, unsigned b, unsigned c);
 
 
 // The exact integral of x^p over the Pyramid reference element.
-mpq_class exact_pyr(unsigned p, unsigned q);
+mpq_class exact_pyr(unsigned p, unsigned q, unsigned r);
 
 #endif

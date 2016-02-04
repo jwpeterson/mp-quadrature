@@ -69,11 +69,28 @@ mpq_class exact_tet(unsigned a, unsigned b, unsigned c)
 
 
 
-mpq_class exact_pyr(unsigned p, unsigned q)
+mpq_class exact_pyr(unsigned p, unsigned q, unsigned r)
 {
   // 0 if p or q is odd
   if (p%2 != 0 || q%2 != 0)
     return 0.;
 
-  return mpq_class(4) / mpq_class(p+q+3) / mpq_class(q+1) / mpq_class(p+1);
+  // The exact solution is
+  // (2 + p + q)! * r! / (3 + p + q + r)! * 4 / (q+1) / (p+1)
+
+  // (2 + p + q)!
+  mpq_class numerator = 1;
+  for (unsigned i=1; i<=2+p+q; ++i)
+    numerator *= i;
+
+  // r!
+  for (unsigned i=1; i<=r; ++i)
+    numerator *= i;
+
+  // (3 + p + q + r)!
+  mpq_class denominator = 1;
+  for (unsigned i=1; i<=p+q+r+3; ++i)
+    denominator *= i;
+
+  return numerator / denominator * mpq_class(4) / mpq_class(q+1) / mpq_class(p+1);
 }
