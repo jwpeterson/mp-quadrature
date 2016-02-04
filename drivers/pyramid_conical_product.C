@@ -73,7 +73,7 @@ int main(int argc, char** argv)
   std::cout << "\nVerifying rule..." << std::endl;
   unsigned max_order = 2*n-1;
   for (unsigned x_power=0; x_power<max_order; ++x_power)
-    for (unsigned y_power=0; y_power<1; ++y_power)
+    for (unsigned y_power=0; y_power<max_order; ++y_power)
       for (unsigned z_power=0; z_power<1; ++z_power)
         {
           // Only try to integrate polynomials we can integrate exactly
@@ -91,7 +91,7 @@ int main(int argc, char** argv)
             std::cout << "quadrature = " << sum << std::endl;
 
           // Compute the analytical integral value.
-          mpfr_class analytical = exact_pyr(x_power);
+          mpfr_class analytical = exact_pyr(x_power, y_power);
 
           if (verbose_verification)
             std::cout << "analytical = " << analytical << std::endl;
