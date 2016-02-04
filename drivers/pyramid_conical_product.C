@@ -67,7 +67,7 @@ int main(int argc, char** argv)
   std::cout << "Sum of weights = " << fix_string(sumweights) << std::endl;
 
   // Print more stuff during verification.  This may be way too much stuff in 3D...
-  const bool verbose_verification = true;
+  const bool verbose_verification = false;
 
   // The rule with n^3 points should be able to integrate a polynomial of _total_ degree 2*n-1
   std::cout << "\nVerifying rule..." << std::endl;
