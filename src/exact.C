@@ -66,3 +66,15 @@ mpq_class exact_tet(unsigned a, unsigned b, unsigned c)
 
   return analytical;
 }
+
+
+
+mpq_class exact_pyr(unsigned p)
+{
+  // 0 if p odd
+  if (p%2 != 0)
+    return 0.;
+
+  mpq_class analytical = 4;
+  return mpq_class(4) / mpq_class(p+3) / mpq_class(p+1);
+}
