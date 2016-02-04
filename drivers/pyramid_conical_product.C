@@ -34,12 +34,26 @@ int main(int argc, char** argv)
 
   // Print out the Pyramid rule points and weights in a form we can use
   // (These are now in 0-based storage)
+  // for (unsigned int i=0; i<n_total; ++i)
+  //   {
+  //     std::cout << "_points[" << std::setw(2) << i << "](0)=" << fix_string(rule_points[i](0)) << ";\n";
+  //     std::cout << "_points[" << std::setw(2) << i << "](1)=" << fix_string(rule_points[i](1)) << ";\n";
+  //     std::cout << "_points[" << std::setw(2) << i << "](2)=" << fix_string(rule_points[i](2)) << ";\n";
+  //   }
+
+  // Print all x-coords first, then y, then z
   for (unsigned int i=0; i<n_total; ++i)
-    {
-      std::cout << "_points[" << std::setw(2) << i << "](0)=" << fix_string(rule_points[i](0)) << ";\n";
-      std::cout << "_points[" << std::setw(2) << i << "](1)=" << fix_string(rule_points[i](1)) << ";\n";
-      std::cout << "_points[" << std::setw(2) << i << "](2)=" << fix_string(rule_points[i](2)) << ";\n";
-    }
+    std::cout << "_points[" << std::setw(2) << i << "](0)=" << fix_string(rule_points[i](0)) << ";\n";
+
+  std::cout << std::endl;
+
+  for (unsigned int i=0; i<n_total; ++i)
+    std::cout << "_points[" << std::setw(2) << i << "](1)=" << fix_string(rule_points[i](1)) << ";\n";
+
+  std::cout << std::endl;
+
+  for (unsigned int i=0; i<n_total; ++i)
+    std::cout << "_points[" << std::setw(2) << i << "](2)=" << fix_string(rule_points[i](2)) << ";\n";
 
   std::cout << "\n";
   for (unsigned int i=0; i<n_total; ++i)
