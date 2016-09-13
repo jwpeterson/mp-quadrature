@@ -29,7 +29,6 @@ public:
 
   // Builds the coefficient matrix K_{ij} = int(phi_i*phi_j +
   // grad(phi_i)*grad(phi_j)) for the Dubiner polynomials of degree d.
-  // Currently only works for d=10...
   void build_H1_projection_matrix(unsigned d,
                                   Matrix<mpfr_class> & matrix);
 
