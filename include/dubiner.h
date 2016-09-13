@@ -17,6 +17,10 @@ public:
   // polynomial values, and the vector 'gradients' with the gradients.
   // This routine evaluates the Dubiner polynomials "numerically"
   // using the method described in Burgers' paper.
+  // R. B\"{u}rger, M. Sepulveda, and T. Voitovich, "On the
+  // Proriol-Koornwinder-Dubiner hierarchical orthogonal polynomial
+  // basis for the DG-FEM".
+  // http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.582.3100&rep=rep1&type=pdf
   void p(unsigned d,
          const mpfr_class & xi,
          const mpfr_class & eta,
