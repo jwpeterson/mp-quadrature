@@ -34,6 +34,7 @@ fi
 
 # 1.) Build GMP
 
+# If the gmp/ directory doesn't exist, create it.
 if [ ! -d gmp ]; then
   mkdir gmp
 fi
