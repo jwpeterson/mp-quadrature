@@ -86,7 +86,7 @@ follow the directions below to build from source...
                    # and much later using the clang compiler on Mavericks
    sudo make install
    ```
-       
+
 1. [GNU MPFR](http://www.mpfr.org/)
 
    To build MPFR from source:
@@ -102,7 +102,7 @@ follow the directions below to build from source...
    make -j4 check
    sudo make install
    ```
-      
+
 # 5. MISCELLANEOUS
 
    There are also some more-or-less OK Matlab/Octave implementations in
