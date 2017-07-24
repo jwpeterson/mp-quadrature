@@ -13,6 +13,25 @@
 # Top-level directory where we will install gmp and mpfr
 install_dir=`pwd`
 
+# We will build/install everything unless there is already something there.
+go=1
+
+# If the libraries are already there, warn before deleting them.
+if ([ -f gmp/lib/libgmp.a ] || [ -f mpfr/lib/libmpfr.a ]); then
+    echo "Warning: this will delete existing local GMP or MPFR libraries."
+    read -p "Do you want to continue? " -r
+    if [[ ! $REPLY =~ ^[Yy]$ ]]
+    then
+        go=0
+    fi
+fi
+
+# If the user didn't say yes, quit.
+if [ $go -eq 0 ] ; then
+    echo "Skipping build."
+    exit 0
+fi
+
 # 1.) Build GMP
 
 if [ ! -d gmp ]; then
