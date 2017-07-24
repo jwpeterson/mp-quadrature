@@ -12,7 +12,7 @@
    rules. Here we have collected a (hopefully growing) number of
    algorithms based on the freely-available GMP, MPFR, and GMPFRXX
    libraries for generating quadrature rules. This code was used to
-   tabulate some of the 1D quadrature rules in the [LibMesh](github.com/libmesh/libmesh) finite element library.
+   tabulate some of the 1D quadrature rules in the [LibMesh](https://github.com/libMesh/libmesh) finite element library.
 
 # 2. INSTALLATION
 
