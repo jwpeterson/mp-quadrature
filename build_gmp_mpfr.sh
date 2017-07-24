@@ -2,7 +2,7 @@
 
 # This script downloads, builds, and installs the GMP and MPFR
 # libraries from source into the current directory.  You can then
-# configure the invariant quadrature software to link against them by
+# configure the mp-quadrature software to link against them by
 # simply running:
 #
 # ./configure
