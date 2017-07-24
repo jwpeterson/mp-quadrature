@@ -43,66 +43,66 @@
    There are several driver programs (drivers/*.C) which make use of
    the library which gets built in lib/.
 
-  1. drivers/print_gauss.C
-     Computes Legendre polynomial roots and weights for 1D Gaussian
-     quadrature rules.  To compute values for the rule with 10 points, run: `./drivers/print_gauss 10`.
-  1. drivers/jacobi_rule.C
-     Computes and prints Jacobi quadrature rules for alpha=1, beta=0,
-     rescaled to the interval [0,1], for rules with 2 through 22 points
-     (i.e. through order 43).
-  1. drivers/conical_product_2D.C and drivers/conical_product_3D.C
-     Computes and prints conical product rule points and weights for
-     rules having n^2 (2D) or n^3 (3D) points.  Run e.g.
+   1. drivers/print_gauss.C
+      Computes Legendre polynomial roots and weights for 1D Gaussian
+      quadrature rules.  To compute values for the rule with 10 points, run: `./drivers/print_gauss 10`.
+   1. drivers/jacobi_rule.C
+      Computes and prints Jacobi quadrature rules for alpha=1, beta=0,
+      rescaled to the interval [0,1], for rules with 2 through 22 points
+      (i.e. through order 43).
+   1. drivers/conical_product_2D.C and drivers/conical_product_3D.C
+      Computes and prints conical product rule points and weights for
+      rules having n^2 (2D) or n^3 (3D) points.  Run e.g.
 
-     `./drivers/conical_product_rule_2D 3`
+      `./drivers/conical_product_rule_2D 3`
 
-     or
+      or
 
-     `./drivers/conical_product_rule_3D 3`
+      `./drivers/conical_product_rule_3D 3`
 
-     to get points and weights for a rule having 3\*3=9 (2D) or 3\*3\*3=27
-     (3D) points.  The sum of weights is also printed for verification,
-     it should be 0.5, the area of the reference triangle (2D) or
-     0.1666..., the volume of the reference tetrahedron (3D).
+      to get points and weights for a rule having 3\*3=9 (2D) or 3\*3\*3=27
+      (3D) points.  The sum of weights is also printed for verification,
+      it should be 0.5, the area of the reference triangle (2D) or
+      0.1666..., the volume of the reference tetrahedron (3D).
 
 
 1. NOTES ON OBTAINING SUPPORTING SOFTWARE:
 
-  1. The simplest approach (if it works!) is to run the included
-     `build_gmp_mpfr.sh` script.  This will download and install the GMP
-     and MPFR libraries from source.  If this does not work for some reason,
-     see the directions below to build from source...
+    1. The simplest approach (if it works!) is to run the included
+       `build_gmp_mpfr.sh` script.  This will download and install the GMP
+       and MPFR libraries from source.  If this does not work for some reason,
+       see the directions below to build from source...
 
-  1. [GNU GMP](https://gmplib.org/)
+    1. [GNU GMP](https://gmplib.org/)
 
-     To build GMP from source:
-```
-     cd /where/you/want/to/build
-     curl -O https://ftp.gnu.org/gnu/gmp/gmp-5.1.3.tar.bz2
-     tar jxvf gmp-5.1.3.tar.bz2
-     ./configure --prefix=/location/to/install/gmp --enable-cxx
-     make -j4
-     make -j4 check  # this worked just fine for me on Snow Leopard,
-                     # and much later using the clang compiler on Mavericks
-     sudo make install
-```
+       To build GMP from source:
+       ```
+       cd /where/you/want/to/build
+       curl -O https://ftp.gnu.org/gnu/gmp/gmp-5.1.3.tar.bz2
+       tar jxvf gmp-5.1.3.tar.bz2
+       ./configure --prefix=/location/to/install/gmp --enable-cxx
+       make -j4
+       make -j4 check  # this worked just fine for me on Snow Leopard,
+                       # and much later using the clang compiler on Mavericks
+       sudo make install
+       ```
+       
+   1. [GNU MPFR](http://www.mpfr.org/)
 
-  1. [GNU MPFR](http://www.mpfr.org/)
-
-     To build MPFR from source:
-```
-     cd /where/you/want/to/build
-     curl -O http://www.mpfr.org/mpfr-current/mpfr-3.1.2.tar.bz2
-     tar jxvf mpfr-3.1.2.tar.bz2
-     cd mpfr-3.1.2
-     ./configure --with-gmp-include=/location/to/install/gmp/include \
-                 --with-gmp-lib=/location/to/install/gmp/lib \
-                 --prefix=/location/to/install/mpfr
-     make -j4
-     make -j4 check
-     sudo make install
-```
-
+      To build MPFR from source:
+      ```
+      cd /where/you/want/to/build
+      curl -O http://www.mpfr.org/mpfr-current/mpfr-3.1.2.tar.bz2
+      tar jxvf mpfr-3.1.2.tar.bz2
+      cd mpfr-3.1.2
+      ./configure --with-gmp-include=/location/to/install/gmp/include \
+                  --with-gmp-lib=/location/to/install/gmp/lib \
+                  --prefix=/location/to/install/mpfr
+      make -j4
+      make -j4 check
+      sudo make install
+      ```
+      
 1. MISCELLANEOUS
 
    There are also some more-or-less OK Matlab/Octave implementations in
