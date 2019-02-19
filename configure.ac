@@ -27,13 +27,13 @@ MY_TOP_SRCDIR=`pwd`
 # Location of the GMP installation.  Defaults to `pwd`/gmp, which is
 # where the build_gmp_mpfr.sh script installs it.
 AC_ARG_WITH(gmp-include,
-            AC_HELP_STRING([--with-gmp-include=PATH],[Specify the path for GMP header files]),
+            AS_HELP_STRING([--with-gmp-include=PATH],[Specify the path for GMP header files]),
             withgmpinc=$withval,
             withgmpinc=$MY_TOP_SRCDIR/gmp/include)
 AC_SUBST(withgmpinc)
 
 AC_ARG_WITH(gmp-lib,
-            AC_HELP_STRING([--with-gmp-lib=PATH],[Specify the path for GMP libraries]),
+            AS_HELP_STRING([--with-gmp-lib=PATH],[Specify the path for GMP libraries]),
             withgmplib=$withval,
             withgmplib=$MY_TOP_SRCDIR/gmp/lib)
 AC_SUBST(withgmplib)
@@ -42,13 +42,13 @@ AC_SUBST(withgmplib)
 # Location of the MPFR installation.  Defaults to `pwd`/mpfr, which is
 # where the build_gmp_mpfr.sh script installs it.
 AC_ARG_WITH(mpfr-include,
-            AC_HELP_STRING([--with-mpfr-include=PATH],[Specify the path for MPFR header files]),
+            AS_HELP_STRING([--with-mpfr-include=PATH],[Specify the path for MPFR header files]),
             withmpfrinc=$withval,
             withmpfrinc=$MY_TOP_SRCDIR/mpfr/include)
 AC_SUBST(withmpfrinc)
 
 AC_ARG_WITH(mpfr-lib,
-            AC_HELP_STRING([--with-mpfr-lib=PATH],[Specify the path for MPFR libraries]),
+            AS_HELP_STRING([--with-mpfr-lib=PATH],[Specify the path for MPFR libraries]),
             withmpfrlib=$withval,
             withmpfrlib=$MY_TOP_SRCDIR/mpfr/lib)
 AC_SUBST(withmpfrlib)
@@ -76,15 +76,11 @@ CFLAGS="$CFLAGS -I$withgmpinc"
 # Test compiling a non-trivial program that includes gmp.h.  Extra
 # paths are passed to the compiler via the CFLAGS variable.  If GMP is
 # not found, we error out during configure by calling AC_MSG_ERROR.
-AC_TRY_COMPILE(
-[
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <gmp.h>
-],
-[
-],
-[AC_MSG_RESULT([gmp.h found in $withgmpinc])],
-[AC_MSG_ERROR([GNU MP not found, see http://gmplib.org/])]
-)
+]], [[
+]])],[AC_MSG_RESULT([gmp.h found in $withgmpinc])],[AC_MSG_ERROR([GNU MP not found, see http://gmplib.org/])
+])
 
 # Also check for linking with GMP libraries...  Need to add paths to
 # LDFLAGS for this.
@@ -101,13 +97,11 @@ __gmpz_init,
 # To do this, we need to set up the right LIBS.
 LIBS="$LIBS -lgmpxx -lgmp"
 
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <stdio.h>
 #include <stdlib.h>
 #include <gmp.h>
-],
-[
+]], [[
 mpz_t x;
 mpz_t y;
 mpz_t result;
@@ -127,10 +121,8 @@ mpz_clear(x);
 mpz_clear(y);
 mpz_clear(result);
 return EXIT_SUCCESS;
-],
-[AC_MSG_RESULT([Non-trivial GMP program successfully linked!])],
-[AC_MSG_ERROR([Trouble linking non-trivial GMP program!])]
-)
+]])],[AC_MSG_RESULT([Non-trivial GMP program successfully linked!])],[AC_MSG_ERROR([Trouble linking non-trivial GMP program!])
+])
 
 
 
@@ -143,15 +135,11 @@ return EXIT_SUCCESS;
 CFLAGS="$CFLAGS -I$withmpfrinc"
 
 # Test compiling a non-trivial program that includes mpfr.h
-AC_TRY_COMPILE(
-[
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[
 #include <mpfr.h>
-],
-[
-],
-[AC_MSG_RESULT([mpfr.h found in $withmpfrinc])],
-[AC_MSG_ERROR([GNU MPFR not found, see http://www.mpfr.org/])]
-)
+]], [[
+]])],[AC_MSG_RESULT([mpfr.h found in $withmpfrinc])],[AC_MSG_ERROR([GNU MPFR not found, see http://www.mpfr.org/])
+])
 
 
 # Also check for linking with MPFR libraries...  Need to add paths to
@@ -170,13 +158,11 @@ mpfr_init,
 # To do this, we need to set up the right LIBS.
 LIBS="$LIBS -lmpfr"
 
-AC_TRY_LINK(
-[
+AC_LINK_IFELSE([AC_LANG_PROGRAM([[
 #include <stdio.h>
 #include <gmp.h>
 #include <mpfr.h>
-],
-[
+]], [[
 unsigned int i;
 mpfr_t s, t, u;
 
@@ -199,10 +185,8 @@ mpfr_clear (s);
 mpfr_clear (t);
 mpfr_clear (u);
 return 0;
-],
-[AC_MSG_RESULT([Non-trivial MPFR program successfully linked!])],
-[AC_MSG_ERROR([Trouble linking non-trivial MPFR program!])]
-)
+]])],[AC_MSG_RESULT([Non-trivial MPFR program successfully linked!])],[AC_MSG_ERROR([Trouble linking non-trivial MPFR program!])
+])
 
 
 AC_OUTPUT
