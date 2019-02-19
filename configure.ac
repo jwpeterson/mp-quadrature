@@ -209,5 +209,5 @@ AC_OUTPUT
 rm -f conftest* config.cache
 
 # Local Variables:
-# mode: m4
+# mode: autoconf
 # End:
