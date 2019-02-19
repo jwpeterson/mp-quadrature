@@ -1,7 +1,7 @@
 #include <fstream>
 #include <sstream>
 #include <iomanip>
-#include <memory> // std::auto_ptr
+#include <memory> // std::unique_ptr
 #include <getopt.h> // getopt_long()
 #include "legendre.h"
 #include "gauss.h"
@@ -92,7 +92,7 @@ int main(int argc, char** argv)
   std::cout << "Final ||r_N||_1 value = " << norm_rN << std::endl;
 
   // Set up the integrand, we have a couple to choose from...
-  std::auto_ptr<Integrand> integrand;
+  std::unique_ptr<Integrand> integrand;
 
   // To build up the name of the output file to write the abs_err and err_bound values to
   // TODO: if the plots/ directory does not exist, we must create it first, otherwise nothing
