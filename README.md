@@ -41,7 +41,9 @@
 # 3. DRIVER PROGRAMS
 
    There are several driver programs (drivers/*.C) which make use of
-   the library which gets built in lib/.
+   the library which gets built in lib/. run_tests.sh is a script
+   which runs several of the driver programs to verify that the
+   installation is working.
 
    1. `drivers/print_gauss.C`
       Computes Legendre polynomial roots and weights for 1D Gaussian
@@ -54,11 +56,11 @@
       Computes and prints conical product rule points and weights for
       rules having n^2 (2D) or n^3 (3D) points.  Run e.g.
 
-      `./drivers/conical_product_rule_2D 3`
+      `./drivers/conical_product_2D 3`
 
       or
 
-      `./drivers/conical_product_rule_3D 3`
+      `./drivers/conical_product_3D 3`
 
       to get points and weights for a rule having 3\*3=9 (2D) or 3\*3\*3=27
       (3D) points.  The sum of weights is also printed for verification,
