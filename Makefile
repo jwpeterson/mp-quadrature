@@ -44,7 +44,7 @@ ALL_LIBS=$(MPQ_LIB) $(GMPFRXX_LIBS) $(MPFR_LIBS) $(GMP_LIBS)
 
 # Flags to turn on extra debugging and print routines.
 #EXTRA_FLAGS=-g -DDEBUG
-EXTRA_FLAGS=-Wall -O2
+EXTRA_FLAGS=-Wall -O2 -std=c++11
 
 # The plus signs on these recursive make calls were required for Linux, otherwise I was getting:
 # warning: jobserver unavailable: using -j1.  Add `+' to parent make rule.

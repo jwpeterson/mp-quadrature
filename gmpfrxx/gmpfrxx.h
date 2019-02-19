@@ -1099,7 +1099,7 @@ struct __gmp_cbrt_function // not in gmpxx
 struct __gmp_root_function // not in gmpxx
 {
   static void eval(mpfr_ptr f, mpfr_srcptr g, unsigned long int l)
-  { mpfr_root(f, g, l, MpFrC::get_rnd()); }
+  { mpfr_rootn_ui(f, g, l, MpFrC::get_rnd()); }
 };
 
 struct __gmp_pow_function // not in gmpxx
