@@ -25,6 +25,7 @@ int main(int argc, char** argv)
     {
       // The number of polynomials in the Dubiner basis of degree 'dubiner_degree'
       const unsigned Np = (dubiner_degree+1)*(dubiner_degree+2)/2;
+      std::cout << "There are " << Np << " polynomials." << std::endl;
 
       // The points and weights from a conical product quadrature rule
       // of high enough order to integrate phi(i)**2, which has degree 2*dubiner_degree
