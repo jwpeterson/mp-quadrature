@@ -202,3 +202,19 @@ Dubiner::jacobi(unsigned n, unsigned alpha, unsigned beta, double x)
     }
   return std::make_pair(p1, dp1);
 }
+
+void
+Dubiner::compare()
+{
+  unsigned int alpha = 1;
+  unsigned int beta = 0;
+  unsigned int n = 2;
+
+  double x = 0.2;
+  mpfr_class mp_x = mpfr_class(2.) / mpfr_class(10.);
+  auto mp_result = this->jacobi(n, alpha, beta, mp_x);
+  auto double_result = this->jacobi(n, alpha, beta, x);
+  std::cout << "mp result: " << mp_result.first
+            << ", double result: " << double_result.first
+            << std::endl;
+}

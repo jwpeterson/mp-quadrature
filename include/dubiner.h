@@ -32,6 +32,9 @@ public:
   void build_H1_projection_matrix(unsigned d,
                                   Matrix<mpfr_class> & matrix);
 
+  // Compare multiple precision and double precision Jacobi polynomial values.
+  void compare();
+
 private:
   // Compute the value and first derivative of the nth Jacobi
   // polynomial, P_n^{alpha,beta}, at x.  Note that this
