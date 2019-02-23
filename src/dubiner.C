@@ -191,6 +191,7 @@ Dubiner::jacobi(unsigned n, unsigned alpha, unsigned beta, double x)
         - 2 * (n + alpha - 1) * (n + beta - 1) * (2*n + alpha + beta) * p1) /
         (2*n * (n + alpha + beta) * (2*n + alpha + beta - 2));
 
+      // FIXME: This is still the Legendre formula for the derivative...
       // Note that dp1 appears in the formula below, but because we
       // swapped, it's really dp0. Also, we have already updated the
       // values, so:
@@ -206,15 +207,37 @@ Dubiner::jacobi(unsigned n, unsigned alpha, unsigned beta, double x)
 void
 Dubiner::compare_jacobi()
 {
-  unsigned int alpha = 1;
+  // We are only interested in nonzero values of alpha, but it would
+  // be good to make sure the function works for arbitrary beta values
+  // as well.
+  unsigned int alpha = 0;
   unsigned int beta = 0;
-  unsigned int n = 2;
+  // unsigned int n = 3;
 
-  double x = 0.2;
-  mpfr_class mp_x = mpfr_class(2.) / mpfr_class(10.);
-  auto mp_result = this->jacobi(n, alpha, beta, mp_x);
-  auto double_result = this->jacobi(n, alpha, beta, x);
-  std::cout << "mp result: " << mp_result.first
-            << ", double result: " << double_result.first
-            << std::endl;
+  for (unsigned int n = 0; n < 6; ++n)
+    {
+      double x = 0.2;
+      mpfr_class mp_x = mpfr_class(2.) / mpfr_class(10.);
+      auto mp_result = this->jacobi(n, alpha, beta, mp_x);
+      auto double_result = this->jacobi(n, alpha, beta, x);
+      std::cout << std::endl
+                << "n = " << n
+                << std::endl
+                << "  alpha = " << alpha
+                << std::endl
+                << "  beta = " << beta
+                << std::endl
+                << "  x = " << x
+                << std::endl
+                << "  mp_x = " << mp_x
+                << std::endl
+                << "  mp value = " << mp_result.first
+                << std::endl
+                << "  double value = " << double_result.first
+                << std::endl
+                << "  mp deriv = " << mp_result.second
+                << std::endl
+                << "  double deriv = " << double_result.second
+                << std::endl;
+    }
 }
