@@ -32,8 +32,10 @@ public:
   void build_H1_projection_matrix(unsigned d,
                                   Matrix<mpfr_class> & matrix);
 
-  // Compare multiple precision and double precision Jacobi polynomial values.
-  void compare();
+  // Compare multiple precision and double precision Jacobi polynomial
+  // values.  This was used in developing/verifying a double-precision
+  // version of the Jacobi polynomial recurrence relation.
+  void compare_jacobi();
 
 private:
   // Compute the value and first derivative of the nth Jacobi

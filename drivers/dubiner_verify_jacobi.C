@@ -12,7 +12,7 @@ int main(int argc, char** argv)
   mpfr_set_default_prec(256);
 
   Dubiner dubiner;
-  dubiner.compare();
+  dubiner.compare_jacobi();
 
   return 0;
 }

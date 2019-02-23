@@ -204,7 +204,7 @@ Dubiner::jacobi(unsigned n, unsigned alpha, unsigned beta, double x)
 }
 
 void
-Dubiner::compare()
+Dubiner::compare_jacobi()
 {
   unsigned int alpha = 1;
   unsigned int beta = 0;
