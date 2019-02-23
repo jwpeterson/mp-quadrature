@@ -162,3 +162,43 @@ std::pair<mpfr_class, mpfr_class> Dubiner::jacobi(unsigned n, unsigned alpha, un
 
   return std::make_pair(val, deriv);
 }
+
+std::pair<double, double>
+Dubiner::jacobi(unsigned n, unsigned alpha, unsigned beta, double x)
+{
+  if (n == 0)
+    return std::make_pair(1,0);
+
+  Real p0 = 1;
+  Real p1 = (alpha + 1) + (alpha + beta + 2) * 0.5 * (x - 1);
+
+  // The recurrence relation we're using only requires one previous
+  // derivative value, but it is from two iterations ago, so we still
+  // need to keep track of two values.
+  Real dp0 = 0;
+  Real dp1 = 0.5 * (alpha + beta + 2);
+
+  unsigned int i = 1;
+  while (i < n)
+    {
+      // Swapping saves a temporary, since this immediately updates p0
+      // and then p1 is updated on the next line. Note that p0 and p1
+      // appear in opposite positions than is usual in the update
+      // formula because of this swap!
+      std::swap(p0, p1);
+      p1 = ((2*n + alpha + beta - 1) *
+        ((2*n + alpha + beta) * (2*n + alpha + beta - 2) * x + alpha * alpha - beta * beta) * p0
+        - 2 * (n + alpha - 1) * (n + beta - 1) * (2*n + alpha + beta) * p1) /
+        (2*n * (n + alpha + beta) * (2*n + alpha + beta - 2));
+
+      // Note that dp1 appears in the formula below, but because we
+      // swapped, it's really dp0. Also, we have already updated the
+      // values, so:
+      // p1 is now P_{i+1}(x)
+      // p0 is now P_{i}(x)
+      std::swap(dp0, dp1);
+      dp1 = (2*i + 1) * p0 + dp1;
+      ++i;
+    }
+  return std::make_pair(p1, dp1);
+}

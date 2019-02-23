@@ -43,6 +43,19 @@ private:
   // while this class produces:
   // (1/2)*((alpha+beta+2)*x + (alpha-beta))
   std::pair<mpfr_class, mpfr_class> jacobi(unsigned n, unsigned alpha, unsigned beta, mpfr_class x);
+
+  // Compute Jacobi polynomial value and first derivative:
+  // P^{(\alpha,\beta)}_n(x)
+  // d/dx P^{(\alpha,\beta)}_n(x)
+  // using double precision values. This is here so we can compare it
+  // to the multiprecision implementation above. It therefore uses the
+  // same normalization as the implementation above. The recurrence
+  // relation we are using can be found on Wikipedia, and is similar
+  // in structure to the recurrence relation for Legendre polynomials,
+  // so we use a similar approach to compute it. The page also describes
+  // recurrence relations for computing the first derivative.
+  std::pair<double, double>
+  jacobi(unsigned n, unsigned alpha, unsigned beta, double x);
 };
 
 #endif
