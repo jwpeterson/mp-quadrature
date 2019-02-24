@@ -213,11 +213,11 @@ Dubiner::compare_jacobi()
 
   for (unsigned int n = 0; n < 19; ++n)
     {
-      // double x = 0.2;
-      // mpfr_class mp_x = mpfr_class(2.) / mpfr_class(10.);
+      double x = 0.2;
+      mpfr_class mp_x = mpfr_class(2.) / mpfr_class(10.);
 
-      double x = 0.25;
-      mpfr_class mp_x = mpfr_class(1.) / mpfr_class(4.);
+      // double x = 0.25;
+      // mpfr_class mp_x = mpfr_class(1.) / mpfr_class(4.);
 
       // double x = 0.;
       // auto mp_x = mpfr_class(0.);
