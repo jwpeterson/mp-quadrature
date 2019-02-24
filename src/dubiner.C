@@ -196,12 +196,18 @@ double Dubiner::jacobi_deriv(unsigned n, unsigned alpha, unsigned beta, double x
 void
 Dubiner::compare_jacobi()
 {
-  // max alpha and beta values
-  const unsigned int alpha_max = 6;
-  const unsigned int beta_max = 6;
+  // d is the max polynomial degree of the basis, e.g. d=2 for
+  // quadratics.
+  const unsigned int d = 10;
 
-  // max polynomial order
-  const unsigned int n_max = 19;
+  // max alpha and beta values. In the real Dubiner code, we will need
+  // to compute alpha values up to 2*d + 1.  beta is always zero in
+  // the real code, but we test it here regardless.
+  const unsigned int alpha_max = 2*d+1;
+  const unsigned int beta_max = 2*d+1;
+
+  // max polynomial order. The real code computes n values up to d.
+  const unsigned int n_max = d;
 
   // Discrete points for computing the error
   const unsigned int N = 20;
