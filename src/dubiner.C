@@ -202,13 +202,19 @@ Dubiner::compare_jacobi()
   unsigned int alpha = 2;
   unsigned int beta = 1;
 
+  // max polynomial order
+  const unsigned int n_max = 19;
+
   // Discrete points for computing the error
   const unsigned int N = 20;
   const Real dx = 2. / (N-1);
   const mpfr_class mp_dx = mpfr_class(2.) / mpfr_class(N-1);
 
-  for (unsigned int n = 0; n < 6; ++n)
+  for (unsigned int n=0; n<n_max; ++n)
     {
+      mpfr_class total_err = 0.;
+      mpfr_class total_err_deriv = 0.;
+
       for (unsigned int i=0; i<N; ++i)
         {
           double x = -1. + i * dx;
@@ -225,29 +231,44 @@ Dubiner::compare_jacobi()
           mpfr_class err = abs(mp_result.first - mpfr_class(double_val));
           mpfr_class err_deriv = abs(mp_result.second - mpfr_class(double_deriv));
 
-          std::cout << std::endl
-                    << "n = " << n
-                    << std::endl
-                    << "  alpha = " << alpha
-                    << std::endl
-                    << "  beta = " << beta
-                    << std::endl
-                    << "  x = " << x
-                    << std::endl
-                    << "  mp_x = " << mp_x
-                    << std::endl
-                    << "  mp value     = " << mp_result.first
-                    << std::endl
-                    << "  double value = " << double_val
-                    << std::endl
-                    << "  value abs err = " << err
-                    << std::endl
-                    << "  mp deriv = " << mp_result.second
-                    << std::endl
-                    << "  double deriv = " << double_deriv
-                    << std::endl
-                    << "  deriv abs err = " << err_deriv
-                    << std::endl;
-        }
-    }
+          total_err += err;
+          total_err_deriv += err_deriv;
+
+          // std::cout << std::endl
+          //           << "n = " << n
+          //           << std::endl
+          //           << "  alpha = " << alpha
+          //           << std::endl
+          //           << "  beta = " << beta
+          //           << std::endl
+          //           << "  x = " << x
+          //           << std::endl
+          //           << "  mp_x = " << mp_x
+          //           << std::endl
+          //           << "  mp value     = " << mp_result.first
+          //           << std::endl
+          //           << "  double value = " << double_val
+          //           << std::endl
+          //           << "  value abs err = " << err
+          //           << std::endl
+          //           << "  mp deriv = " << mp_result.second
+          //           << std::endl
+          //           << "  double deriv = " << double_deriv
+          //           << std::endl
+          //           << "  deriv abs err = " << err_deriv
+          //           << std::endl;
+        } // end loop over mesh points
+
+      std::cout << std::endl
+                << "n = " << n
+                << std::endl
+                << "  alpha = " << alpha
+                << std::endl
+                << "  beta = " << beta
+                << std::endl
+                << "  value abs err = " << total_err
+                << std::endl
+                << "  deriv abs err = " << total_err_deriv
+                << std::endl;
+    } // end loop over n
 }
