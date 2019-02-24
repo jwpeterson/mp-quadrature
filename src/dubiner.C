@@ -196,11 +196,9 @@ double Dubiner::jacobi_deriv(unsigned n, unsigned alpha, unsigned beta, double x
 void
 Dubiner::compare_jacobi()
 {
-  // We are only interested in nonzero values of alpha, but it would
-  // be good to make sure the function works for arbitrary beta values
-  // as well.
-  unsigned int alpha = 2;
-  unsigned int beta = 1;
+  // max alpha and beta values
+  const unsigned int alpha_max = 6;
+  const unsigned int beta_max = 6;
 
   // max polynomial order
   const unsigned int n_max = 19;
@@ -210,65 +208,69 @@ Dubiner::compare_jacobi()
   const Real dx = 2. / (N-1);
   const mpfr_class mp_dx = mpfr_class(2.) / mpfr_class(N-1);
 
-  for (unsigned int n=0; n<n_max; ++n)
-    {
-      mpfr_class total_err = 0.;
-      mpfr_class total_err_deriv = 0.;
+  for (unsigned int alpha=0; alpha<alpha_max; ++alpha)
+    for (unsigned int beta=0; beta<beta_max; ++beta)
+      {
+        for (unsigned int n=0; n<n_max; ++n)
+          {
+            mpfr_class total_err = 0.;
+            mpfr_class total_err_deriv = 0.;
 
-      for (unsigned int i=0; i<N; ++i)
-        {
-          double x = -1. + i * dx;
-          mpfr_class mp_x = mpfr_class(-1.) + i * mp_dx;
+            for (unsigned int i=0; i<N; ++i)
+              {
+                double x = -1. + i * dx;
+                mpfr_class mp_x = mpfr_class(-1.) + i * mp_dx;
 
-          // Compute multi-precision value
-          std::pair<mpfr_class, mpfr_class>
-            mp_result = this->jacobi(n, alpha, beta, mp_x);
+                // Compute multi-precision value
+                std::pair<mpfr_class, mpfr_class>
+                  mp_result = this->jacobi(n, alpha, beta, mp_x);
 
-          // Compute double precision value
-          double double_val = this->jacobi_value(n, alpha, beta, x);
-          double double_deriv = this->jacobi_deriv(n, alpha, beta, x);
+                // Compute double precision value
+                double double_val = this->jacobi_value(n, alpha, beta, x);
+                double double_deriv = this->jacobi_deriv(n, alpha, beta, x);
 
-          mpfr_class err = abs(mp_result.first - mpfr_class(double_val));
-          mpfr_class err_deriv = abs(mp_result.second - mpfr_class(double_deriv));
+                mpfr_class err = abs(mp_result.first - mpfr_class(double_val));
+                mpfr_class err_deriv = abs(mp_result.second - mpfr_class(double_deriv));
 
-          total_err += err;
-          total_err_deriv += err_deriv;
+                total_err += err;
+                total_err_deriv += err_deriv;
 
-          // std::cout << std::endl
-          //           << "n = " << n
-          //           << std::endl
-          //           << "  alpha = " << alpha
-          //           << std::endl
-          //           << "  beta = " << beta
-          //           << std::endl
-          //           << "  x = " << x
-          //           << std::endl
-          //           << "  mp_x = " << mp_x
-          //           << std::endl
-          //           << "  mp value     = " << mp_result.first
-          //           << std::endl
-          //           << "  double value = " << double_val
-          //           << std::endl
-          //           << "  value abs err = " << err
-          //           << std::endl
-          //           << "  mp deriv = " << mp_result.second
-          //           << std::endl
-          //           << "  double deriv = " << double_deriv
-          //           << std::endl
-          //           << "  deriv abs err = " << err_deriv
-          //           << std::endl;
-        } // end loop over mesh points
+                // std::cout << std::endl
+                //           << "n = " << n
+                //           << std::endl
+                //           << "  alpha = " << alpha
+                //           << std::endl
+                //           << "  beta = " << beta
+                //           << std::endl
+                //           << "  x = " << x
+                //           << std::endl
+                //           << "  mp_x = " << mp_x
+                //           << std::endl
+                //           << "  mp value     = " << mp_result.first
+                //           << std::endl
+                //           << "  double value = " << double_val
+                //           << std::endl
+                //           << "  value abs err = " << err
+                //           << std::endl
+                //           << "  mp deriv = " << mp_result.second
+                //           << std::endl
+                //           << "  double deriv = " << double_deriv
+                //           << std::endl
+                //           << "  deriv abs err = " << err_deriv
+                //           << std::endl;
+              } // end loop over mesh points
 
-      std::cout << std::endl
-                << "n = " << n
-                << std::endl
-                << "  alpha = " << alpha
-                << std::endl
-                << "  beta = " << beta
-                << std::endl
-                << "  value abs err = " << total_err
-                << std::endl
-                << "  deriv abs err = " << total_err_deriv
-                << std::endl;
-    } // end loop over n
+            std::cout << std::endl
+                      << "n = " << n
+                      << std::endl
+                      << "  alpha = " << alpha
+                      << std::endl
+                      << "  beta = " << beta
+                      << std::endl
+                      << "  value abs err = " << total_err
+                      << std::endl
+                      << "  deriv abs err = " << total_err_deriv
+                      << std::endl;
+          } // end loop over n
+      } // end loop over alpha, beta
 }
