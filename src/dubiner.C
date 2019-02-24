@@ -208,51 +208,60 @@ Dubiner::compare_jacobi()
   // We are only interested in nonzero values of alpha, but it would
   // be good to make sure the function works for arbitrary beta values
   // as well.
-  unsigned int alpha = 0;
-  unsigned int beta = 0;
+  unsigned int alpha = 2;
+  unsigned int beta = 1;
 
-  for (unsigned int n = 0; n < 19; ++n)
+  std::vector<double> x_vals = {-1, 1};
+  std::vector<mpfr_class> mp_x_vals = {mpfr_class(-1.), mpfr_class(1.)};
+
+  for (unsigned int n = 0; n < 6; ++n)
     {
-      double x = 0.2;
-      mpfr_class mp_x = mpfr_class(2.) / mpfr_class(10.);
+      for (unsigned int i = 0; i < x_vals.size(); ++i)
+        {
+          double x = x_vals[i];
+          mpfr_class mp_x = mp_x_vals[i];
 
-      // double x = 0.25;
-      // mpfr_class mp_x = mpfr_class(1.) / mpfr_class(4.);
+          // double x = 0.2;
+          // mpfr_class mp_x = mpfr_class(2.) / mpfr_class(10.);
 
-      // double x = 0.;
-      // auto mp_x = mpfr_class(0.);
+          // double x = 0.25;
+          // mpfr_class mp_x = mpfr_class(1.) / mpfr_class(4.);
 
-      // double x = 1.;
-      // auto mp_x = mpfr_class(1.);
+          // double x = 0.;
+          // auto mp_x = mpfr_class(0.);
 
-      std::pair<mpfr_class, mpfr_class>
-        mp_result = this->jacobi(n, alpha, beta, mp_x);
+          // double x = 1.;
+          // auto mp_x = mpfr_class(1.);
 
-      std::pair<double, double>
-        double_result = this->jacobi(n, alpha, beta, x);
+          std::pair<mpfr_class, mpfr_class>
+            mp_result = this->jacobi(n, alpha, beta, mp_x);
 
-      mpfr_class err = abs(mp_result.first - mpfr_class(double_result.first));
+          std::pair<double, double>
+            double_result = this->jacobi(n, alpha, beta, x);
 
-      std::cout << std::endl
-                << "n = " << n
-                << std::endl
-                << "  alpha = " << alpha
-                << std::endl
-                << "  beta = " << beta
-                << std::endl
-                << "  x = " << x
-                << std::endl
-                << "  mp_x = " << mp_x
-                << std::endl
-                << "  mp value     = " << mp_result.first
-                << std::endl
-                << "  double value = " << double_result.first
-                << std::endl
-                << "  abs err = " << err
-                << std::endl
-                << "  mp deriv = " << mp_result.second
-                << std::endl
-                << "  double deriv = " << double_result.second
-                << std::endl;
+          mpfr_class err = abs(mp_result.first - mpfr_class(double_result.first));
+
+          std::cout << std::endl
+                    << "n = " << n
+                    << std::endl
+                    << "  alpha = " << alpha
+                    << std::endl
+                    << "  beta = " << beta
+                    << std::endl
+                    << "  x = " << x
+                    << std::endl
+                    << "  mp_x = " << mp_x
+                    << std::endl
+                    << "  mp value     = " << mp_result.first
+                    << std::endl
+                    << "  double value = " << double_result.first
+                    << std::endl
+                    << "  abs err = " << err
+                    << std::endl
+                    << "  mp deriv = " << mp_result.second
+                    << std::endl
+                    << "  double deriv = " << double_result.second
+                    << std::endl;
+        }
     }
 }
