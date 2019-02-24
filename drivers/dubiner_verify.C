@@ -32,7 +32,7 @@ int main(int argc, char** argv)
 
   // Parse command line options using getopt_long()
   int ch = -1;
-  while ((ch = getopt_long(argc, argv, "hr:", longopts, NULL)) != -1)
+  while ((ch = getopt_long(argc, argv, "hd:", longopts, NULL)) != -1)
     {
       switch (ch)
         {
