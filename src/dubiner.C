@@ -186,10 +186,28 @@ Dubiner::jacobi(unsigned n, unsigned alpha, unsigned beta, double x)
       // appear in opposite positions than is usual in the update
       // formula because of this swap!
       std::swap(p0, p1);
-      p1 = ((2*n + alpha + beta - 1) *
-        ((2*n + alpha + beta) * (2*n + alpha + beta - 2) * x + alpha * alpha - beta * beta) * p0
-        - 2 * (n + alpha - 1) * (n + beta - 1) * (2*n + alpha + beta) * p1) /
-        (2*n * (n + alpha + beta) * (2*n + alpha + beta - 2));
+      // p1 = ((2*i + alpha + beta - 1) *
+      //  ((2*i + alpha + beta) * (2*i + alpha + beta - 2) * x + alpha * alpha - beta * beta) * p0
+      //  - 2 * (i + alpha - 1) * (i + beta - 1) * (2*i + alpha + beta) * p1) /
+      //  (2*i * (i + alpha + beta) * (2*i + alpha + beta - 2));
+
+      // Wikipedia coefficients
+      // Real coeff1 = (2*i * (i + alpha + beta) * (2*i + alpha + beta - 2));
+      // Real coeff2 = (2*i + alpha + beta - 1) *
+      //   ((2*i + alpha + beta) * (2*i + alpha + beta - 2) * x + (alpha * alpha) - (beta * beta));
+      // Real coeff3 = 2 * (i + alpha - 1) * (i + beta - 1) * (2*i + alpha + beta);
+
+      // Shifted coefficients: let n = i+1 in the Wikipedia recurrence relation.
+      Real coeff1 = 2 * (i + 1) * (i + 1 + alpha + beta) * (2*i + alpha + beta);
+      Real coeff2 = (2*i + alpha + beta + 1) *
+        ((2*i + alpha + beta + 2) * (2*i + alpha + beta) * x + (alpha * alpha) - (beta * beta));
+      Real coeff3 = 2 * (i + alpha) * (i + beta) * (2*i + alpha + beta + 2);
+
+      // std::cout << "coeff1 = " << coeff1 << std::endl;
+      // std::cout << "coeff2 = " << coeff2 << std::endl;
+      // std::cout << "coeff3 = " << coeff3 << std::endl;
+
+      p1 = (coeff2/coeff1) * p0 - (coeff3/coeff1) * p1;
 
       // FIXME: This is still the Legendre formula for the derivative...
       // Note that dp1 appears in the formula below, but because we
@@ -212,12 +230,21 @@ Dubiner::compare_jacobi()
   // as well.
   unsigned int alpha = 0;
   unsigned int beta = 0;
-  // unsigned int n = 3;
 
   for (unsigned int n = 0; n < 6; ++n)
     {
-      double x = 0.2;
-      mpfr_class mp_x = mpfr_class(2.) / mpfr_class(10.);
+      // double x = 0.2;
+      // mpfr_class mp_x = mpfr_class(2.) / mpfr_class(10.);
+
+      double x = 0.25;
+      mpfr_class mp_x = mpfr_class(1.) / mpfr_class(4.);
+
+      // double x = 0.;
+      // auto mp_x = mpfr_class(0.);
+
+      // double x = 1.;
+      // auto mp_x = mpfr_class(1.);
+
       auto mp_result = this->jacobi(n, alpha, beta, mp_x);
       auto double_result = this->jacobi(n, alpha, beta, x);
       std::cout << std::endl
