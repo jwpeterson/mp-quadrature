@@ -181,33 +181,13 @@ Dubiner::jacobi(unsigned n, unsigned alpha, unsigned beta, double x)
   unsigned int i = 1;
   while (i < n)
     {
-      // Swapping saves a temporary, since this immediately updates p0
-      // and then p1 is updated on the next line. Note that p0 and p1
-      // appear in opposite positions than is usual in the update
-      // formula because of this swap!
+      // Note: we swap before updating p1, so p0 and p1 appear in
+      // opposite positions than is usual in the update formula.
       std::swap(p0, p1);
       p1 = (((2*i + alpha + beta + 1) *
         ((2*i + alpha + beta + 2) * (2*i + alpha + beta) * x + (alpha * alpha) - (beta * beta))) * p0
         - 2 * (i + alpha) * (i + beta) * (2*i + alpha + beta + 2) * p1) /
        (2 * (i + 1) * (i + 1 + alpha + beta) * (2*i + alpha + beta));
-
-      // Wikipedia coefficients
-      // Real coeff1 = (2*i * (i + alpha + beta) * (2*i + alpha + beta - 2));
-      // Real coeff2 = (2*i + alpha + beta - 1) *
-      //   ((2*i + alpha + beta) * (2*i + alpha + beta - 2) * x + (alpha * alpha) - (beta * beta));
-      // Real coeff3 = 2 * (i + alpha - 1) * (i + beta - 1) * (2*i + alpha + beta);
-
-      // Shifted coefficients: let n = i+1 in the Wikipedia recurrence relation.
-      // Real coeff1 = 2 * (i + 1) * (i + 1 + alpha + beta) * (2*i + alpha + beta);
-      // Real coeff2 = (2*i + alpha + beta + 1) *
-      //   ((2*i + alpha + beta + 2) * (2*i + alpha + beta) * x + (alpha * alpha) - (beta * beta));
-      // Real coeff3 = 2 * (i + alpha) * (i + beta) * (2*i + alpha + beta + 2);
-
-      // std::cout << "coeff1 = " << coeff1 << std::endl;
-      // std::cout << "coeff2 = " << coeff2 << std::endl;
-      // std::cout << "coeff3 = " << coeff3 << std::endl;
-
-      // p1 = (coeff2/coeff1) * p0 - (coeff3/coeff1) * p1;
 
       // FIXME: This is still the Legendre formula for the derivative...
       // Note that dp1 appears in the formula below, but because we
