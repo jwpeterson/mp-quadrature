@@ -9,6 +9,7 @@ drivers/test_dubiner
 drivers/compute_residuals_1D
 drivers/dubiner_verify
 drivers/pyramid_conical_product
+drivers/dubiner_verify_jacobi
 lib/
 *.a
 *.o
