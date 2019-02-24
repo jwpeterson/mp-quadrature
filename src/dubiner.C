@@ -211,7 +211,7 @@ Dubiner::compare_jacobi()
   unsigned int alpha = 0;
   unsigned int beta = 0;
 
-  for (unsigned int n = 0; n < 6; ++n)
+  for (unsigned int n = 0; n < 19; ++n)
     {
       // double x = 0.2;
       // mpfr_class mp_x = mpfr_class(2.) / mpfr_class(10.);
@@ -225,8 +225,14 @@ Dubiner::compare_jacobi()
       // double x = 1.;
       // auto mp_x = mpfr_class(1.);
 
-      auto mp_result = this->jacobi(n, alpha, beta, mp_x);
-      auto double_result = this->jacobi(n, alpha, beta, x);
+      std::pair<mpfr_class, mpfr_class>
+        mp_result = this->jacobi(n, alpha, beta, mp_x);
+
+      std::pair<double, double>
+        double_result = this->jacobi(n, alpha, beta, x);
+
+      mpfr_class err = abs(mp_result.first - mpfr_class(double_result.first));
+
       std::cout << std::endl
                 << "n = " << n
                 << std::endl
@@ -238,9 +244,11 @@ Dubiner::compare_jacobi()
                 << std::endl
                 << "  mp_x = " << mp_x
                 << std::endl
-                << "  mp value = " << mp_result.first
+                << "  mp value     = " << mp_result.first
                 << std::endl
                 << "  double value = " << double_result.first
+                << std::endl
+                << "  abs err = " << err
                 << std::endl
                 << "  mp deriv = " << mp_result.second
                 << std::endl
