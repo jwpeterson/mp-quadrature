@@ -231,6 +231,7 @@ Dubiner::compare_jacobi()
           double double_deriv = this->jacobi_deriv(n, alpha, beta, x);
 
           mpfr_class err = abs(mp_result.first - mpfr_class(double_val));
+          mpfr_class err_deriv = abs(mp_result.second - mpfr_class(double_deriv));
 
           std::cout << std::endl
                     << "n = " << n
@@ -247,11 +248,13 @@ Dubiner::compare_jacobi()
                     << std::endl
                     << "  double value = " << double_val
                     << std::endl
-                    << "  abs err = " << err
+                    << "  value abs err = " << err
                     << std::endl
                     << "  mp deriv = " << mp_result.second
                     << std::endl
                     << "  double deriv = " << double_deriv
+                    << std::endl
+                    << "  deriv abs err = " << err_deriv
                     << std::endl;
         }
     }
