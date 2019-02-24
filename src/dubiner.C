@@ -202,31 +202,23 @@ Dubiner::compare_jacobi()
   unsigned int alpha = 2;
   unsigned int beta = 1;
 
-  std::vector<double> x_vals = {-1, 1};
-  std::vector<mpfr_class> mp_x_vals = {mpfr_class(-1.), mpfr_class(1.)};
+  // Discrete points for computing the error
+  const unsigned int N = 20;
+  const Real dx = 2. / (N-1);
+  const mpfr_class mp_dx = mpfr_class(2.) / mpfr_class(N-1);
 
   for (unsigned int n = 0; n < 6; ++n)
     {
-      for (unsigned int i = 0; i < x_vals.size(); ++i)
+      for (unsigned int i=0; i<N; ++i)
         {
-          double x = x_vals[i];
-          mpfr_class mp_x = mp_x_vals[i];
+          double x = -1. + i * dx;
+          mpfr_class mp_x = mpfr_class(-1.) + i * mp_dx;
 
-          // double x = 0.2;
-          // mpfr_class mp_x = mpfr_class(2.) / mpfr_class(10.);
-
-          // double x = 0.25;
-          // mpfr_class mp_x = mpfr_class(1.) / mpfr_class(4.);
-
-          // double x = 0.;
-          // auto mp_x = mpfr_class(0.);
-
-          // double x = 1.;
-          // auto mp_x = mpfr_class(1.);
-
+          // Compute multi-precision value
           std::pair<mpfr_class, mpfr_class>
             mp_result = this->jacobi(n, alpha, beta, mp_x);
 
+          // Compute double precision value
           double double_val = this->jacobi_value(n, alpha, beta, x);
           double double_deriv = this->jacobi_deriv(n, alpha, beta, x);
 
