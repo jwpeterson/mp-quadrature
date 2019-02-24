@@ -145,6 +145,21 @@ int main(int argc, char** argv)
               }
           }
 
+      // Assuming everything worked and the mass matrix is diagonal,
+      // the eigenvalues of this matrix will be the diagonal entries,
+      // and the condition number will be the ratio of the max/min
+      // values. From what I have seen, the diagonal entries are
+      // naturally ordered from largest to smallest.
+      std::cout << "Mass matrix condition number: "
+                << mass_sums(0, 0) / mass_sums(Np-1, Np-1)
+                << std::endl;
+
+      // According to the paper by Burgers et al where this basis
+      // is defined, (2*d + 1) * (d + 1)
+      std::cout << "Theoretical mass matrix condition number: "
+                << (2*max_dubiner_degree + 1) * (max_dubiner_degree + 1)
+                << std::endl;
+
       // Print the Laplace matrix
       std::cout << "\n int dphi(i)*dphi(j)" << std::endl;
       laplace_sums.print();
