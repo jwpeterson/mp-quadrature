@@ -2,6 +2,11 @@
 #include "dubiner.h"
 #include "conical.h"
 
+#include <getopt.h> // getopt_long()
+
+// A usage function for this utility
+void usage();
+
 // This test driver verifies the orthogonality of the Dubiner
 // polynomials, both symbolic and numeric versions.
 int main(int argc, char** argv)
@@ -16,8 +21,39 @@ int main(int argc, char** argv)
 
   // Read max Dubiner polynomial degree from command line
   unsigned int max_dubiner_degree = 4;
-  if (argc > 1)
-    max_dubiner_degree = atoi(argv[1]);
+
+  // options descriptor - this associates "long" and "short" command line options.
+  static struct option longopts[] =
+    {
+      {"degree", required_argument, NULL, 'd'},
+      {"help",   no_argument,       NULL, 'h'},
+      { NULL,    0,                 NULL,  0 }
+    };
+
+  // Parse command line options using getopt_long()
+  int ch = -1;
+  while ((ch = getopt_long(argc, argv, "hr:", longopts, NULL)) != -1)
+    {
+      switch (ch)
+        {
+        case 'd':
+          {
+            max_dubiner_degree = atoi(optarg);
+            break;
+          }
+
+        case 'h':
+          {
+            usage();
+            return 0;
+          }
+
+        default:
+          // We could error here, print a usage command, or just ignore unrecognized arguments...
+          usage();
+        }
+    } // end while
+
   std::cout << "\nVerifying d=" << max_dubiner_degree << " Dubiner polynomials." << std::endl;
 
   // Compute integral(phi(i)*phi(j)) for each of the Dubiner polynomials.
@@ -115,4 +151,16 @@ int main(int argc, char** argv)
     }
 
   return 0;
+}
+
+void usage()
+{
+  std::cout << "\n";
+  std::cout << "This program computes the Dubiner polynomials at the \n"
+            << "points of a conical quadrature rule and computes the \n"
+            << "corresponding mass and Laplacian matrices.\n\n"
+            << "Command line options:\n"
+            << "-d N, --degree N: Compute Dubiner polynomials of degree N\n"
+            << "-h, --help: Print this help message and exit.\n"
+            << std::endl;
 }
