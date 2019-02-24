@@ -163,20 +163,13 @@ std::pair<mpfr_class, mpfr_class> Dubiner::jacobi(unsigned n, unsigned alpha, un
   return std::make_pair(val, deriv);
 }
 
-std::pair<double, double>
-Dubiner::jacobi(unsigned n, unsigned alpha, unsigned beta, double x)
+double Dubiner::jacobi_value(unsigned n, unsigned alpha, unsigned beta, double x)
 {
   if (n == 0)
-    return std::make_pair(1,0);
+    return 1.;
 
   Real p0 = 1;
   Real p1 = (alpha + 1) + (alpha + beta + 2) * 0.5 * (x - 1);
-
-  // The recurrence relation we're using only requires one previous
-  // derivative value, but it is from two iterations ago, so we still
-  // need to keep track of two values.
-  Real dp0 = 0;
-  Real dp1 = 0.5 * (alpha + beta + 2);
 
   unsigned int i = 1;
   while (i < n)
@@ -189,17 +182,15 @@ Dubiner::jacobi(unsigned n, unsigned alpha, unsigned beta, double x)
         - 2 * (i + alpha) * (i + beta) * (2*i + alpha + beta + 2) * p1) /
        (2 * (i + 1) * (i + 1 + alpha + beta) * (2*i + alpha + beta));
 
-      // FIXME: This is still the Legendre formula for the derivative...
-      // Note that dp1 appears in the formula below, but because we
-      // swapped, it's really dp0. Also, we have already updated the
-      // values, so:
-      // p1 is now P_{i+1}(x)
-      // p0 is now P_{i}(x)
-      std::swap(dp0, dp1);
-      dp1 = (2*i + 1) * p0 + dp1;
       ++i;
     }
-  return std::make_pair(p1, dp1);
+  return p1;
+}
+
+double Dubiner::jacobi_deriv(unsigned n, unsigned alpha, unsigned beta, double x)
+{
+  // Call jacobi_value for elevated (alpha, beta) and decremented n.
+  return n == 0 ? 0 : 0.5 * (1 + alpha + beta + n) * this->jacobi_value(n-1, alpha+1, beta+1, x);
 }
 
 void
@@ -236,10 +227,10 @@ Dubiner::compare_jacobi()
           std::pair<mpfr_class, mpfr_class>
             mp_result = this->jacobi(n, alpha, beta, mp_x);
 
-          std::pair<double, double>
-            double_result = this->jacobi(n, alpha, beta, x);
+          double double_val = this->jacobi_value(n, alpha, beta, x);
+          double double_deriv = this->jacobi_deriv(n, alpha, beta, x);
 
-          mpfr_class err = abs(mp_result.first - mpfr_class(double_result.first));
+          mpfr_class err = abs(mp_result.first - mpfr_class(double_val));
 
           std::cout << std::endl
                     << "n = " << n
@@ -254,13 +245,13 @@ Dubiner::compare_jacobi()
                     << std::endl
                     << "  mp value     = " << mp_result.first
                     << std::endl
-                    << "  double value = " << double_result.first
+                    << "  double value = " << double_val
                     << std::endl
                     << "  abs err = " << err
                     << std::endl
                     << "  mp deriv = " << mp_result.second
                     << std::endl
-                    << "  double deriv = " << double_result.second
+                    << "  double deriv = " << double_deriv
                     << std::endl;
         }
     }

@@ -49,18 +49,27 @@ private:
   // (1/2)*((alpha+beta+2)*x + (alpha-beta))
   std::pair<mpfr_class, mpfr_class> jacobi(unsigned n, unsigned alpha, unsigned beta, mpfr_class x);
 
-  // Compute Jacobi polynomial value and first derivative:
-  // P^{(\alpha,\beta)}_n(x)
-  // d/dx P^{(\alpha,\beta)}_n(x)
-  // using double precision values. This is here so we can compare it
-  // to the multiprecision implementation above. It therefore uses the
-  // same normalization as the implementation above. The recurrence
+  // Compute Jacobi polynomial value, P^{(\alpha,\beta)}_n(x) using
+  // double precision values. This is here so we can compare it to the
+  // multiprecision implementation above. It therefore uses the same
+  // normalization as the implementation above. The recurrence
   // relation we are using can be found on Wikipedia, and is similar
   // in structure to the recurrence relation for Legendre polynomials,
-  // so we use a similar approach to compute it. The page also describes
-  // recurrence relations for computing the first derivative.
-  std::pair<double, double>
-  jacobi(unsigned n, unsigned alpha, unsigned beta, double x);
+  // so we use a similar approach to compute it. The Wikipedia page
+  // also gives a formula for computing the first derivative.
+  double jacobi_value(unsigned n, unsigned alpha, unsigned beta, double x);
+
+  // There does not seem to be a formula for computing the the Jacobi
+  // polynomial derivatives like the following for the Legendre polynomials:
+  // (2n+1) * P_n = d/dx (P_{n+1} - P_{n-1})
+  // Instead, we have the formula:
+  // d/dx P_n^{(alpha,beta)} = (1/2) * (1 + alpha + beta + n) * P^{(alpha+1,beta+1)}_{n-1}
+  // so to compute the _derivative_ for a given (alpha, beta), we just need
+  // the _value_ for (alpha+1,beta+1).
+  // Therefore, it does not really make sense to compute the value
+  // and derivative at the same time, and we have two separate functions
+  // for this that can be called together if necessary.
+  double jacobi_deriv(unsigned n, unsigned alpha, unsigned beta, double x);
 };
 
 #endif
