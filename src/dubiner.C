@@ -208,58 +208,48 @@ Dubiner::compare_jacobi()
   const Real dx = 2. / (N-1);
   const mpfr_class mp_dx = mpfr_class(2.) / mpfr_class(N-1);
 
+  // Error tolerance. We will only print messages if the error is
+  // larger than this.
+  const double error_tol = 1.e-9;
+
+  std::cout << "Comparing multi-precision and "
+            << "double-precision Jacobi polynomial values." << std::endl;
+  std::cout << "We will only print results if the error is larger than "
+            << error_tol << std::endl;
+
   for (unsigned int alpha=0; alpha<alpha_max; ++alpha)
     for (unsigned int beta=0; beta<beta_max; ++beta)
-      {
-        for (unsigned int n=0; n<n_max; ++n)
-          {
-            mpfr_class total_err = 0.;
-            mpfr_class total_err_deriv = 0.;
+      for (unsigned int n=0; n<n_max; ++n)
+        {
+          mpfr_class total_err = 0.;
+          mpfr_class total_err_deriv = 0.;
 
-            for (unsigned int i=0; i<N; ++i)
-              {
-                double x = -1. + i * dx;
-                mpfr_class mp_x = mpfr_class(-1.) + i * mp_dx;
+          for (unsigned int i=0; i<N; ++i)
+            {
+              double x = -1. + i * dx;
+              mpfr_class mp_x = mpfr_class(-1.) + i * mp_dx;
 
-                // Compute multi-precision value
-                std::pair<mpfr_class, mpfr_class>
-                  mp_result = this->jacobi(n, alpha, beta, mp_x);
+              // Compute multi-precision value
+              std::pair<mpfr_class, mpfr_class>
+                mp_result = this->jacobi(n, alpha, beta, mp_x);
 
-                // Compute double precision value
-                double double_val = this->jacobi_value(n, alpha, beta, x);
-                double double_deriv = this->jacobi_deriv(n, alpha, beta, x);
+              // Compute double precision value
+              double double_val = this->jacobi_value(n, alpha, beta, x);
+              double double_deriv = this->jacobi_deriv(n, alpha, beta, x);
 
-                mpfr_class err = abs(mp_result.first - mpfr_class(double_val));
-                mpfr_class err_deriv = abs(mp_result.second - mpfr_class(double_deriv));
+              // Compute and accumulate error between
+              // multi-precision "reference" value and
+              // double-precision values.
+              mpfr_class err = abs(mp_result.first - mpfr_class(double_val));
+              mpfr_class err_deriv = abs(mp_result.second - mpfr_class(double_deriv));
 
-                total_err += err;
-                total_err_deriv += err_deriv;
+              total_err += err;
+              total_err_deriv += err_deriv;
+            } // end loop over mesh points
 
-                // std::cout << std::endl
-                //           << "n = " << n
-                //           << std::endl
-                //           << "  alpha = " << alpha
-                //           << std::endl
-                //           << "  beta = " << beta
-                //           << std::endl
-                //           << "  x = " << x
-                //           << std::endl
-                //           << "  mp_x = " << mp_x
-                //           << std::endl
-                //           << "  mp value     = " << mp_result.first
-                //           << std::endl
-                //           << "  double value = " << double_val
-                //           << std::endl
-                //           << "  value abs err = " << err
-                //           << std::endl
-                //           << "  mp deriv = " << mp_result.second
-                //           << std::endl
-                //           << "  double deriv = " << double_deriv
-                //           << std::endl
-                //           << "  deriv abs err = " << err_deriv
-                //           << std::endl;
-              } // end loop over mesh points
-
+          // Only print error if it is larger than some threshold which might indicate
+          // there is an issue with the algorithm.
+          if (total_err > error_tol || total_err_deriv > error_tol)
             std::cout << std::endl
                       << "n = " << n
                       << std::endl
@@ -271,6 +261,5 @@ Dubiner::compare_jacobi()
                       << std::endl
                       << "  deriv abs err = " << total_err_deriv
                       << std::endl;
-          } // end loop over n
-      } // end loop over alpha, beta
+        } // end loop over n
 }
