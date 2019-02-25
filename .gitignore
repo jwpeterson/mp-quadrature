@@ -31,3 +31,4 @@ gmpfrxx/example
 *.so.*
 drivers/lu
 plots
+drivers/dubiner_verify_double
