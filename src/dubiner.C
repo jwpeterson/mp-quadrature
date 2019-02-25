@@ -74,6 +74,74 @@ void Dubiner::p(unsigned d,
 
 
 
+void Dubiner::p_double
+(unsigned d,
+ double xi,
+ double eta,
+ std::vector<double> & vals,
+ std::vector<Point<double>> & gradients)
+{
+  // Make sure there are no old values in the vectors.
+  vals.clear();
+  gradients.clear();
+
+  for (unsigned i=0; i<=d; ++i)
+    for (unsigned j=0; j<=d; ++j)
+      {
+        // If degree is too high, continue
+        if (i+j > d)
+          continue;
+
+        // Map (xi, eta) to barycentric coordinates
+        double
+          zeta0 = xi,
+          zeta1 = eta,
+          zeta2 = 1. - xi - eta;
+
+        // Compute transformed coordinate for evaluating P_i
+        double transformed1 = (zeta1 - zeta0) / (zeta1 + zeta0);
+
+        // Compute P_i^(0,0) and derivative at the transformed coordinate.
+        double P_i = this->jacobi_value(/*n=*/i, /*alpha=*/0, /*beta=*/0, /*x=*/transformed1);
+        double dPi_dx = this->jacobi_deriv(/*n=*/i, /*alpha=*/0, /*beta=*/0, /*x=*/transformed1);
+
+        // Compute the "scaling" term
+        double scaling_term = std::pow(zeta1 + zeta0, i);
+
+        // Compute transformed coordinate for evaluating P_j
+        double transformed2 = 2.*zeta2 - 1.;
+
+        // Compute P_j^(2*i+1,0) and derivative
+        double P_j = this->jacobi_value(/*n=*/j, /*alpha=*/2*i+1, /*beta=*/0, /*x=*/transformed2);
+        double dPj_dx = this->jacobi_deriv(/*n=*/j, /*alpha=*/2*i+1, /*beta=*/0, /*x=*/transformed2);
+
+        // Compute and store the value
+        vals.push_back(P_i * scaling_term * P_j);
+
+        // Compute derivatives, avoiding division by 0.
+        double den2 = (xi + eta) * (xi + eta);
+
+        // Compute d/d(xi) P_i
+        double dPi_dxi = (den2 == 0.) ? 0. : (-2. * eta / den2 * dPi_dx);
+
+        // Compute d/d(eta) P_i
+        double dPi_deta = (den2 == 0.) ? 0. : (2. * xi / den2 * dPi_dx);
+
+        // Compute derivative of scaling term
+        double dscaling_term = (i == 0) ? 0. : i * std::pow(zeta1 + zeta0, i - 1);
+
+        // Compute d/d(xi) P_j = d/d(eta) P_j = (-2) * d(P_j)/dx
+        double dPj = -2. * dPj_dx;
+
+        // Finally, compute and store the derivatives
+        gradients.push_back
+          (Point<double>(P_i * scaling_term * dPj + P_j * (P_i * dscaling_term + scaling_term * dPi_dxi),
+                         P_i * scaling_term * dPj + P_j * (P_i * dscaling_term + scaling_term * dPi_deta)));
+      }
+}
+
+
+
 void Dubiner::build_H1_projection_matrix(unsigned d,
                                          Matrix<mpfr_class> & matrix)
 {

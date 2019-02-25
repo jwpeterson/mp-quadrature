@@ -27,6 +27,14 @@ public:
          std::vector<mpfr_class> & vals,
          std::vector<Point<mpfr_class> > & gradients);
 
+  // Double-precision version of the function above.
+  void p_double
+  (unsigned d,
+   double xi,
+   double eta,
+   std::vector<double> & vals,
+   std::vector<Point<double>> & gradients);
+
   // Builds the coefficient matrix K_{ij} = int(phi_i*phi_j +
   // grad(phi_i)*grad(phi_j)) for the Dubiner polynomials of degree d.
   void build_H1_projection_matrix(unsigned d,
