@@ -32,6 +32,39 @@ if [ $go -eq 0 ] ; then
     exit 0
 fi
 
+# Versions of the libraries we will use. These will be updated periodically.
+gmp_version=6.1.2
+mpfr_version=4.0.1
+
+# Check whether we already have the required tarball versions.
+have_gmp_tarball=no
+have_mpfr_tarball=no
+if test -f gmp/gmp-${gmp_version}.tar.bz2; then
+    have_gmp_tarball=yes
+fi
+if test -f mpfr/mpfr-${mpfr_version}.tar.bz2; then
+    have_mpfr_tarball=yes
+fi
+
+# If the required tarballs are not already available, we need to
+# choose a command line downloader. By default we use curl, falling
+# back on wget if it's not available, and throwing an error if neither
+# is available.
+if test $have_gmp_tarball = no || test $have_mpfr_tarball = no; then
+    if type -P "curl" &>/dev/null; then
+        echo "Using curl to download tarballs"
+        cld=curl
+        cld_options=-O
+    elif type -P "wget" &>/dev/null; then
+        echo "Using wget to download tarballs"
+        cld=wget
+        cld_options=
+    else
+        echo "Either curl or wget is required."
+        exit 0
+    fi
+fi
+
 # 1.) Build GMP
 
 # If the gmp/ directory doesn't exist, create it.
@@ -43,9 +76,8 @@ fi
 pushd gmp
 
 # Download the tarball if necessary
-gmp_version=6.1.2
-if [ ! -f gmp-${gmp_version}.tar.bz2 ]; then
-    curl -O https://ftp.gnu.org/gnu/gmp/gmp-${gmp_version}.tar.bz2
+if test $have_gmp_tarball = no; then
+    $cld $cld_options https://ftp.gnu.org/gnu/gmp/gmp-${gmp_version}.tar.bz2
 fi
 
 # Clean up anything left over from a previous installation.
@@ -79,9 +111,8 @@ fi
 pushd mpfr
 
 # Download the tarball
-mpfr_version=4.0.1
-if [ ! -f mpfr-${mpfr_version}.tar.bz2 ]; then
-    curl -O https://www.mpfr.org/mpfr-${mpfr_version}/mpfr-${mpfr_version}.tar.bz2
+if test $have_mpfr_tarball = no; then
+    $cld $cld_options https://www.mpfr.org/mpfr-${mpfr_version}/mpfr-${mpfr_version}.tar.bz2
 fi
 
 # Clean up anything left over from a previous installation.
