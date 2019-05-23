@@ -43,16 +43,17 @@ fi
 pushd gmp
 
 # Download the tarball if necessary
-if [ ! -f gmp-5.1.3.tar.bz2 ]; then
-    curl -O https://ftp.gnu.org/gnu/gmp/gmp-5.1.3.tar.bz2
+gmp_version=6.1.2
+if [ ! -f gmp-${gmp_version}.tar.bz2 ]; then
+    curl -O https://ftp.gnu.org/gnu/gmp/gmp-${gmp_version}.tar.bz2
 fi
 
 # Clean up anything left over from a previous installation.
-rm -rf gmp-5.1.3 include lib share
+rm -rf gmp-${gmp_version} include lib share
 
 # Unpack the tarball
-tar jxvf gmp-5.1.3.tar.bz2
-pushd gmp-5.1.3
+tar jxvf gmp-${gmp_version}.tar.bz2
+pushd gmp-${gmp_version}
 
 # Configure GMP
 ./configure --prefix=${install_dir}/gmp --enable-cxx
@@ -78,16 +79,17 @@ fi
 pushd mpfr
 
 # Download the tarball
-if [ ! -f mpfr-3.1.2.tar.bz2 ]; then
-    curl -O http://www.mpfr.org/mpfr-3.1.2/mpfr-3.1.2.tar.bz2
+mpfr_version=4.0.1
+if [ ! -f mpfr-${mpfr_version}.tar.bz2 ]; then
+    curl -O https://www.mpfr.org/mpfr-${mpfr_version}/mpfr-${mpfr_version}.tar.bz2
 fi
 
 # Clean up anything left over from a previous installation.
-rm -rf mpfr-3.1.2 include lib share
+rm -rf mpfr-${mpfr_version} include lib share
 
 # Unpack the tarball
-tar jxvf mpfr-3.1.2.tar.bz2
-pushd mpfr-3.1.2
+tar jxvf mpfr-${mpfr_version}.tar.bz2
+pushd mpfr-${mpfr_version}
 
 # Configure using the GMP we just built
 ./configure --prefix=${install_dir}/mpfr --with-gmp-include=${install_dir}/gmp/include --with-gmp-lib=${install_dir}/gmp/lib
