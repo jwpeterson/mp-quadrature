@@ -10,6 +10,8 @@ drivers/compute_residuals_1D
 drivers/dubiner_verify
 drivers/pyramid_conical_product
 drivers/dubiner_verify_jacobi
+drivers/dubiner_verify_double
+drivers/gatermann
 lib/
 *.a
 *.o
@@ -31,4 +33,3 @@ gmpfrxx/example
 *.so.*
 drivers/lu
 plots
-drivers/dubiner_verify_double
