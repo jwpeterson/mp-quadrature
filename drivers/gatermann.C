@@ -107,13 +107,17 @@ int main()
 
   // Compute the residual
   std::vector<mpfr_class> r;
-  residual_and_jacobian(&r, nullptr, u);
-  // residual_and_jacobian(nullptr, nullptr, u); // test that we can "do nothing"
+  Matrix<mpfr_class> jac;
+  residual_and_jacobian(&r, &jac, u);
+  // residual_and_jacobian(&r, nullptr, u);
 
   // Print the result
   std::cout << "r=" << std::endl;
   for (const auto & val : r)
     std::cout << val << std::endl;
+
+  std::cout << "jac=" << std::endl;
+  jac.print();
 
   return 0;
 }
@@ -123,6 +127,10 @@ residual_and_jacobian(std::vector<mpfr_class> * r,
                       Matrix<mpfr_class> * jac,
                       const std::vector<mpfr_class> & u)
 {
+  // If there's nothing to do, then there's nothing to do.
+  if (!r && !jac)
+    return;
+
   // The list of monomial exponents that we are going to test.
   std::vector<std::pair<unsigned int, unsigned int>> polys =
     {
@@ -130,12 +138,23 @@ residual_and_jacobian(std::vector<mpfr_class> * r,
       {4,1}, {6,0}, {5,1}, {7,0}, {6,1}, {4,2}
     };
 
-  // Allocate space for residual vector
+  // The number of equations (and the number of unknowns).
+  unsigned int n = polys.size();
+
+  // Zero any previous values and allocate space for residual and Jacobian, if required.
   if (r)
-    r->resize(polys.size());
+    {
+      r->clear();
+      r->resize(n);
+    }
+  if (jac)
+    {
+      jac->clear();
+      jac->resize(n, n);
+    }
 
   // Loop over (w,x,y) triples in u
-  for (unsigned int i=0; i<polys.size(); i++)
+  for (unsigned int i=0; i<n; i++)
     {
       // The powers of x and y in the monomial we are currently integrating.
       unsigned int xpower = polys[i].first;
@@ -152,10 +171,47 @@ residual_and_jacobian(std::vector<mpfr_class> * r,
           // The implied third barycentric coordinate
           mpfr_class z = mpfr_class(1) - x - y;
 
+          // The "spatial" part is needed by both the residual and Jacobian,
+          // so we can always compute it.
+          mpfr_class spatial =
+            pow(x, xpower) * pow(y, ypower) +
+            pow(z, xpower) * pow(x, ypower) +
+            pow(y, xpower) * pow(z, ypower);
+
+          // Compute residual contribution, if required.
           if (r)
-            (*r)[i] += w * (pow(x, xpower) * pow(y, ypower) +
-                            pow(z, xpower) * pow(x, ypower) +
-                            pow(y, xpower) * pow(z, ypower));
+            (*r)[i] += w * spatial;
+
+          // Compute Jacobian contribution, if required.
+          if (jac)
+            {
+              // Derivative wrt w
+              (*jac)(i, q) += spatial;
+
+              // We are differentiating polynomials, so if xpower or
+              // ypower is 0 the derivative of the corresponding term
+              // will be zero. In that case we don't want to subtract
+              // 1 from the unsigned variable which represents the
+              // exponent, since that would cause it to wrap, possibly
+              // leading to other issues. Therefore we will just
+              // define the power to still be zero in that case...
+              // Note that the -1 terms come from differentiating "z"
+              // wrt either x or y.
+              unsigned int xpm1 = xpower > 0 ? xpower-1 : 0;
+              unsigned int ypm1 = ypower > 0 ? ypower-1 : 0;
+
+              // Derivative wrt x
+              (*jac)(i,q+1) +=
+                xpower * pow(x, xpm1) * pow(y, ypower) +
+                (mpfr_class(-1) * xpower * pow(z, xpm1) * pow(x, ypower) + pow(z, xpower) * ypower * pow(x, ypm1)) +
+                pow(y, xpower) * mpfr_class(-1) * ypower * pow(z, ypm1);
+
+              // Derivative wrt y
+              (*jac)(i,q+2) +=
+                pow(x, xpower) * ypower * pow(y, ypm1) +
+                mpfr_class(-1) * xpower * pow(z, xpm1) * pow(x, ypower) +
+                (xpower * pow(y, xpm1) * pow(z, ypower) + pow(y, xpower) * mpfr_class(-1) * ypower * pow(z, ypm1));
+            }
         }
 
       // Subtract off the true integral value, I(p_i)
