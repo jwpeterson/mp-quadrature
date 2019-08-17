@@ -53,16 +53,6 @@ int main()
   // 10.) x^7,
   // 11.) x^6 * y,
   // 12.) x^4 * y^2
-//  std::vector<std::pair<unsigned int, unsigned int>> polys =
-//    {
-//      {0,0}, {2,0}, {3,0}, {2,1}, {4,0}, {5,0},
-//      {4,1}, {6,0}, {5,1}, {7,0}, {6,1}, {4,2}
-//    };
-//
-//  for (const auto & p : polys)
-//    std::cout << "(" << p.first << "," << p.second << ") = "
-//              << exact_tri(p.first, p.second)
-//              << std::endl;
 
   // The nonlinear system of equations is to be solved by Newton's
   // method, so we need to form a residual and Jacobian. The residual is
@@ -101,7 +91,7 @@ int main()
   //     2.7771616697639178e-01, // y4
   //   };
 
-  // A less accurate initial guess (for testing).
+  // A less accurate initial guess (converges to same solution).
   std::vector<mpfr_class> u =
     {
       2.65e-02, // w1
@@ -121,50 +111,27 @@ int main()
       2.77e-01, // y4
     };
 
-  // Print the initial guess
-  // std::cout << "u=" << std::endl;
-  // for (const auto & val : u)
-  //   std::cout << val << std::endl;
+  // We now use Newton iterations to obtain more digits of accuracy in the
+  // points and weights.
+
+  // Newton iteration parameters.
+  mpfr_class tol = 1.e-36;
+  unsigned iter = 0;
+  const unsigned int maxits = 10;
+  bool converged = false;
 
   // Storage for residual, Newton update, and Jacobian
   std::vector<mpfr_class> r, du;
   Matrix<mpfr_class> jac;
-  // residual_and_jacobian(&r, &jac, u); // test with 2 non-nullptr args
-  // residual_and_jacobian(&r, nullptr, u); // test with no Jacobian
-  // residual_and_jacobian(nullptr, &jac, u); // test with no residual
-
-  // Print the results
-  // std::cout << "r=" << std::endl;
-  // for (const auto & val : r)
-  //   std::cout << val << std::endl;
-  // std::cout << "jac=" << std::endl;
-  // jac.print();
-
-  // Use Newton iterations to obtain more digits of accuracy in the
-  // solution.
-  // bool keep_going = true;
-
-  // Newton iteration residual norm convergence tolerance and max iteration count.
-  mpfr_class tol = 1.e-36;
-  unsigned iter = 0;
-  const unsigned int maxits = 10;
 
   while (true)
   {
     ++iter;
     if (iter > maxits)
-      {
-        std::cout << "Newton iteration not converged before max iterations reached." << std::endl;
-        break;
-      }
+      break;
 
     // Compute the residual (vector) at the current guess.
     residual_and_jacobian(&r, nullptr, u);
-
-    // Print residual
-    // std::cout << "r=" << std::endl;
-    // for (const auto & val : r)
-    //   std::cout << val << std::endl;
 
     // Check the norm of the residual vector to see if we are done.
     mpfr_class residual_norm = 0.;
@@ -175,7 +142,10 @@ int main()
     std::cout << "Iteration " << iter << ", residual_norm=" << residual_norm << std::endl;
 
     if (residual_norm < tol)
-      break;
+      {
+        converged = true;
+        break;
+      }
 
     // Compute Jacobian (only) at the current guess.
     residual_and_jacobian(nullptr, &jac, u);
@@ -183,20 +153,21 @@ int main()
     // Compute update: du = -jac^{-1} * r
     jac.lu_solve(du, r);
 
-    // Print update
-    // std::cout << "du=" << std::endl;
-    // for (const auto & val : du)
-    //   std::cout << val << std::endl;
-
     // Compute next iterate, u -= du
     for (unsigned int i=0; i<u.size(); ++i)
       u[i] -= du[i];
-
-    // Print updated solution
-    std::cout << "u=" << std::endl;
-    for (const auto & val : u)
-      std::cout << val << std::endl;
   } // end while
+
+  if (!converged)
+    {
+      std::cout << "Newton iteration not converged before max iterations reached." << std::endl;
+      abort();
+    }
+
+  // Print final solution
+  std::cout << "u=" << std::endl;
+  for (const auto & val : u)
+    std::cout << val << std::endl;
 
   return 0;
 }
@@ -269,7 +240,7 @@ residual_and_jacobian(std::vector<mpfr_class> * r,
               (*jac)(i, q) += spatial;
 
               // We are differentiating polynomials, so if xpower or
-              // ypower is 0 the derivative of the corresponding term
+              // ypower is 0, the derivative of the corresponding term
               // will be zero. In that case we don't want to subtract
               // 1 from the unsigned variable which represents the
               // exponent, since that would cause it to wrap, possibly
