@@ -12,6 +12,7 @@ drivers/pyramid_conical_product
 drivers/dubiner_verify_jacobi
 drivers/dubiner_verify_double
 drivers/gatermann
+drivers/gatermann_search
 lib/
 *.a
 *.o
