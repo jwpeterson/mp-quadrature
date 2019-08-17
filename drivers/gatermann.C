@@ -1,15 +1,19 @@
 // Functions for computing exact integrals of monomials
 // on the reference triangle.
 #include "exact.h"
+#include "matrix.h"
 
 // C++ includes
 #include <vector>
 #include <utility>
 #include <iostream>
 
-// Function used to compute the residual at the input u
-std::vector<mpfr_class>
-residual(const std::vector<mpfr_class> & u);
+// Function used to (possibly) compute the residual and Jacobian at
+// the input u.  If either "r" or "jac" is nullptr, their computation
+// is skipped.
+void residual_and_jacobian(std::vector<mpfr_class> * r,
+                           Matrix<mpfr_class> * jac,
+                           const std::vector<mpfr_class> & u);
 
 // A degree 7 rule with 12 points.  This rule can be found in:
 //
@@ -102,7 +106,9 @@ int main()
     std::cout << val << std::endl;
 
   // Compute the residual
-  std::vector<mpfr_class> r = residual(u);
+  std::vector<mpfr_class> r;
+  residual_and_jacobian(&r, nullptr, u);
+  // residual_and_jacobian(nullptr, nullptr, u); // test that we can "do nothing"
 
   // Print the result
   std::cout << "r=" << std::endl;
@@ -112,8 +118,10 @@ int main()
   return 0;
 }
 
-std::vector<mpfr_class>
-residual(const std::vector<mpfr_class> & u)
+void
+residual_and_jacobian(std::vector<mpfr_class> * r,
+                      Matrix<mpfr_class> * jac,
+                      const std::vector<mpfr_class> & u)
 {
   // The list of monomial exponents that we are going to test.
   std::vector<std::pair<unsigned int, unsigned int>> polys =
@@ -123,7 +131,8 @@ residual(const std::vector<mpfr_class> & u)
     };
 
   // Allocate space for residual vector
-  std::vector<mpfr_class> r(polys.size());
+  if (r)
+    r->resize(polys.size());
 
   // Loop over (w,x,y) triples in u
   for (unsigned int i=0; i<polys.size(); i++)
@@ -143,15 +152,14 @@ residual(const std::vector<mpfr_class> & u)
           // The implied third barycentric coordinate
           mpfr_class z = mpfr_class(1) - x - y;
 
-          r[i] += w * (pow(x, xpower) * pow(y, ypower) +
-                       pow(z, xpower) * pow(x, ypower) +
-                       pow(y, xpower) * pow(z, ypower));
+          if (r)
+            (*r)[i] += w * (pow(x, xpower) * pow(y, ypower) +
+                            pow(z, xpower) * pow(x, ypower) +
+                            pow(y, xpower) * pow(z, ypower));
         }
 
       // Subtract off the true integral value, I(p_i)
-      r[i] -= exact_tri(xpower, ypower);
+      if (r)
+        (*r)[i] -= exact_tri(xpower, ypower);
     }
-
-  // Return the result
-  return r;
 }
