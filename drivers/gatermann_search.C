@@ -7,6 +7,8 @@
 #include <vector>
 #include <utility>
 #include <iostream>
+#include <stdlib.h> // random
+#include <time.h> // time()
 
 // Function used to (possibly) compute the residual and Jacobian at
 // the input u.  If either "r" or "jac" is nullptr, their computation
@@ -36,25 +38,94 @@ int main()
   // 53 binary digits is about what you normally get with a double.
   mpfr_set_default_prec(256);
 
-  // A less accurate initial guess (converges to same solution).
+  // Varies the sequence of pseudorandom numbers returned by random().
+  // srandom(42);
+
+  // Use the current time since epoch as a seed.
+  // Seeds that produce initial guesses which fail to converge
+  // (only the weights were chosen randomly).
+  // 1566139255
+  // 1566139317 // matrix is singular!
+  // 1566139363
+  // 1566139397
+  // 1566139449
+  // 1566139481
+  // 1566139509
+  // 1566139629
+  // 1566139669
+  // 1566139711
+  // 1566139735
+  // 1566139757
+  // 1566139782
+  time_t seed = time(nullptr);
+  std::cout << "seed=" << seed << std::endl;
+  srandom(seed);
+
+  // An initial guess which is known to converge to the solution in Gatermann's paper.
+  // std::vector<mpfr_class> u =
+  //   {
+  //     2.65e-02, // w1
+  //     6.23e-02, // x1
+  //     6.75e-02, // y1
+  //
+  //     4.38e-02, // w2
+  //     5.52e-02, // x2
+  //     3.21e-01, // y2
+  //
+  //     2.87e-02, // w3
+  //     3.43e-02, // x3
+  //     6.60e-01, // y3
+  //
+  //     6.74e-02, // w4
+  //     5.15e-01, // x4
+  //     2.77e-01, // y4
+  //   };
+
+  // A "random" initial guess. Note that all parameters must be
+  // positve, weights cannot exceed 0.5, the area of the reference
+  // element. Also, each weight parameter corresponds to 3 quadrature
+  // points, so actually it cannot exceed (1/3) * (1/2) = 1/6.
+  // For the points, they must be chosen such that 1 - x - y > 0
+  // and their relative order matters, i.e. reversing x and y will
+  // give you a different solution.
+  mpfr_class w1 = (1. / 6) * random() / RAND_MAX;
+  mpfr_class w2 = (1. / 6 - w1) * random() / RAND_MAX;
+  mpfr_class w3 = (1. / 6 - w1 - w2) * random() / RAND_MAX;
+  mpfr_class w4 = 1. / 6 - w1 - w2 - w3; // The last weight is not random, it's whatever is left over.
+
+  // For the true solution, the sum of weight parameters is:
+  // 2.65e-02 + 4.38e-02 + 2.87e-02 + 6.74e-02 = 0.1664,
+  // so we should verify the same is true for our random initial
+  // guess.
+  // std::cout << "w1 = " << w1 << std::endl;
+  // std::cout << "w2 = " << w2 << std::endl;
+  // std::cout << "w3 = " << w3 << std::endl;
+  // std::cout << "w4 = " << w4 << std::endl;
+  // std::cout << "sum = " << w1+w2+w3+w4 << std::endl;
+
   std::vector<mpfr_class> u =
     {
-      2.65e-02, // w1
+      w1,
       6.23e-02, // x1
       6.75e-02, // y1
 
-      4.38e-02, // w2
+      w2,
       5.52e-02, // x2
       3.21e-01, // y2
 
-      2.87e-02, // w3
+      w3,
       3.43e-02, // x3
       6.60e-01, // y3
 
-      6.74e-02, // w4
+      w4,
       5.15e-01, // x4
       2.77e-01, // y4
     };
+
+  // Print initial guess
+  std::cout << "u=" << std::endl;
+  for (const auto & val : u)
+    std::cout << val << std::endl;
 
   // We now use Newton iterations to obtain more digits of accuracy in the
   // points and weights.
@@ -76,7 +147,7 @@ bool newton(std::vector<mpfr_class> & u)
   // Newton iteration parameters.
   mpfr_class tol = 1.e-36;
   unsigned iter = 0;
-  const unsigned int maxits = 10;
+  const unsigned int maxits = 20;
   bool converged = false;
 
   // Storage for residual, Newton update, and Jacobian
