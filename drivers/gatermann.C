@@ -53,16 +53,16 @@ int main()
   // 10.) x^7,
   // 11.) x^6 * y,
   // 12.) x^4 * y^2
-  std::vector<std::pair<unsigned int, unsigned int>> polys =
-    {
-      {0,0}, {2,0}, {3,0}, {2,1}, {4,0}, {5,0},
-      {4,1}, {6,0}, {5,1}, {7,0}, {6,1}, {4,2}
-    };
-
-  for (const auto & p : polys)
-    std::cout << "(" << p.first << "," << p.second << ") = "
-              << exact_tri(p.first, p.second)
-              << std::endl;
+//  std::vector<std::pair<unsigned int, unsigned int>> polys =
+//    {
+//      {0,0}, {2,0}, {3,0}, {2,1}, {4,0}, {5,0},
+//      {4,1}, {6,0}, {5,1}, {7,0}, {6,1}, {4,2}
+//    };
+//
+//  for (const auto & p : polys)
+//    std::cout << "(" << p.first << "," << p.second << ") = "
+//              << exact_tri(p.first, p.second)
+//              << std::endl;
 
   // The nonlinear system of equations is to be solved by Newton's
   // method, so we need to form a residual and Jacobian. The residual is
@@ -82,42 +82,121 @@ int main()
 
   // The solution is initialized to the known solution with 16 digits
   // as given in the paper by Gatermann.
+  // std::vector<mpfr_class> u =
+  //   {
+  //     2.6517028157436251e-02, // w1
+  //     6.2382265094402118e-02, // x1
+  //     6.7517867073916085e-02, // y1
+  //
+  //     4.3881408714446055e-02, // w2
+  //     5.5225456656926611e-02, // x2
+  //     3.2150249385198182e-01, // y2
+  //
+  //     2.8775042784981585e-02, // w3
+  //     3.4324302945097146e-02, // x3
+  //     6.6094919618673565e-01, // y3
+  //
+  //     6.7493187009802774e-02, // w4
+  //     5.1584233435359177e-01, // x4
+  //     2.7771616697639178e-01, // y4
+  //   };
+
+  // A less accurate initial guess (for testing).
   std::vector<mpfr_class> u =
     {
-      2.6517028157436251e-02, // w1
-      6.2382265094402118e-02, // x1
-      6.7517867073916085e-02, // y1
+      2.65e-02, // w1
+      6.23e-02, // x1
+      6.75e-02, // y1
 
-      4.3881408714446055e-02, // w2
-      5.5225456656926611e-02, // x2
-      3.2150249385198182e-01, // y2
+      4.38e-02, // w2
+      5.52e-02, // x2
+      3.21e-01, // y2
 
-      2.8775042784981585e-02, // w3
-      3.4324302945097146e-02, // x3
-      6.6094919618673565e-01, // y3
+      2.87e-02, // w3
+      3.43e-02, // x3
+      6.60e-01, // y3
 
-      6.7493187009802774e-02, // w4
-      5.1584233435359177e-01, // x4
-      2.7771616697639178e-01, // y4
+      6.74e-02, // w4
+      5.15e-01, // x4
+      2.77e-01, // y4
     };
 
-  std::cout << "u=" << std::endl;
-  for (const auto & val : u)
-    std::cout << val << std::endl;
+  // Print the initial guess
+  // std::cout << "u=" << std::endl;
+  // for (const auto & val : u)
+  //   std::cout << val << std::endl;
 
-  // Compute the residual
-  std::vector<mpfr_class> r;
+  // Storage for residual, Newton update, and Jacobian
+  std::vector<mpfr_class> r, du;
   Matrix<mpfr_class> jac;
-  residual_and_jacobian(&r, &jac, u);
-  // residual_and_jacobian(&r, nullptr, u);
+  // residual_and_jacobian(&r, &jac, u); // test with 2 non-nullptr args
+  // residual_and_jacobian(&r, nullptr, u); // test with no Jacobian
+  // residual_and_jacobian(nullptr, &jac, u); // test with no residual
 
-  // Print the result
-  std::cout << "r=" << std::endl;
-  for (const auto & val : r)
-    std::cout << val << std::endl;
+  // Print the results
+  // std::cout << "r=" << std::endl;
+  // for (const auto & val : r)
+  //   std::cout << val << std::endl;
+  // std::cout << "jac=" << std::endl;
+  // jac.print();
 
-  std::cout << "jac=" << std::endl;
-  jac.print();
+  // Use Newton iterations to obtain more digits of accuracy in the
+  // solution.
+  // bool keep_going = true;
+
+  // Newton iteration residual norm convergence tolerance and max iteration count.
+  mpfr_class tol = 1.e-36;
+  unsigned iter = 0;
+  const unsigned int maxits = 10;
+
+  while (true)
+  {
+    ++iter;
+    if (iter > maxits)
+      {
+        std::cout << "Newton iteration not converged before max iterations reached." << std::endl;
+        break;
+      }
+
+    // Compute the residual (vector) at the current guess.
+    residual_and_jacobian(&r, nullptr, u);
+
+    // Print residual
+    // std::cout << "r=" << std::endl;
+    // for (const auto & val : r)
+    //   std::cout << val << std::endl;
+
+    // Check the norm of the residual vector to see if we are done.
+    mpfr_class residual_norm = 0.;
+    for (unsigned int i=0; i<r.size(); ++i)
+      residual_norm += r[i] * r[i];
+    residual_norm = sqrt(residual_norm);
+
+    std::cout << "Iteration " << iter << ", residual_norm=" << residual_norm << std::endl;
+
+    if (residual_norm < tol)
+      break;
+
+    // Compute Jacobian (only) at the current guess.
+    residual_and_jacobian(nullptr, &jac, u);
+
+    // Compute update: du = -jac^{-1} * r
+    jac.lu_solve(du, r);
+
+    // Print update
+    // std::cout << "du=" << std::endl;
+    // for (const auto & val : du)
+    //   std::cout << val << std::endl;
+
+    // Compute next iterate, u -= du
+    for (unsigned int i=0; i<u.size(); ++i)
+      u[i] -= du[i];
+
+    // Print updated solution
+    std::cout << "u=" << std::endl;
+    for (const auto & val : u)
+      std::cout << val << std::endl;
+  } // end while
 
   return 0;
 }
@@ -153,7 +232,8 @@ residual_and_jacobian(std::vector<mpfr_class> * r,
       jac->resize(n, n);
     }
 
-  // Loop over (w,x,y) triples in u
+  // For each basis funciton i, we loop over all (w,x,y) triples in u and
+  // compute the residual and Jacobian contributions, as requested.
   for (unsigned int i=0; i<n; i++)
     {
       // The powers of x and y in the monomial we are currently integrating.
@@ -201,16 +281,16 @@ residual_and_jacobian(std::vector<mpfr_class> * r,
               unsigned int ypm1 = ypower > 0 ? ypower-1 : 0;
 
               // Derivative wrt x
-              (*jac)(i,q+1) +=
+              (*jac)(i,q+1) += w * (
                 xpower * pow(x, xpm1) * pow(y, ypower) +
                 (mpfr_class(-1) * xpower * pow(z, xpm1) * pow(x, ypower) + pow(z, xpower) * ypower * pow(x, ypm1)) +
-                pow(y, xpower) * mpfr_class(-1) * ypower * pow(z, ypm1);
+                pow(y, xpower) * mpfr_class(-1) * ypower * pow(z, ypm1));
 
               // Derivative wrt y
-              (*jac)(i,q+2) +=
+              (*jac)(i,q+2) += w * (
                 pow(x, xpower) * ypower * pow(y, ypm1) +
                 mpfr_class(-1) * xpower * pow(z, xpm1) * pow(x, ypower) +
-                (xpower * pow(y, xpm1) * pow(z, ypower) + pow(y, xpower) * mpfr_class(-1) * ypower * pow(z, ypm1));
+                (xpower * pow(y, xpm1) * pow(z, ypower) + pow(y, xpower) * mpfr_class(-1) * ypower * pow(z, ypm1)));
             }
         }
 
