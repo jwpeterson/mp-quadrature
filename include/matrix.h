@@ -31,6 +31,11 @@ public:
   void resize(unsigned n_rows, unsigned n_cols);
 
   /**
+   * Clears (zeros) any existing values and sets the number of rows/cols to 0.
+   */
+  void clear();
+
+  /**
    * Returns the number of rows (cols) in the Matrix
    */
   unsigned n_rows() const { return _n_rows; }
@@ -109,6 +114,16 @@ void Matrix<T>::resize(unsigned n_rows, unsigned n_cols)
   _n_rows = n_rows;
   _n_cols = n_cols;
   _val.resize(_n_rows * _n_cols);
+}
+
+
+
+template<class T>
+void Matrix<T>::clear()
+{
+  _n_rows = 0;
+  _n_cols = 0;
+  _val.clear();
 }
 
 
@@ -245,7 +260,7 @@ void Matrix<T>::_lu_decompose()
 
       // Scale upper triangle entries of row i by the diagonal entry
       // Note: don't scale the diagonal entry itself!
-      const T diag_inv = 1. / A(i,i);
+      const T diag_inv = T(1) / A(i,i);
       for (unsigned j=i+1; j<_n_rows; ++j)
         A(i,j) *= diag_inv;
 
@@ -273,6 +288,7 @@ void Matrix<T>::_lu_decompose()
 template <class T>
 void Matrix<T>::_lu_back_substitute(std::vector<T>& x, const std::vector<T>& b) const
 {
+  x.clear();
   x.resize (_n_rows);
 
   // A convenient reference to *this
