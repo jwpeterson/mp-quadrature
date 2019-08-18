@@ -21,6 +21,9 @@ void residual_and_jacobian(std::vector<mpfr_class> * r,
 // If the Newton iterations fail, this is reported back to the user.
 bool newton(std::vector<mpfr_class> & u);
 
+// Compute the l2-norm of vector r.
+mpfr_class norm(const std::vector<mpfr_class> & r);
+
 // Our goal here is to determine whether there might be more than one
 // solution to the SEVENTH-order Ro3-invariant quadrature rule
 // originally reported in Gatermann, 1988.  We are going to try
@@ -39,7 +42,7 @@ int main()
   mpfr_set_default_prec(256);
 
   // Varies the sequence of pseudorandom numbers returned by random().
-  // srandom(42);
+  // srandom(1566142027);
 
   // Use the current time since epoch as a seed.
   // Seeds that produce initial guesses which fail to converge
@@ -57,6 +60,8 @@ int main()
   // 1566139735
   // 1566139757
   // 1566139782
+  // 1566139962
+  // 1566142027 // backtracking seems like it *could* help this case, but doesn't.
   time_t seed = time(nullptr);
   std::cout << "seed=" << seed << std::endl;
   srandom(seed);
@@ -145,7 +150,10 @@ int main()
 bool newton(std::vector<mpfr_class> & u)
 {
   // Newton iteration parameters.
-  mpfr_class tol = 1.e-36;
+  const mpfr_class tol(1.e-36);
+  const mpfr_class divtol(1.e9);
+  const mpfr_class alphamin(1.e-3);
+  const bool do_backtracking = false;
   unsigned iter = 0;
   const unsigned int maxits = 20;
   bool converged = false;
@@ -153,6 +161,9 @@ bool newton(std::vector<mpfr_class> & u)
   // Storage for residual, Newton update, and Jacobian
   std::vector<mpfr_class> r, du;
   Matrix<mpfr_class> jac;
+
+  // Store previous residual norm. Used for simplified line searching technique.
+  mpfr_class old_residual_norm = 0.;
 
   while (true)
     {
@@ -164,10 +175,7 @@ bool newton(std::vector<mpfr_class> & u)
       residual_and_jacobian(&r, nullptr, u);
 
       // Check the norm of the residual vector to see if we are done.
-      mpfr_class residual_norm = 0.;
-      for (unsigned int i=0; i<r.size(); ++i)
-        residual_norm += r[i] * r[i];
-      residual_norm = sqrt(residual_norm);
+      mpfr_class residual_norm = norm(r);
 
       std::cout << "Iteration " << iter << ", residual_norm=" << residual_norm << std::endl;
 
@@ -177,22 +185,80 @@ bool newton(std::vector<mpfr_class> & u)
           break;
         }
 
+      // If the residual is too large, just give up.
+      if (residual_norm > divtol)
+        break;
+
       // Compute Jacobian (only) at the current guess.
       residual_and_jacobian(nullptr, &jac, u);
 
       // Compute update: du = -jac^{-1} * r
       jac.lu_solve(du, r);
 
-      // Compute next iterate, u -= du
-      for (unsigned int i=0; i<u.size(); ++i)
-        u[i] -= du[i];
+      // Compute next iterate, u -= alpha*du using simplified
+      // backtracking, alpha_min < alpha <= 1.
+      // This is only theoretically helpful at the moment, so far I have not encountered
+      // an actual case where a failing case was able to converge by using backtracking.
+      mpfr_class alpha(1);
+      bool backtracking_converged = false;
+      while (true)
+        {
+          if (alpha < alphamin)
+            break;
+
+          for (unsigned int i=0; i<u.size(); ++i)
+            u[i] -= alpha * du[i];
+
+          if (do_backtracking)
+            {
+              residual_and_jacobian(&r, nullptr, u);
+              mpfr_class new_residual_norm = norm(r);
+
+              std::cout << "Trying Newton step with alpha = " << alpha
+                        << ", residual = " << new_residual_norm << std::endl;
+
+              if (new_residual_norm < residual_norm)
+                {
+                  backtracking_converged = true;
+                  break;
+                }
+
+              // Don't waste time backtracking if we already diverged
+              if (new_residual_norm > divtol)
+                break;
+
+              alpha /= mpfr_class(2);
+            }
+          else
+            {
+              // If we aren't doing backtracking, then backtracking is "done".
+              backtracking_converged = true;
+              break;
+            }
+        }
+
+      if (!backtracking_converged)
+        break;
     } // end while
 
   if (!converged)
-    std::cout << "Newton iteration not converged before max iterations reached." << std::endl;
+    std::cout << "Newton iteration diverged, backtracking failed, or max iterations exceeded."
+              << std::endl;
 
   return converged;
 }
+
+
+mpfr_class norm(const std::vector<mpfr_class> & r)
+{
+  mpfr_class residual_norm = 0.;
+  for (unsigned int i=0; i<r.size(); ++i)
+    residual_norm += r[i] * r[i];
+  residual_norm = sqrt(residual_norm);
+  return residual_norm;
+}
+
+
 
 void
 residual_and_jacobian(std::vector<mpfr_class> * r,
