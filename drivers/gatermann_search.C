@@ -11,6 +11,7 @@
 #include <numeric> // std::accumulate
 #include <stdlib.h> // random
 #include <time.h> // time()
+#include <assert.h>
 
 // Function used to (possibly) compute the residual and Jacobian at
 // the input u.  If either "r" or "jac" is nullptr, their computation
@@ -23,8 +24,22 @@ void residual_and_jacobian(std::vector<mpfr_class> * r,
 // If the Newton iterations fail, this is reported back to the user.
 bool newton(std::vector<mpfr_class> & u);
 
+// Use a quasi-Newton minimization algorithm (BFGS) to try and
+// find a mininum of the scalar function f = (1/2) \vec{r} \cdot
+// \vec{r}, where \vec{r} is the residual vector.
+bool bfgs(std::vector<mpfr_class> & u);
+
+// Implements the gradient descent method for the scalar function
+// f = (1/2) \vec{r} \cdot \vec{r},
+// where \vec{r} is the residual vector.
+bool gradient_descent(std::vector<mpfr_class> & u);
+
 // Compute the l2-norm of vector r.
 mpfr_class norm(const std::vector<mpfr_class> & r);
+
+// Computes the dot product x.y, returning the result as a scalar.
+mpfr_class dot(const std::vector<mpfr_class> & x,
+               const std::vector<mpfr_class> & y);
 
 // Generates a fixed-size, dense block of random samples using the
 // Latin hypercube sampling method and checks whether any of them
@@ -49,7 +64,7 @@ int main()
   mpfr_set_default_prec(256);
 
   // Varies the sequence of pseudorandom numbers returned by random().
-  // srandom(1566142027);
+  srandom(1566365077);
 
   // Use the current time since epoch as a seed.
   // Seeds that produce initial guesses which fail to converge
@@ -69,29 +84,9 @@ int main()
   // 1566139782
   // 1566139962
   // 1566142027 // backtracking seems like it *could* help this case, but doesn't.
-  time_t seed = time(nullptr);
-  std::cout << "seed=" << seed << std::endl;
-  srandom(seed);
-
-  // An initial guess which is known to converge to the solution in Gatermann's paper.
-  // std::vector<mpfr_class> u =
-  //   {
-  //     2.65e-02, // w1
-  //     6.23e-02, // x1
-  //     6.75e-02, // y1
-  //
-  //     4.38e-02, // w2
-  //     5.52e-02, // x2
-  //     3.21e-01, // y2
-  //
-  //     2.87e-02, // w3
-  //     3.43e-02, // x3
-  //     6.60e-01, // y3
-  //
-  //     6.74e-02, // w4
-  //     5.15e-01, // x4
-  //     2.77e-01, // y4
-  //   };
+  // time_t seed = time(nullptr);
+  // std::cout << "seed=" << seed << std::endl;
+  // srandom(seed);
 
   unsigned int testset_counter = 0;
   while (true)
@@ -99,6 +94,7 @@ int main()
       ++testset_counter;
       std::cout << "Running test set " << testset_counter << std::endl;
       generate_lhc_and_test();
+      break;
     }
 
   return 0;
@@ -267,17 +263,49 @@ void generate_lhc_and_test()
           u.push_back(y_guess[i]);
         }
 
+      // Debugging: set initial guess to known solution!
+//      u =
+//        {
+//          2.65e-02, // w1
+//          6.23e-02, // x1
+//          6.75e-02, // y1
+//
+//          4.38e-02, // w2
+//          5.52e-02, // x2
+//          3.21e-01, // y2
+//
+//          2.87e-02, // w3
+//          3.43e-02, // x3
+//          6.60e-01, // y3
+//
+//          6.74e-02, // w4
+//          5.15e-01, // x4
+//          2.77e-01, // y4
+//        };
+
       // Print initial guess
       // std::cout << "Initial guess=" << std::endl;
       // for (const auto & val : u)
       //   std::cout << val << std::endl;
 
-      // We now use Newton iterations to obtain more digits of accuracy in the
-      // points and weights.
+      // Use BFGS quasi-Newton minimization
+      // bool converged = bfgs(u);
+
+      // Use the gradient descent method. This is much cheaper and simpler
+      // to understand than BFGS, and it seems to do about as good a job?
+      // bool converged = gradient_descent(u);
+
+      // Follow up bfgs with Newton? For a random initial guess, it
+      // might be worthwhile seeing if we can improve it slightly with
+      // an optimization algorithm before switching to Newton's
+      // method?
       bool converged = newton(u);
 
       if (converged)
         {
+          // Debugging
+          // std::cout << "Solution converged!" << std::endl;
+
           // We want to check whether this solution is a permutation
           // of the one that we already have. So we sort the weights
           // and compare them to the weights of the solution we
@@ -312,6 +340,281 @@ void generate_lhc_and_test()
             }
         }
     } // end loop over n_tests
+}
+
+
+
+bool bfgs(std::vector<mpfr_class> & u)
+{
+  // BFGS iteration parameters.
+  const mpfr_class tol(1.e-36);
+  const mpfr_class divtol(1.e16);
+  const mpfr_class alphamin(1.e-10);
+  // const bool do_backtracking = true; // backtrackling linesearch is required.
+  unsigned iter = 0;
+  const unsigned int maxits = 20;
+  bool converged = false;
+
+  // Problem size
+  unsigned int n = u.size();
+
+  // Storage for residual, Newton update, and Jacobian
+  std::vector<mpfr_class> r(n), du(n), grad_f(n), grad_f_old(n), hess_du(n), y(n);
+  Matrix<mpfr_class> jac(n,n), hess(n,n), hess_copy(n,n);
+
+  while (true)
+    {
+      ++iter;
+      if (iter > maxits)
+        break;
+
+      // Compute the residual and Jacobian at the current guess.
+      residual_and_jacobian(&r, &jac, u);
+
+      // Compute the size of the scalar function "f"
+      // which we are trying to minimize, _not_ dot(r,r)^0.5.
+      mpfr_class residual = 0.5 * dot(r,r);
+
+      // Debugging:
+      // std::cout << "residual = " << residual << std::endl;
+
+      // If the residual is small enough, return true.
+      if (residual < tol)
+        {
+          converged = true;
+          break;
+        }
+
+      // If the residual is too large, just give up.
+      if (residual > divtol)
+        break;
+
+      // Compute grad(f) = jac^T * r at the current guess.
+      grad_f.clear();
+      grad_f.resize(n);
+      for (unsigned int i=0; i<n; ++i)
+        for (unsigned int j=0; j<n; ++j)
+          grad_f[i] += jac(j,i) * r[j];
+
+      // Debugging
+      // std::cout << "grad_f=" << std::endl;
+      // for (const auto & val : grad_f)
+      //   std::cout << val << std::endl;
+
+      // The initial Hessian approximation.
+      // if (iter == 1)
+      if (true)
+        {
+          // Approximate the Hessian as beta*I + J^T * J
+          hess.clear();
+          hess.resize(n,n);
+          for (unsigned int i=0; i<n; ++i)
+            for (unsigned int j=0; j<n; ++j)
+              for (unsigned int k=0; k<n; ++k)
+                hess(i,j) += jac(k,i) * jac(k,j);
+
+          // Choosing beta=1 initially is equivalent to taking one
+          // step of gradient descent.
+          mpfr_class beta(1);
+          for (unsigned int i=0; i<n; ++i)
+            hess(i,i) += beta;
+        }
+      else
+        {
+          // I did not have much luck with the BFGS Hessian approximation formula.
+          // Even with starting guesses near the root it failed to find a descent
+          // direction...
+
+          // Compute change in successive gradients
+          for (unsigned int i=0; i<n; ++i)
+            y[i] = grad_f[i] - grad_f_old[i];
+
+          // Compute denominator of first term, y * du
+          mpfr_class denom1(0);
+          for (unsigned int i=0; i<n; ++i)
+            denom1 += y[i] * du[i];
+
+          // Debugging
+          // std::cout << "denom1 = " << denom1 << std::endl;
+
+          // Compute "B_k \Delta x_k"
+          hess_du = hess * du;
+
+          // Compute denominator of second term
+          mpfr_class denom2(0);
+          for (unsigned int i=0; i<n; ++i)
+            denom2 += du[i] * hess_du[i];
+
+          // Debugging
+          // std::cout << "denom2 = " << denom2 << std::endl;
+
+          // BFGS update
+          for (unsigned int i=0; i<n; ++i)
+            for (unsigned int j=0; j<n; ++j)
+              hess(i,j) += (y[i]*y[j] / denom1) - (hess_du[i]*hess_du[j] / denom2);
+        }
+
+      // Debugging: print Hessian.
+      // std::cout << "hess=" << std::endl;
+      // hess.print();
+
+      // Solve Hessian system for update, -du. This destroys the Hessian,
+      // so use a copy of the real one.
+      hess_copy = hess;
+      hess_copy.lu_solve(du, grad_f);
+
+      // Compute next iterate, u -= alpha*du using simplified
+      // backtracking, alpha_min < alpha <= 1.
+      // This is only theoretically helpful at the moment, so far I have not encountered
+      // an actual case where a failing case was able to converge by using backtracking.
+      mpfr_class alpha(1);
+      bool backtracking_converged = false;
+      mpfr_class du_norm = norm(du);
+      mpfr_class grad_f_norm = norm(grad_f);
+      // m is "local slope along the search direction".
+      // https://en.wikipedia.org/wiki/Backtracking_line_search
+      mpfr_class m = -dot(du, grad_f); // should be normalized somehow?
+      // std::cout << "m=" << m << std::endl;
+      // Parameter in (0,1)
+      mpfr_class c = 0.5;
+      while (true)
+        {
+          if (alpha < alphamin)
+            break;
+
+          std::vector<mpfr_class> u_trial = u;
+          for (unsigned int i=0; i<u.size(); ++i)
+            u_trial[i] -= alpha * du[i];
+
+          // Check for sufficient decrease in the objective function.
+          residual_and_jacobian(&r, nullptr, u_trial);
+          mpfr_class residual_trial = 0.5 * dot(r,r);
+          // std::cout << "residual_trial=" << residual_trial << std::endl;
+          mpfr_class residual_drop = residual - residual_trial;
+          // std::cout << "residual_drop=" << residual_drop << std::endl;
+          mpfr_class required_residual_drop = alpha * -c * m;
+          // std::cout << "required_residual_drop=" << required_residual_drop << std::endl;
+          if (residual_drop >= required_residual_drop)
+            {
+              // std::cout << "Accept step with alpha = " << alpha << std::endl;
+              backtracking_converged = true;
+              u = u_trial;
+              break;
+            }
+          else
+            {
+              // Reduce alpha and try again
+              alpha /= mpfr_class(2);
+            }
+        } // end while (backtracking)
+
+      // If backtracking failed, then we break out with converged==false.
+      if (!backtracking_converged)
+        {
+          std::cout << "Backtracking could not find a local min." << std::endl;
+          break;
+        }
+
+      // Debugging: print du
+      // std::cout << "du=" << std::endl;
+      // for (const auto & val : du)
+      //   std::cout << val << std::endl;
+
+      // Store old gradient for next iteration.
+      grad_f_old = grad_f;
+    }
+
+  return converged;
+}
+
+
+
+bool gradient_descent(std::vector<mpfr_class> & u)
+{
+  // Gradient descent parameters.
+  const mpfr_class tol(1.e-36);
+  const mpfr_class divtol(1.e16);
+  // const mpfr_class alphamin(1.e-10);
+  // const bool do_backtracking = true; // not currently used.
+  unsigned iter = 0;
+  const unsigned int maxits = 20;
+  bool converged = false;
+
+  // Problem size
+  unsigned int n = u.size();
+
+  // Storage needed for algorithm.
+  std::vector<mpfr_class> r(n), du(n), grad_f(n), grad_f_old(n), u_old(n);
+  Matrix<mpfr_class> jac(n,n);
+
+  while (true)
+    {
+      ++iter;
+      if (iter > maxits)
+        break;
+
+      // Compute the residual and Jacobian at the current guess.
+      residual_and_jacobian(&r, &jac, u);
+
+      // Compute the size of the scalar function "f"
+      // which we are trying to minimize, _not_ dot(r,r)^0.5.
+      mpfr_class residual = 0.5 * dot(r,r);
+
+      // Debugging:
+      // std::cout << "Iteration " << iter << ", residual = " << residual << std::endl;
+
+      // If the residual is small enough, return true.
+      if (residual < tol)
+        {
+          converged = true;
+          break;
+        }
+
+      // If the residual is too large, just give up.
+      if (residual > divtol)
+        break;
+
+      // Compute grad(f) = jac^T * r at the current guess.
+      grad_f.clear();
+      grad_f.resize(n);
+      for (unsigned int i=0; i<n; ++i)
+        for (unsigned int j=0; j<n; ++j)
+          grad_f[i] += jac(j,i) * r[j];
+
+      // Debugging
+      // std::cout << "grad_f=" << std::endl;
+      // for (const auto & val : grad_f)
+      //   std::cout << val << std::endl;
+
+      // Compute scalar coefficient gamma that tells how far down the gradient direction to
+      // travel.
+      mpfr_class gamma_n(1);
+      if (iter > 1)
+        {
+          std::vector<mpfr_class> z = u;
+          std::vector<mpfr_class> y = grad_f;
+
+          for (unsigned int i=0; i<n; ++i)
+            {
+              z[i] -= u_old[i];
+              y[i] -= grad_f_old[i];
+            }
+          gamma_n = abs(dot(z, y)) / dot(y, y);
+
+          // Debugging:
+          // std::cout << "gamma_n = " << gamma_n << std::endl;
+        }
+
+      // Store old information for next iteration. Note: do this before updating u.
+      grad_f_old = grad_f;
+      u_old = u;
+
+      // Compute the new iterate.
+      for (unsigned int i=0; i<n; ++i)
+        u[i] -= gamma_n * grad_f[i];
+    }
+
+  return converged;
 }
 
 
@@ -420,14 +723,20 @@ bool newton(std::vector<mpfr_class> & u)
 
 mpfr_class norm(const std::vector<mpfr_class> & r)
 {
-  mpfr_class residual_norm = 0.;
-  for (unsigned int i=0; i<r.size(); ++i)
-    residual_norm += r[i] * r[i];
-  residual_norm = sqrt(residual_norm);
-  return residual_norm;
+  return sqrt(dot(r,r));
 }
 
 
+
+mpfr_class dot(const std::vector<mpfr_class> & x,
+               const std::vector<mpfr_class> & y)
+{
+  assert(x.size() == y.size());
+  mpfr_class dot_prod = 0.;
+  for (unsigned int i=0; i<x.size(); ++i)
+    dot_prod += x[i] * y[i];
+  return dot_prod;
+}
 
 void
 residual_and_jacobian(std::vector<mpfr_class> * r,

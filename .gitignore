@@ -13,6 +13,7 @@ drivers/dubiner_verify_jacobi
 drivers/dubiner_verify_double
 drivers/gatermann
 drivers/gatermann_search
+drivers/Ro3_deg6
 lib/
 *.a
 *.o

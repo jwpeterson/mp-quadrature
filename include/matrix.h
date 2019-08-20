@@ -72,6 +72,11 @@ public:
    */
   void lu_solve(std::vector<T>& x, const std::vector<T>& b);
 
+  /**
+   * Returns y = (*this) * x
+   */
+  std::vector<T> operator * (const std::vector<T> & x);
+
 private:
   /**
    * Ingredients of the lu_solve() function.
@@ -322,6 +327,20 @@ void Matrix<T>::_lu_back_substitute(std::vector<T>& x, const std::vector<T>& b) 
       for (int j=i+1; j<static_cast<int>(_n_rows); ++j)
         x[i] -= A(i,j)*x[j];
     }
+}
+
+
+
+template <class T>
+std::vector<T>
+Matrix<T>::operator * (const std::vector<T> & x)
+{
+  std::vector<T> y(_n_rows);
+  for (unsigned int i=0; i<_n_rows; ++i)
+    for (unsigned int j=0; j<_n_cols; ++j)
+      y[i] += (*this)(i,j) * x[j];
+
+  return y;
 }
 
 
