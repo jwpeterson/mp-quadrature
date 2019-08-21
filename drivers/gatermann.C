@@ -2,6 +2,7 @@
 // on the reference triangle.
 #include "exact.h"
 #include "matrix.h"
+#include "vect.h"
 
 // C++ includes
 #include <vector>
@@ -134,10 +135,7 @@ int main()
     residual_and_jacobian(&r, nullptr, u);
 
     // Check the norm of the residual vector to see if we are done.
-    mpfr_class residual_norm = 0.;
-    for (unsigned int i=0; i<r.size(); ++i)
-      residual_norm += r[i] * r[i];
-    residual_norm = sqrt(residual_norm);
+    mpfr_class residual_norm = norm(r);
 
     std::cout << "Iteration " << iter << ", residual_norm=" << residual_norm << std::endl;
 
@@ -153,9 +151,8 @@ int main()
     // Compute update: du = -jac^{-1} * r
     jac.lu_solve(du, r);
 
-    // Compute next iterate, u -= du
-    for (unsigned int i=0; i<u.size(); ++i)
-      u[i] -= du[i];
+    // Compute next iterate.
+    u -= du;
   } // end while
 
   if (!converged)
@@ -166,8 +163,7 @@ int main()
 
   // Print final solution
   std::cout << "u=" << std::endl;
-  for (const auto & val : u)
-    std::cout << val << std::endl;
+  print(u);
 
   return 0;
 }

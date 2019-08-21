@@ -73,9 +73,16 @@ public:
   void lu_solve(std::vector<T>& x, const std::vector<T>& b);
 
   /**
+   * Matrix-vector product
    * Returns y = (*this) * x
    */
   std::vector<T> operator * (const std::vector<T> & x);
+
+  /**
+   * Transposed Matrix-vector product
+   * Returns y = (*this)^T * x
+   */
+  std::vector<T> matvec_transpose (const std::vector<T> & x);
 
 private:
   /**
@@ -343,5 +350,17 @@ Matrix<T>::operator * (const std::vector<T> & x)
   return y;
 }
 
+
+
+template <class T>
+std::vector<T> Matrix<T>::matvec_transpose (const std::vector<T> & x)
+{
+  std::vector<T> y(_n_cols);
+  for (unsigned int i=0; i<_n_cols; ++i)
+    for (unsigned int j=0; j<_n_rows; ++j)
+      y[i] += (*this)(j,i) * x[j];
+
+  return y;
+}
 
 #endif // __matrix_h__

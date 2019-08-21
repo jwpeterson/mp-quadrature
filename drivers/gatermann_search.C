@@ -2,6 +2,7 @@
 // on the reference triangle.
 #include "exact.h"
 #include "matrix.h"
+#include "vect.h"
 
 // C++ includes
 #include <vector>
@@ -33,13 +34,6 @@ bool bfgs(std::vector<mpfr_class> & u);
 // f = (1/2) \vec{r} \cdot \vec{r},
 // where \vec{r} is the residual vector.
 bool gradient_descent(std::vector<mpfr_class> & u);
-
-// Compute the l2-norm of vector r.
-mpfr_class norm(const std::vector<mpfr_class> & r);
-
-// Computes the dot product x.y, returning the result as a scalar.
-mpfr_class dot(const std::vector<mpfr_class> & x,
-               const std::vector<mpfr_class> & y);
 
 // Generates a fixed-size, dense block of random samples using the
 // Latin hypercube sampling method and checks whether any of them
@@ -196,9 +190,7 @@ void generate_lhc_and_test()
       // Debugging: for a small n_tests, make sure that each random
       // number comes from a different bin.
       // std::cout << "Random numbers used for current test." << std::endl;
-      // for (const auto & val : current_random)
-      //   std::cout << val << " ";
-      // std::cout << std::endl;
+      // print(current_random);
 
       // Every time we need a random number, post-increment "ctr".
       unsigned int ctr = 0;
@@ -233,8 +225,7 @@ void generate_lhc_and_test()
       // 2.65e-02 + 4.38e-02 + 2.87e-02 + 6.74e-02 = 0.1664,
       // so we should verify the same is true for our random initial
       // guess.
-      // for (unsigned int i=0; i<w_guess.size(); ++i)
-      //   std::cout << w_guess[i] << std::endl;
+      // print(w_guess);
       // std::cout << "sum = "
       //           << std::accumulate(w_guess.begin(), w_guess.end(), mpfr_class(0))
       //           << std::endl;
@@ -285,8 +276,7 @@ void generate_lhc_and_test()
 
       // Print initial guess
       // std::cout << "Initial guess=" << std::endl;
-      // for (const auto & val : u)
-      //   std::cout << val << std::endl;
+      // print(u);
 
       // Use BFGS quasi-Newton minimization
       // bool converged = bfgs(u);
@@ -330,8 +320,7 @@ void generate_lhc_and_test()
           if (norm_w > mpfr_class(1.e-6))
             {
               std::cout << "Possible new solution u=" << std::endl;
-              for (const auto & val : u)
-                std::cout << val << std::endl;
+              print(u);
             }
           else
             {
@@ -390,16 +379,11 @@ bool bfgs(std::vector<mpfr_class> & u)
         break;
 
       // Compute grad(f) = jac^T * r at the current guess.
-      grad_f.clear();
-      grad_f.resize(n);
-      for (unsigned int i=0; i<n; ++i)
-        for (unsigned int j=0; j<n; ++j)
-          grad_f[i] += jac(j,i) * r[j];
+      grad_f = jac.matvec_transpose(r);
 
       // Debugging
       // std::cout << "grad_f=" << std::endl;
-      // for (const auto & val : grad_f)
-      //   std::cout << val << std::endl;
+      // print(grad_f);
 
       // The initial Hessian approximation.
       // if (iter == 1)
@@ -426,13 +410,14 @@ bool bfgs(std::vector<mpfr_class> & u)
           // direction...
 
           // Compute change in successive gradients
-          for (unsigned int i=0; i<n; ++i)
-            y[i] = grad_f[i] - grad_f_old[i];
+          y = grad_f - grad_f_old;
+
+          // Debugging
+          // std::cout << "y=" << std::endl;
+          // print(y);
 
           // Compute denominator of first term, y * du
-          mpfr_class denom1(0);
-          for (unsigned int i=0; i<n; ++i)
-            denom1 += y[i] * du[i];
+          mpfr_class denom1 = dot(y,du);
 
           // Debugging
           // std::cout << "denom1 = " << denom1 << std::endl;
@@ -441,9 +426,7 @@ bool bfgs(std::vector<mpfr_class> & u)
           hess_du = hess * du;
 
           // Compute denominator of second term
-          mpfr_class denom2(0);
-          for (unsigned int i=0; i<n; ++i)
-            denom2 += du[i] * hess_du[i];
+          mpfr_class denom2 = dot(du,hess_du);
 
           // Debugging
           // std::cout << "denom2 = " << denom2 << std::endl;
@@ -517,8 +500,7 @@ bool bfgs(std::vector<mpfr_class> & u)
 
       // Debugging: print du
       // std::cout << "du=" << std::endl;
-      // for (const auto & val : du)
-      //   std::cout << val << std::endl;
+      // print(du);
 
       // Store old gradient for next iteration.
       grad_f_old = grad_f;
@@ -575,30 +557,20 @@ bool gradient_descent(std::vector<mpfr_class> & u)
         break;
 
       // Compute grad(f) = jac^T * r at the current guess.
-      grad_f.clear();
-      grad_f.resize(n);
-      for (unsigned int i=0; i<n; ++i)
-        for (unsigned int j=0; j<n; ++j)
-          grad_f[i] += jac(j,i) * r[j];
+      grad_f = jac.matvec_transpose(r);
 
       // Debugging
       // std::cout << "grad_f=" << std::endl;
-      // for (const auto & val : grad_f)
-      //   std::cout << val << std::endl;
+      // print(grad_f);
 
       // Compute scalar coefficient gamma that tells how far down the gradient direction to
       // travel.
       mpfr_class gamma_n(1);
       if (iter > 1)
         {
-          std::vector<mpfr_class> z = u;
-          std::vector<mpfr_class> y = grad_f;
+          std::vector<mpfr_class> z = u - u_old;
+          std::vector<mpfr_class> y = grad_f - grad_f_old;
 
-          for (unsigned int i=0; i<n; ++i)
-            {
-              z[i] -= u_old[i];
-              y[i] -= grad_f_old[i];
-            }
           gamma_n = abs(dot(z, y)) / dot(y, y);
 
           // Debugging:
@@ -610,8 +582,7 @@ bool gradient_descent(std::vector<mpfr_class> & u)
       u_old = u;
 
       // Compute the new iterate.
-      for (unsigned int i=0; i<n; ++i)
-        u[i] -= gamma_n * grad_f[i];
+      subtract_scaled(u, gamma_n, grad_f);
     }
 
   return converged;
@@ -678,8 +649,15 @@ bool newton(std::vector<mpfr_class> & u)
           if (alpha < alphamin)
             break;
 
-          for (unsigned int i=0; i<u.size(); ++i)
-            u[i] -= alpha * du[i];
+          // This looks "nice" but is probably less efficient in general because
+          // a temporary has to be created for the result of "alpha * du" and then
+          // finally our custom operator-=() function is called. It's not possible
+          // to define a non-member operator-=() that takes more than two args.
+          // u -= alpha * du;
+
+          // This looks less "cool" but is probably more efficient
+          // because no temporary is created.
+          subtract_scaled(u, alpha, du);
 
           if (do_backtracking)
             {
@@ -720,23 +698,6 @@ bool newton(std::vector<mpfr_class> & u)
   return converged;
 }
 
-
-mpfr_class norm(const std::vector<mpfr_class> & r)
-{
-  return sqrt(dot(r,r));
-}
-
-
-
-mpfr_class dot(const std::vector<mpfr_class> & x,
-               const std::vector<mpfr_class> & y)
-{
-  assert(x.size() == y.size());
-  mpfr_class dot_prod = 0.;
-  for (unsigned int i=0; i<x.size(); ++i)
-    dot_prod += x[i] * y[i];
-  return dot_prod;
-}
 
 void
 residual_and_jacobian(std::vector<mpfr_class> * r,

@@ -2,6 +2,7 @@
 // on the reference triangle.
 #include "exact.h"
 #include "matrix.h"
+#include "vect.h"
 
 // C++ includes
 #include <vector>
@@ -22,9 +23,6 @@ void residual_and_jacobian(std::vector<mpfr_class> * r,
 // Given an initial guess u, uses Newton's method to see if it can obtain a solution.
 // If the Newton iterations fail, this is reported back to the user.
 bool newton(std::vector<mpfr_class> & u);
-
-// Compute the l2-norm of vector r.
-mpfr_class norm(const std::vector<mpfr_class> & r);
 
 // Generates a fixed-size, dense block of random samples using the
 // Latin hypercube sampling method and checks whether any of them
@@ -224,8 +222,7 @@ void generate_lhc_and_test()
 
       // Print initial guess
       // std::cout << "Initial guess=" << std::endl;
-      // for (const auto & val : u)
-      //   std::cout << val << std::endl;
+      // print(u);
 
       // We now use Newton iterations to obtain more digits of accuracy in the
       // points and weights.
@@ -234,8 +231,7 @@ void generate_lhc_and_test()
       if (converged)
         {
           std::cout << "Possible new solution u=" << std::endl;
-          for (const auto & val : u)
-            std::cout << val << std::endl;
+          print(u);
 
           // TODO: Later we may need to check for duplicates.
           // // We want to check whether this solution is a permutation
@@ -262,8 +258,7 @@ void generate_lhc_and_test()
           // if (norm_w > mpfr_class(1.e-6))
           //   {
           //     std::cout << "Possible new solution u=" << std::endl;
-          //     for (const auto & val : u)
-          //       std::cout << val << std::endl;
+          //     print(u);
           //   }
           // else
           //   {
@@ -375,16 +370,6 @@ bool newton(std::vector<mpfr_class> & u)
   //             << std::endl;
 
   return converged;
-}
-
-
-mpfr_class norm(const std::vector<mpfr_class> & r)
-{
-  mpfr_class residual_norm = 0.;
-  for (unsigned int i=0; i<r.size(); ++i)
-    residual_norm += r[i] * r[i];
-  residual_norm = sqrt(residual_norm);
-  return residual_norm;
 }
 
 
