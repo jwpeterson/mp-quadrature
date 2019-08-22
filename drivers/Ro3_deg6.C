@@ -4,6 +4,7 @@
 #include "matrix.h"
 #include "vect.h"
 #include "newton.h"
+#include "solver_data.h"
 
 // C++ includes
 #include <vector>
@@ -66,6 +67,11 @@ int main()
 
 void generate_lhc_and_test()
 {
+  // Set parameters to be used by solvers
+  SolverData solver_data;
+  solver_data.verbose = true;
+  solver_data.residual_and_jacobian = residual_and_jacobian;
+
   // A "random" initial guess. Note that all parameters must be
   // positive, the sum of the weights cannot exceed the reference element
   // area. Also, each weight parameter corresponds to 3 quadrature
@@ -207,7 +213,8 @@ void generate_lhc_and_test()
         }
 
       // Set initial guess vector
-      std::vector<mpfr_class> u;
+      std::vector<mpfr_class> & u = solver_data.u;
+      u.clear();
       u.reserve(w_guess.size() + x_guess.size() + y_guess.size());
       u.push_back(w_guess[0]); // centroid weight is first dof
       for (unsigned int i=0; i<x_guess.size(); ++i)
@@ -224,11 +231,11 @@ void generate_lhc_and_test()
       bool converged = false;
 
       // Attempt to improve initial guess with a Newton minimization iterations.
-      converged = newton_min(u, residual_and_jacobian);
+      converged = newton_min(solver_data);
 
       // We now use Newton iterations to obtain more digits of accuracy in the
       // points and weights.
-      converged = newton(u, residual_and_jacobian);
+      converged = newton(solver_data);
 
       if (converged)
         {

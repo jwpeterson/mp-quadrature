@@ -4,6 +4,7 @@
 #include "matrix.h"
 #include "vect.h"
 #include "newton.h"
+#include "solver_data.h"
 
 // C++ includes
 #include <vector>
@@ -77,6 +78,11 @@ int main()
 
 void generate_lhc_and_test()
 {
+  // Set parameters to be used by solvers
+  SolverData solver_data;
+  solver_data.verbose = true;
+  solver_data.residual_and_jacobian = residual_and_jacobian;
+
   // A "random" initial guess. Note that all parameters must be
   // positive, the sum of the weights cannot exceed the reference element
   // area. Also, each weight parameter corresponds to 3 quadrature
@@ -224,7 +230,8 @@ void generate_lhc_and_test()
         }
 
       // Set initial guess vector
-      std::vector<mpfr_class> u;
+      std::vector<mpfr_class> & u = solver_data.u;
+      u.clear();
       u.reserve(12);
       for (unsigned int i=0; i<w_guess.size(); ++i)
         {
@@ -234,24 +241,24 @@ void generate_lhc_and_test()
         }
 
       // Debugging: set initial guess to known solution!
-//      u =
-//        {
-//          2.65e-02, // w1
-//          6.23e-02, // x1
-//          6.75e-02, // y1
-//
-//          4.38e-02, // w2
-//          5.52e-02, // x2
-//          3.21e-01, // y2
-//
-//          2.87e-02, // w3
-//          3.43e-02, // x3
-//          6.60e-01, // y3
-//
-//          6.74e-02, // w4
-//          5.15e-01, // x4
-//          2.77e-01, // y4
-//        };
+      u =
+        {
+          2.65e-02, // w1
+          6.23e-02, // x1
+          6.75e-02, // y1
+
+          4.38e-02, // w2
+          5.52e-02, // x2
+          3.21e-01, // y2
+
+          2.87e-02, // w3
+          3.43e-02, // x3
+          6.60e-01, // y3
+
+          6.74e-02, // w4
+          5.15e-01, // x4
+          2.77e-01, // y4
+        };
 
       // Print initial guess
       // std::cout << "Initial guess=" << std::endl;
@@ -293,7 +300,7 @@ void generate_lhc_and_test()
       // std::cout << "u=" << std::endl;
       // print(u);
 
-      converged = newton_min(u, residual_and_jacobian);
+      converged = newton_min(solver_data);
 
       // Debugging: print u after minimization
       // std::cout << "u=" << std::endl;
@@ -314,7 +321,7 @@ void generate_lhc_and_test()
       // random initial guess, it might be worthwhile seeing if we can
       // improve it slightly with an optimization algorithm before
       // switching to Newton's method?
-      converged = newton(u, residual_and_jacobian);
+      converged = newton(solver_data);
 
       if (converged)
         {

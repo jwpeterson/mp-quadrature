@@ -1,17 +1,23 @@
+// Local includes
+#include "solver_data.h"
 #include "newton.h"
 #include "vect.h"
 
-bool newton(std::vector<mpfr_class> & u,
-            ResidualAndJacobianFunctionPtr residual_and_jacobian)
+bool newton(SolverData & solver_data)
 {
   // Newton iteration parameters.
-  const mpfr_class tol(1.e-36);
-  const mpfr_class divtol(1.e16);
-  const mpfr_class alphamin(1.e-3);
+  mpfr_class tol = solver_data.tol;
+  mpfr_class divtol = solver_data.divtol;
+  mpfr_class alphamin = solver_data.alphamin;
   const bool do_backtracking = false;
   unsigned iter = 0;
-  const unsigned int maxits = 20;
+  unsigned int maxits = solver_data.maxits;
   bool converged = false;
+
+  ResidualAndJacobianFunctionPtr
+    residual_and_jacobian = solver_data.residual_and_jacobian;
+
+  std::vector<mpfr_class> & u = solver_data.u;
 
   // Storage for residual, Newton update, and Jacobian
   std::vector<mpfr_class> r, du;
@@ -32,7 +38,8 @@ bool newton(std::vector<mpfr_class> & u,
       // Check the norm of the residual vector to see if we are done.
       mpfr_class residual_norm = norm(r);
 
-      // std::cout << "Iteration " << iter << ", residual_norm=" << residual_norm << std::endl;
+      if (solver_data.verbose)
+        std::cout << "Iteration " << iter << ", residual_norm=" << residual_norm << std::endl;
 
       if (residual_norm < tol)
         {
@@ -86,8 +93,9 @@ bool newton(std::vector<mpfr_class> & u,
               (*residual_and_jacobian)(&r, nullptr, u);
               mpfr_class new_residual_norm = norm(r);
 
-              std::cout << "Trying Newton step with alpha = " << alpha
-                        << ", residual = " << new_residual_norm << std::endl;
+              if (solver_data.verbose)
+                std::cout << "Trying Newton step with alpha = " << alpha
+                          << ", residual = " << new_residual_norm << std::endl;
 
               if (new_residual_norm < residual_norm)
                 {
@@ -122,16 +130,20 @@ bool newton(std::vector<mpfr_class> & u,
 
 
 
-bool newton_min(std::vector<mpfr_class> & u,
-                ResidualAndJacobianFunctionPtr residual_and_jacobian)
+bool newton_min(SolverData & solver_data)
 {
   // Newton minimization iteration parameters.
-  const mpfr_class tol(1.e-36);
-  const mpfr_class divtol(1.e16);
-  const mpfr_class alphamin(1.e-10);
+  mpfr_class tol = solver_data.tol;
+  mpfr_class divtol = solver_data.divtol;
+  mpfr_class alphamin = solver_data.alphamin;
+  unsigned int maxits = solver_data.maxits;
   unsigned iter = 0;
-  const unsigned int maxits = 25;
   bool converged = false;
+
+  ResidualAndJacobianFunctionPtr
+    residual_and_jacobian = solver_data.residual_and_jacobian;
+
+  std::vector<mpfr_class> & u = solver_data.u;
 
   // Problem size
   unsigned int n = u.size();
