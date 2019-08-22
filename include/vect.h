@@ -84,4 +84,28 @@ std::vector<T> operator - (const std::vector<T> & u,
   return ret;
 }
 
+// Add in-place, u += v
+template<class T>
+void operator += (std::vector<T> & u,
+                  const std::vector<T> & v)
+{
+  const unsigned int n = u.size();
+  for (unsigned int i=0; i<n; ++i)
+    u[i] += v[i];
+}
+
+// Add and return by value
+template<class T>
+std::vector<T> operator + (const std::vector<T> & u,
+                           const std::vector<T> & v)
+{
+  const unsigned int n = u.size();
+  std::vector<T> ret(n);
+
+  for (unsigned int i=0; i<n; ++i)
+    ret[i] = u[i] + v[i];
+
+  return ret;
+}
+
 #endif

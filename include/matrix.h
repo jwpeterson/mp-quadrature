@@ -5,6 +5,7 @@
 #include <vector>
 #include <iomanip>
 #include <stdlib.h> // exit
+#include <stdexcept>
 
 /**
  * Templated matrix class implementing operations needed for
@@ -265,10 +266,7 @@ void Matrix<T>::_lu_decompose()
 
       // If the max abs entry found is zero, the matrix is singular
       if (A(i,i) == 0.)
-        {
-          std::cerr << "Matrix is singular!" << std::endl;
-          exit(1);
-        }
+        throw std::runtime_error("Matrix is singular!");
 
       // Scale upper triangle entries of row i by the diagonal entry
       // Note: don't scale the diagonal entry itself!

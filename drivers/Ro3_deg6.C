@@ -3,6 +3,7 @@
 #include "exact.h"
 #include "matrix.h"
 #include "vect.h"
+#include "newton.h"
 
 // C++ includes
 #include <vector>
@@ -19,10 +20,6 @@
 void residual_and_jacobian(std::vector<mpfr_class> * r,
                            Matrix<mpfr_class> * jac,
                            const std::vector<mpfr_class> & u);
-
-// Given an initial guess u, uses Newton's method to see if it can obtain a solution.
-// If the Newton iterations fail, this is reported back to the user.
-bool newton(std::vector<mpfr_class> & u);
 
 // Generates a fixed-size, dense block of random samples using the
 // Latin hypercube sampling method and checks whether any of them
@@ -224,152 +221,21 @@ void generate_lhc_and_test()
       // std::cout << "Initial guess=" << std::endl;
       // print(u);
 
+      bool converged = false;
+
+      // Attempt to improve initial guess with a Newton minimization iterations.
+      converged = newton_min(u, residual_and_jacobian);
+
       // We now use Newton iterations to obtain more digits of accuracy in the
       // points and weights.
-      bool converged = newton(u);
+      converged = newton(u, residual_and_jacobian);
 
       if (converged)
         {
           std::cout << "Possible new solution u=" << std::endl;
           print(u);
-
-          // TODO: Later we may need to check for duplicates.
-          // // We want to check whether this solution is a permutation
-          // // of the one that we already have. So we sort the weights
-          // // and compare them to the weights of the solution we
-          // // already have.
-          // std::vector<mpfr_class> weights = {u[0], u[1], u[4], u[7]};
-          // std::sort(weights.begin(), weights.end());
-          //
-          // const std::vector<mpfr_class> known_weights =
-          //   {
-          //     mpfr_class("2.6517028157436251428754180460739e-2"),
-          //     mpfr_class("2.8775042784981585738445496900219e-2"),
-          //     mpfr_class("4.3881408714446055036769903139288e-2"),
-          //     mpfr_class("6.7493187009802774462697086166421e-2")
-          //   };
-          //
-          // for (unsigned int i=0; i<weights.size(); ++i)
-          //   weights[i] -= known_weights[i];
-          //
-          // mpfr_class norm_w = norm(weights);
-          // // std::cout << "norm_w=" << norm_w << std::endl;
-          //
-          // if (norm_w > mpfr_class(1.e-6))
-          //   {
-          //     std::cout << "Possible new solution u=" << std::endl;
-          //     print(u);
-          //   }
-          // else
-          //   {
-          //     // Keep track of the number of converged (but duplicate) solutions.
-          //     n_converged++;
-          //   }
         }
     } // end loop over n_tests
-}
-
-
-
-bool newton(std::vector<mpfr_class> & u)
-{
-  // Newton iteration parameters.
-  const mpfr_class tol(1.e-36);
-  const mpfr_class divtol(1.e16);
-  const mpfr_class alphamin(1.e-3);
-  const bool do_backtracking = false;
-  unsigned iter = 0;
-  const unsigned int maxits = 20;
-  bool converged = false;
-
-  // Storage for residual, Newton update, and Jacobian
-  std::vector<mpfr_class> r, du;
-  Matrix<mpfr_class> jac;
-
-  // Store previous residual norm. Used for simplified line searching technique.
-  mpfr_class old_residual_norm = 0.;
-
-  while (true)
-    {
-      ++iter;
-      if (iter > maxits)
-        break;
-
-      // Compute the residual (vector) at the current guess.
-      residual_and_jacobian(&r, nullptr, u);
-
-      // Check the norm of the residual vector to see if we are done.
-      mpfr_class residual_norm = norm(r);
-
-      // std::cout << "Iteration " << iter << ", residual_norm=" << residual_norm << std::endl;
-
-      if (residual_norm < tol)
-        {
-          converged = true;
-          break;
-        }
-
-      // If the residual is too large, just give up.
-      if (residual_norm > divtol)
-        break;
-
-      // Compute Jacobian (only) at the current guess.
-      residual_and_jacobian(nullptr, &jac, u);
-
-      // Compute update: du = -jac^{-1} * r
-      jac.lu_solve(du, r);
-
-      // Compute next iterate, u -= alpha*du using simplified
-      // backtracking, alpha_min < alpha <= 1.
-      // This is only theoretically helpful at the moment, so far I have not encountered
-      // an actual case where a failing case was able to converge by using backtracking.
-      mpfr_class alpha(1);
-      bool backtracking_converged = false;
-      while (true)
-        {
-          if (alpha < alphamin)
-            break;
-
-          for (unsigned int i=0; i<u.size(); ++i)
-            u[i] -= alpha * du[i];
-
-          if (do_backtracking)
-            {
-              residual_and_jacobian(&r, nullptr, u);
-              mpfr_class new_residual_norm = norm(r);
-
-              std::cout << "Trying Newton step with alpha = " << alpha
-                        << ", residual = " << new_residual_norm << std::endl;
-
-              if (new_residual_norm < residual_norm)
-                {
-                  backtracking_converged = true;
-                  break;
-                }
-
-              // Don't waste time backtracking if we already diverged
-              if (new_residual_norm > divtol)
-                break;
-
-              alpha /= mpfr_class(2);
-            }
-          else
-            {
-              // If we aren't doing backtracking, then backtracking is "done".
-              backtracking_converged = true;
-              break;
-            }
-        }
-
-      if (!backtracking_converged)
-        break;
-    } // end while
-
-  // if (!converged)
-  //   std::cout << "Newton iteration diverged, backtracking failed, or max iterations exceeded."
-  //             << std::endl;
-
-  return converged;
 }
 
 
