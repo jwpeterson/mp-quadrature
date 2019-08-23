@@ -46,6 +46,20 @@ int main()
   // Invalid degrees are: 2, 4, 11, 13, ...
   unsigned int d=15;
 
+  // Testing
+  // std::cout << mpfr_class(exact_tri(0,0)) << std::endl; // =0.5
+  // std::cout << mpfr_class(exact_tri(2,0)) << std::endl; // =0.0833333333333
+  // std::cout << mpfr_class(exact_tri(3,0)) << std::endl; // =0.05
+  // std::cout << mpfr_class(exact_tri(2,1)) << std::endl; // =0.0166666666667
+  // std::cout << mpfr_class(exact_tri(4,0)) << std::endl; // =0.0333333333333
+  // std::cout << mpfr_class(exact_tri(5,0)) << std::endl; // =0.0238095238095
+  // std::cout << mpfr_class(exact_tri(4,1)) << std::endl; // =0.0047619047619
+  // std::cout << mpfr_class(exact_tri(6,0)) << std::endl; // =0.0178571428571
+  // std::cout << mpfr_class(exact_tri(5,1)) << std::endl; // =0.00297619047619
+  // std::cout << mpfr_class(exact_tri(4,2)) << std::endl; // =0.00119047619048
+  // std::cout << mpfr_class(exact_tri(7,0)) << std::endl; // =0.0138888888889
+  // std::cout << mpfr_class(exact_tri(6,1)) << std::endl; // =0.00198412698413
+
   // Number of tests to run per test set (user input).
   unsigned int n_tests = 1;
 
