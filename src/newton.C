@@ -14,8 +14,8 @@ bool newton(SolverData & solver_data)
   unsigned int maxits = solver_data.maxits;
   bool converged = false;
 
-  ResidualAndJacobianFunctionPtr
-    residual_and_jacobian = solver_data.residual_and_jacobian;
+  ResidualAndJacobian & residual_and_jacobian =
+    solver_data.residual_and_jacobian;
 
   std::vector<mpfr_class> & u = solver_data.u;
 
@@ -33,7 +33,7 @@ bool newton(SolverData & solver_data)
         break;
 
       // Compute the residual (vector) at the current guess.
-      (*residual_and_jacobian)(&r, nullptr, u);
+      residual_and_jacobian(&r, nullptr, u);
 
       // Check the norm of the residual vector to see if we are done.
       mpfr_class residual_norm = norm(r);
@@ -52,7 +52,7 @@ bool newton(SolverData & solver_data)
         break;
 
       // Compute Jacobian (only) at the current guess.
-      (*residual_and_jacobian)(nullptr, &jac, u);
+      residual_and_jacobian(nullptr, &jac, u);
 
       // Compute update: du = -jac^{-1} * r
       try
@@ -90,7 +90,7 @@ bool newton(SolverData & solver_data)
 
           if (do_backtracking)
             {
-              (*residual_and_jacobian)(&r, nullptr, u);
+              residual_and_jacobian(&r, nullptr, u);
               mpfr_class new_residual_norm = norm(r);
 
               if (solver_data.verbose)
@@ -140,8 +140,8 @@ bool newton_min(SolverData & solver_data)
   unsigned iter = 0;
   bool converged = false;
 
-  ResidualAndJacobianFunctionPtr
-    residual_and_jacobian = solver_data.residual_and_jacobian;
+  ResidualAndJacobian & residual_and_jacobian =
+    solver_data.residual_and_jacobian;
 
   std::vector<mpfr_class> & u = solver_data.u;
 
@@ -159,14 +159,14 @@ bool newton_min(SolverData & solver_data)
         break;
 
       // Compute the residual and Jacobian at the current guess.
-      (*residual_and_jacobian)(&r, &jac, u);
+      residual_and_jacobian(&r, &jac, u);
 
       // Compute the size of the scalar function "f"
       // which we are trying to minimize, _not_ dot(r,r)^0.5.
       mpfr_class residual = 0.5 * dot(r,r);
 
-      // Debugging:
-      // std::cout << "Iteration " << iter << ", residual = " << residual << std::endl;
+      if (solver_data.verbose)
+        std::cout << "Iteration " << iter << ", residual = " << residual << std::endl;
 
       // If the residual is small enough, return true.
       if (residual < tol)
@@ -215,7 +215,7 @@ bool newton_min(SolverData & solver_data)
           u_eps[j] += eps;
 
           // Compute Jacobian at u + eps
-          (*residual_and_jacobian)(nullptr, &djac, u_eps);
+          residual_and_jacobian(nullptr, &djac, u_eps);
 
           // Debugging
           // std::cout << "j=" << j << std::endl;
@@ -253,7 +253,7 @@ bool newton_min(SolverData & solver_data)
         {
           // std::cout << "Trying step with alpha=" << alpha << std::endl;
           trial_u = u - alpha * du;
-          (*residual_and_jacobian)(&r, nullptr, trial_u);
+          residual_and_jacobian(&r, nullptr, trial_u);
           mpfr_class trial_residual = 0.5 * dot(r,r);
 
           // Debugging

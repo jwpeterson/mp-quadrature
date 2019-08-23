@@ -7,6 +7,7 @@
 #include "vect.h"
 
 void test_ro3(unsigned int d,
+              unsigned int n_tests,
               SolverData & solver_data)
 {
   // The number of unknowns
@@ -16,6 +17,7 @@ void test_ro3(unsigned int d,
   // The number of Ro3 points
   unsigned int n_ro3 = N / 3;
 
+  // Debugging
   std::cout << "N = " << N << std::endl;
   std::cout << "n_centroid = " << n_centroid << std::endl;
   std::cout << "n_ro3 = " << n_ro3 << std::endl;
@@ -41,7 +43,6 @@ void test_ro3(unsigned int d,
   // number of parameters we are solving for, since we choose the
   // weights so that they sum up to the reference element area.
   unsigned int n_dim = n_centroid + (3 * n_ro3) - 1;
-  unsigned int n_tests = 1;
 
   // Status message
   std::cout << "Generating random initial guesses..." << std::endl;

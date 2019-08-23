@@ -13,8 +13,8 @@ bool gradient_descent(SolverData & solver_data)
   unsigned iter = 0;
   bool converged = false;
 
-  ResidualAndJacobianFunctionPtr
-    residual_and_jacobian = solver_data.residual_and_jacobian;
+  ResidualAndJacobian & residual_and_jacobian =
+    solver_data.residual_and_jacobian;
 
   std::vector<mpfr_class> & u = solver_data.u;
 
