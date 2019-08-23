@@ -9,7 +9,7 @@ bool newton(SolverData & solver_data)
   mpfr_class tol = solver_data.tol;
   mpfr_class divtol = solver_data.divtol;
   mpfr_class alphamin = solver_data.alphamin;
-  const bool do_backtracking = false;
+  const bool do_backtracking = true;
   unsigned iter = 0;
   unsigned int maxits = solver_data.maxits;
   bool converged = false;
@@ -18,13 +18,14 @@ bool newton(SolverData & solver_data)
     solver_data.residual_and_jacobian;
 
   std::vector<mpfr_class> & u = solver_data.u;
+  unsigned int n = u.size();
 
   // Storage for residual, Newton update, and Jacobian
-  std::vector<mpfr_class> r, du;
-  Matrix<mpfr_class> jac;
+  std::vector<mpfr_class> r(n), du(n), trial_u(n);
+  Matrix<mpfr_class> jac(n,n);
 
   // Store previous residual norm. Used for simplified line searching technique.
-  mpfr_class old_residual_norm = 0.;
+  // mpfr_class old_residual_norm = 0.;
 
   while (true)
     {
@@ -71,55 +72,53 @@ bool newton(SolverData & solver_data)
       // backtracking, alpha_min < alpha <= 1.
       // This is only theoretically helpful at the moment, so far I have not encountered
       // an actual case where a failing case was able to converge by using backtracking.
-      mpfr_class alpha(1);
-      bool backtracking_converged = false;
-      while (true)
+      if (do_backtracking)
         {
-          if (alpha < alphamin)
-            break;
-
-          // This looks "nice" but is probably less efficient in general because
-          // a temporary has to be created for the result of "alpha * du" and then
-          // finally our custom operator-=() function is called. It's not possible
-          // to define a non-member operator-=() that takes more than two args.
-          // u -= alpha * du;
-
-          // This looks less "cool" but is probably more efficient
-          // because no temporary is created.
-          subtract_scaled(u, alpha, du);
-
-          if (do_backtracking)
+          mpfr_class alpha = mpfr_class(1);
+          bool linesearch_converged = false;
+          // 2^(-50) ~ 9e-16
+          for (unsigned int back=0; back<50; ++back)
             {
-              residual_and_jacobian(&r, nullptr, u);
-              mpfr_class new_residual_norm = norm(r);
+              // std::cout << "Trying step with alpha=" << alpha << std::endl;
+              trial_u = u - alpha * du;
+              residual_and_jacobian(&r, nullptr, trial_u);
+              mpfr_class trial_residual = norm(r);
 
-              if (solver_data.verbose)
-                std::cout << "Trying Newton step with alpha = " << alpha
-                          << ", residual = " << new_residual_norm << std::endl;
+              // if (solver_data.verbose)
+              //   std::cout << "alpha = " << alpha
+              //             << ", trial_residual = " << trial_residual << std::endl;
 
-              if (new_residual_norm < residual_norm)
+              if (trial_residual < residual_norm)
                 {
-                  backtracking_converged = true;
+                  // Accept this trial solution
+                  u = trial_u;
+                  linesearch_converged = true;
+
+                  // if (solver_data.verbose)
+                  //   std::cout << "Accept step with alpha = " << alpha << std::endl;
+
                   break;
                 }
-
-              // Don't waste time backtracking if we already diverged
-              if (new_residual_norm > divtol)
-                break;
-
-              alpha /= mpfr_class(2);
+              else
+                alpha /= 2;
             }
-          else
+
+          // If the linesearch failed, we can quit or just keep going.
+          if (!linesearch_converged)
             {
-              // If we aren't doing backtracking, then backtracking is "done".
-              backtracking_converged = true;
-              break;
+              // 1.) Keep going
+              subtract_scaled(u, alpha, du);
+
+              // 2.) Quit
+              // break;
             }
         }
-
-      if (!backtracking_converged)
-        break;
-    } // end while
+      else
+        {
+          // Accept full step
+          u -= du;
+        }
+    } // end while (true)
 
   // if (!converged)
   //   std::cout << "Newton iteration diverged, backtracking failed, or max iterations exceeded."

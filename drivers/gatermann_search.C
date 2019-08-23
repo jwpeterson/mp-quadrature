@@ -43,14 +43,16 @@ int main()
 
   // The max degree of polynomials the rule is supposed to integrate
   // exactly (user input).
-  unsigned int d=8;
+  // Invalid degrees are: 2, 4, 11, 13, ...
+  unsigned int d=15;
 
   // Number of tests to run per test set (user input).
-  unsigned int n_tests = 10000;
+  unsigned int n_tests = 1;
 
   // Set parameters to be used by solvers
   SolverData solver_data;
   solver_data.verbose = false;
+  solver_data.maxits = 15;
   solver_data.residual_and_jacobian = ResidualAndJacobian(d);
 
   unsigned int testset_counter = 0;
@@ -59,6 +61,7 @@ int main()
       ++testset_counter;
       std::cout << "Running test set " << testset_counter << std::endl;
       test_ro3(d, n_tests, solver_data);
+      // Comment out this break to run forever.
       break;
     }
 

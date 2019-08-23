@@ -35,3 +35,4 @@ gmpfrxx/example
 *.so.*
 drivers/lu
 plots
+TAGS

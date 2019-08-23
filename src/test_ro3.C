@@ -141,7 +141,45 @@ void test_ro3(unsigned int d,
           u.push_back(y_guess[i]);
         }
 
+      // For d==3, there is a four-point rule, but it has a negative
+      // centroid weight, -27/96. It is actually better to use a 2x2
+      // conical product rule which has all positive weights in this
+      // case.
+//      if (d==3)
+//        u =
+//          {
+//            -2.8125000000000000000000000000000e-1
+//            2.6041666666666666666666666666667e-1
+//            6.0000000000000000000000000000000e-1
+//            2.0000000000000000000000000000000e-1
+//          };
+
+      // For d==5, we get the following 7 point rule. I believe that
+      // this should be the same fifth-order rule that we currently
+      // have in libmesh which is listed as being from "Quadrature on
+      // Simplices of Arbitrary Dimension" by Walkington. This rule
+      // actually has an analytical solution for the points and
+      // weights. Note that x==y for the two Ro3 points, this
+      // corresponds to points located on the three triangle medians:
+      // (a,a), (a,1-2*a), and (1-2*a,a). It is also interesting to
+      // note that our algorithm of using minimization/rootfinding
+      // "cycles" converges for almost every random initial guess in
+      // this case (although sometimes requiring more than one cycle),
+      // i.e. this is a really easy problem.
+//      if (d==5)
+//        u =
+//          {
+//            1.1250000000000000000000000000000e-1,
+//            6.6197076394253090368824693916576e-2,
+//            4.7014206410511508977044120951345e-1,
+//            4.7014206410511508977044120951345e-1,
+//            6.2969590272413576297841972750091e-2,
+//            1.0128650732345633880098736191512e-1,
+//            1.0128650732345633880098736191512e-1
+//          };
+
       // Debugging: set initial guess to known solution for 12 point, degree=7 case.
+// if (d==7)
 //      u =
 //        {
 //          2.65e-02, // w1
@@ -161,6 +199,115 @@ void test_ro3(unsigned int d,
 //          2.77e-01, // y4
 //        };
 
+      // This rule is reported in Cools & Haegemans TW96 for degree=8
+      // but it seems quite dubious to me as one of the weights is
+      // basically zero and one of the points is waaaay outside the
+      // reference element... it does converge using our solver
+      // however, and the solution is:
+      //
+      // u=
+      // 1.6058343856681218798400231921758e-10
+      // 3.4579201116826902882140270303267e-1
+      // 3.6231682215692616666791285362864
+      // 2.6530624434780379346899858317533e-2
+      // 6.5101993458939166328104791860010e-2
+      // 8.7016510156356306077747992432900e-1
+      // 2.9285717640165892159260292342121e-2
+      // 6.5177530364879570753723544017162e-1
+      // 3.1347788752373300717357808540986e-1
+      // 4.3909556791220782401863560411239e-2
+      // 3.1325121067172530695595743477398e-1
+      // 6.3062143431895614010295743491499e-1
+      // 6.6940767639916174191830767611771e-2
+      // 5.1334692063945414949358896494129e-1
+      // 2.8104124731511039057273791035622e-1
+// if (d==8)
+//      u =
+//        {
+//          0.16058e-09, // w1
+//          0.3458, // x1
+//          0.3623e+01, // y1
+//
+//          0.2653e-01, // w2
+//          0.651e-01, // x2
+//          0.8701, // y2
+//
+//          0.2928e-01, // w3
+//          0.6518, // x3
+//          0.3135, // y3
+//
+//          0.4391e-01, // w4
+//          0.31325, // x4
+//          0.6306, // y4
+//
+//          0.6694e-01, // w5
+//          0.513347, // x5
+//          0.2810, // y5
+//        };
+
+
+      // This rule is reported in Cools & Haegemans TW96 for degree=10,
+      // but it also has points outside the reference element. Our solver
+      // converges to this if we do Newton iterations only, but not if we
+      // do some minimization steps first..
+      //
+      // u=
+      // 4.7910534861520060666258795267317e-2
+      // 1.5319130036758557630224218647182e-7
+      // 5.8469201683584513030840399896305e-2
+      // -5.4887778772527519316973900501509e-1
+      // 1.3260526227928785221366811484040e-2
+      // 5.0849285064031410704623553266007e-2
+      // 9.0799059794957813439289694951544e-1
+      // 1.5646439344539042136182802356194e-2
+      // 5.1586732419949674486519820945603e-1
+      // 4.6312452842927062902198120980987e-1
+      // 2.1704258224807323310774404349324e-2
+      // 2.4311033191739048229513038265738e-1
+      // 7.2180595182371959467025855850715e-1
+      // 2.1797613600129922367395409006103e-2
+      // 7.5397765920922660134372366560338e-1
+      // 2.0647569839132397632996966382170e-1
+      // 3.8587913508193459468029657331332e-2
+      // 4.2209207910846960293600275784774e-1
+      // 1.2689533413411127326858250178468e-1
+      // 3.9699584282594413021921681475048e-2
+      // 1.9823878846663354067849545395741e-1
+      // 6.2124412566393319744542137613089e-1
+// if (d==10)
+//      u =
+//        {
+//          0.4791e-01, // w0
+//
+//          0.15319e-06, // w1
+//          0.5846e-01, // x1
+//          -0.5489, // y1
+//
+//          0.1326e-01, // w2
+//          0.50849e-01, // x2
+//          0.908, // y2
+//
+//          0.15646e-01, // w3
+//          0.515867e+00, // x3
+//          0.46312, // y3
+//
+//          0.2170e-01, // w4
+//          0.24311e+00, // x4
+//          0.7218, // y4
+//
+//          0.218e-01, // w5
+//          0.75398e+00, // x5
+//          0.2065, // y5
+//
+//          0.3859e-01, // w6
+//          0.422e+00, // x6
+//          0.1269, // y6
+//
+//          0.397e-01, // w7
+//          0.1982e+00, // x7
+//          0.6212, // y7
+//        };
+
       // Print initial guess
       // std::cout << "Initial guess=" << std::endl;
       // print(u);
@@ -170,14 +317,59 @@ void test_ro3(unsigned int d,
 
       // Try a few iterations of one of the minimization routines.
       // converged = newton_min(solver_data);
-      converged = gradient_descent(solver_data);
+      // converged = gradient_descent(solver_data);
       // converged = nlcg(solver_data);
 
       // Follow up initial guess minimization with Newton. For a
       // random initial guess, it might be worthwhile seeing if we can
       // improve it slightly with an optimization algorithm before
       // switching to Newton's method?
-      converged = newton(solver_data);
+      // converged = newton(solver_data);
+
+      // Cycle back and forth between N minimization steps and N Newton iterations.
+      // while (true)
+      unsigned int n_cycles = 250;
+      mpfr_class norm_r = 0.;
+      for (unsigned int cycle=0; cycle<n_cycles; ++cycle)
+        {
+          // Minimization step
+          gradient_descent(solver_data);
+          // newton_min(solver_data);
+          // nlcg(solver_data);
+
+          // Root-finding step
+          converged = newton(solver_data);
+
+          // Report one residual value per cycle
+          std::vector<mpfr_class> r;
+          solver_data.residual_and_jacobian(&r, nullptr, u);
+          norm_r = norm(r);
+          std::cout << "cycle " << cycle << ", residual norm = " << norm_r << std::endl;
+          // print(r);
+
+          // Check for negative values. There's no point in further
+          // converging an invalid configuration (negative weights,
+          // points outside the region).
+          bool negative = false;
+          for (unsigned int q=0; q<u.size(); ++q)
+            if (u[q] < 0.)
+              {
+                negative = true;
+                break;
+              }
+
+          // Don't spend time on a useless solution.
+          if (negative)
+            {
+              std::cout << "Candidate solution has negative points/weights." << std::endl;
+              // Debugging
+              print(u);
+              break;
+            }
+
+          if (converged)
+            break;
+        }
 
       if (converged)
         {
@@ -188,6 +380,12 @@ void test_ro3(unsigned int d,
 
           // Keep track of the number of converged solutions.
           n_converged++;
+        }
+      else if (norm_r < 1.e-4)
+        {
+          // Debugging: we didn't converge, but maybe it was still promising?
+          std::cout << "u=" << std::endl;
+          print(u);
         }
     } // end loop over n_tests
 }
