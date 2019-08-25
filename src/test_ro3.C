@@ -6,6 +6,9 @@
 #include "newton.h"
 #include "vect.h"
 
+// C++ includes
+#include <stdlib.h> // random()
+
 void test_ro3(unsigned int d,
               unsigned int n_tests,
               SolverData & solver_data)
@@ -52,8 +55,17 @@ void test_ro3(unsigned int d,
   // will therefore represent an n_dim-dimensional set of test
   // parameters. We will random_shuffle() the rows so that we get one
   // sample from each "bin" of a given random variable.
-  std::vector<std::vector<double>> random_numbers =
-    lhc(n_dim, n_tests);
+  // std::vector<std::vector<double>> random_numbers =
+  //   lhc(n_dim, n_tests);
+
+  // No LHC sampling, just an (n_dim x n_tests) block of random numbers.
+  std::vector<std::vector<double>> random_numbers(n_dim);
+  for (auto & vec : random_numbers)
+    {
+      vec.resize(n_tests);
+      for (auto & val : vec)
+        val = double(random()) / RAND_MAX;
+    }
 
   // Status message
   std::cout << "Testing initial guesses..." << std::endl;
@@ -328,44 +340,27 @@ void test_ro3(unsigned int d,
 
       // Cycle back and forth between N minimization steps and N Newton iterations.
       // while (true)
-      unsigned int n_cycles = 250;
+      unsigned int n_cycles = 1;
       mpfr_class norm_r = 0.;
       for (unsigned int cycle=0; cycle<n_cycles; ++cycle)
         {
           // Minimization step
-          gradient_descent(solver_data);
-          // newton_min(solver_data);
+          // gradient_descent(solver_data);
+          newton_min(solver_data);
           // nlcg(solver_data);
 
           // Root-finding step
-          converged = newton(solver_data);
+          // converged = newton(solver_data);
 
           // Report one residual value per cycle
-          std::vector<mpfr_class> r;
-          solver_data.residual_and_jacobian(&r, nullptr, u);
-          norm_r = norm(r);
-          std::cout << "cycle " << cycle << ", residual norm = " << norm_r << std::endl;
-          // print(r);
-
-          // Check for negative values. There's no point in further
-          // converging an invalid configuration (negative weights,
-          // points outside the region).
-          bool negative = false;
-          for (unsigned int q=0; q<u.size(); ++q)
-            if (u[q] < 0.)
-              {
-                negative = true;
-                break;
-              }
-
-          // Don't spend time on a useless solution.
-          if (negative)
+          if (n_cycles > 1)
             {
-              std::cout << "Candidate solution has negative points/weights." << std::endl;
-              // Debugging
-              print(u);
-              break;
+              std::vector<mpfr_class> r;
+              solver_data.residual_and_jacobian(&r, nullptr, u);
+              norm_r = norm(r);
+              std::cout << "cycle " << cycle << ", residual norm = " << norm_r << std::endl;
             }
+          // print(r);
 
           if (converged)
             break;
@@ -381,11 +376,11 @@ void test_ro3(unsigned int d,
           // Keep track of the number of converged solutions.
           n_converged++;
         }
-      else if (norm_r < 1.e-4)
-        {
-          // Debugging: we didn't converge, but maybe it was still promising?
-          std::cout << "u=" << std::endl;
-          print(u);
-        }
+
+      // Debugging: we didn't converge, but maybe it was still promising?
+      std::cout << "Solution is *not* converged!" << std::endl;
+      std::cout << "u=" << std::endl;
+      print(u);
+
     } // end loop over n_tests
 }

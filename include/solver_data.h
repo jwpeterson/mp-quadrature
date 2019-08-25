@@ -4,6 +4,7 @@
 // Local includes
 #include "matrix.h"
 #include "exact.h"
+#include "vect.h"
 
 // Support library headers
 #include "mpfr.h"
@@ -170,6 +171,78 @@ struct ResidualAndJacobian
   }
 };
 
+
+
+// Provides an operator() that returns true or false depending on
+// whether the trial solution is "feasible", i.e. satisfies any
+// required constraints/bounds which are separate from the nonlinear
+// equations themselves.
+struct CheckFeasibility
+{
+  CheckFeasibility(unsigned int d_in = 1) :
+    d(d_in),
+    N((d*d + 3*d + 6)/6),
+    n_centroid(N % 3),
+    n_ro3(N / 3)
+  {
+  }
+
+  // polynomial degree
+  unsigned int d;
+
+  // Number of unknowns in the residual vector
+  unsigned int N;
+
+  // The number of centroid points
+  unsigned int n_centroid;
+
+  // The number of Ro3-invariant points
+  unsigned int n_ro3;
+
+  // Return true if the trial_u is feasible, false otherwise.
+  bool operator() (const std::vector<mpfr_class> & trial_u)
+  {
+    if (N != trial_u.size())
+      {
+        std::cout << "Error, wrong size solution in CheckFeasibility." << std::endl;
+        abort();
+      }
+
+    // 1.) No parameters can be negative (or exactly zero).
+    for (unsigned int q=0; q<trial_u.size(); ++q)
+      if (trial_u[q] <= 0.)
+        {
+          // Debugging:
+          // std::cout << "trial_u is infeasible due to parameter <= 0!"
+          //           << std::endl;
+          // print(trial_u);
+
+          return false;
+        }
+
+    // 2.) Check if 1-x-y <= 0
+    for (unsigned int q=n_centroid; q<trial_u.size(); q+=3)
+      {
+        mpfr_class x = trial_u[q+1];
+        mpfr_class y = trial_u[q+2];
+        if (mpfr_class(1) - x - y <= 0)
+          {
+            // Debugging:
+            // std::cout << "trial_u is infeasible due to 1-x-y <= 0!"
+            //           << std::endl;
+            // print(trial_u);
+
+            return false;
+          }
+      }
+
+    // If we made it here without returning, must be feasible!
+    return true;
+  }
+};
+
+
+
 // Parameters that control the behavior of solvers.
 struct SolverData
 {
@@ -178,6 +251,7 @@ struct SolverData
     divtol(1.e16),
     maxits(20),
     alphamin(1.e-3),
+    do_backtracking(false),
     verbose(false) {}
 
   // Initial guess/solution vector
@@ -187,8 +261,10 @@ struct SolverData
   unsigned int maxits;
   // smallest backtracking backtracking linesearch fraction
   mpfr_class alphamin;
+  bool do_backtracking;
   bool verbose;
   ResidualAndJacobian residual_and_jacobian;
+  CheckFeasibility check_feasibility;
 };
 
 #endif

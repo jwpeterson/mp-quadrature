@@ -6,6 +6,7 @@
 #include <iomanip>
 #include <stdlib.h> // exit
 #include <stdexcept>
+#include <assert.h>
 
 /**
  * Templated matrix class implementing operations needed for
@@ -85,6 +86,13 @@ public:
    */
   std::vector<T> matvec_transpose (const std::vector<T> & x);
 
+  /**
+   * Compute a measure of the matrix asymmetry given by:
+   * |a(i,j) - a(j,i)|
+   *  Useful for debugging.
+   */
+  T asymmetry() const;
+
 private:
   /**
    * Ingredients of the lu_solve() function.
@@ -116,8 +124,7 @@ Matrix<T>::Matrix(unsigned n_rows, unsigned n_cols)
 
 
 template <class T>
-Matrix<T>::~Matrix()
-{}
+Matrix<T>::~Matrix() = default;
 
 
 
@@ -359,6 +366,23 @@ std::vector<T> Matrix<T>::matvec_transpose (const std::vector<T> & x)
       y[i] += (*this)(j,i) * x[j];
 
   return y;
+}
+
+
+
+template <class T>
+T Matrix<T>::asymmetry() const
+{
+  // Only for square matrices
+  assert(_n_rows == _n_cols);
+
+  T asymmetry(0);
+
+  for (unsigned int i=0; i<_n_rows; ++i)
+    for (unsigned int j=i+1; j<_n_cols; ++j)
+      asymmetry += abs((*this)(i,j) - (*this)(j,i));
+
+  return asymmetry;
 }
 
 #endif // __matrix_h__

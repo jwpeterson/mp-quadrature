@@ -9,13 +9,16 @@ bool newton(SolverData & solver_data)
   mpfr_class tol = solver_data.tol;
   mpfr_class divtol = solver_data.divtol;
   mpfr_class alphamin = solver_data.alphamin;
-  const bool do_backtracking = true;
+  bool do_backtracking = solver_data.do_backtracking;
   unsigned iter = 0;
   unsigned int maxits = solver_data.maxits;
   bool converged = false;
 
   ResidualAndJacobian & residual_and_jacobian =
     solver_data.residual_and_jacobian;
+
+  CheckFeasibility & check_feasibility =
+    solver_data.check_feasibility;
 
   std::vector<mpfr_class> & u = solver_data.u;
   unsigned int n = u.size();
@@ -88,7 +91,25 @@ bool newton(SolverData & solver_data)
               //   std::cout << "alpha = " << alpha
               //             << ", trial_residual = " << trial_residual << std::endl;
 
-              if (trial_residual < residual_norm)
+              // Was the residual reduced?
+              // bool residual_reduced = trial_residual < residual_norm;
+
+              // Check feasibility of the proposed solution.
+              bool feasible = check_feasibility(trial_u);
+
+              // if (solver_data.verbose && !residual_reduced)
+              //   std::cout << "newton: backtracking step "
+              //             << back
+              //             << ", Residual was not reduced!"
+              //             << std::endl;
+
+              // if (solver_data.verbose && !feasible)
+              //   std::cout << "newton: backtracking step "
+              //             << back
+              //             << ", trial solution was not feasible!"
+              //             << std::endl;
+
+              if (/*residual_reduced &&*/feasible)
                 {
                   // Accept this trial solution
                   u = trial_u;
@@ -107,10 +128,10 @@ bool newton(SolverData & solver_data)
           if (!linesearch_converged)
             {
               // 1.) Keep going
-              subtract_scaled(u, alpha, du);
+              // subtract_scaled(u, alpha, du);
 
               // 2.) Quit
-              // break;
+              break;
             }
         }
       else
@@ -136,11 +157,15 @@ bool newton_min(SolverData & solver_data)
   mpfr_class divtol = solver_data.divtol;
   mpfr_class alphamin = solver_data.alphamin;
   unsigned int maxits = solver_data.maxits;
+  bool do_backtracking = solver_data.do_backtracking;
   unsigned iter = 0;
   bool converged = false;
 
   ResidualAndJacobian & residual_and_jacobian =
     solver_data.residual_and_jacobian;
+
+  CheckFeasibility & check_feasibility =
+    solver_data.check_feasibility;
 
   std::vector<mpfr_class> & u = solver_data.u;
 
@@ -196,6 +221,9 @@ bool newton_min(SolverData & solver_data)
           for (unsigned int k=0; k<n; ++k)
             hess(i,j) += jac(k,i) * jac(k,j);
 
+      // Debugging: check symmetry of hessian
+      // std::cout << "asymmetry=" << hess.asymmetry() << std::endl;
+
       // Choosing beta=1 initially is equivalent to taking one
       // step of gradient descent. Note: this isn't part of the real
       // Hessian, but it may be necessary to ensure the Hessian remains
@@ -206,7 +234,7 @@ bool newton_min(SolverData & solver_data)
 
       // Finite differencing parameter. I tried several different values
       // for this, but the results did not seem to be very sensitve to it?
-      mpfr_class eps(1.e-8);
+      mpfr_class eps(1.e-12);
 
       for (unsigned int j=0; j<n; ++j)
         {
@@ -224,6 +252,9 @@ bool newton_min(SolverData & solver_data)
             for (unsigned int i=0; i<n; ++i)
               hess(i,j) += r[k] * (djac(k,i) - jac(k,i)) / eps;
         }
+
+      // Debugging: check symmetry of hessian
+      // std::cout << "asymmetry=" << hess.asymmetry() << std::endl;
 
       // Debugging: print Hessian.
       // std::cout << "hess=" << std::endl;
@@ -248,45 +279,46 @@ bool newton_min(SolverData & solver_data)
       // Line search
       mpfr_class alpha = mpfr_class(1);
       bool linesearch_converged = false;
-      for (unsigned int back=0; back<10; ++back)
-        {
-          // std::cout << "Trying step with alpha=" << alpha << std::endl;
-          trial_u = u - alpha * du;
-          residual_and_jacobian(&r, nullptr, trial_u);
-          mpfr_class trial_residual = 0.5 * dot(r,r);
 
-          // Debugging
-          // std::cout << "alpha = " << alpha
-          //           << ", trial_residual = " << trial_residual << std::endl;
-          if (trial_residual < residual)
+      if (do_backtracking)
+        {
+          for (unsigned int back=0; back<25; ++back)
             {
-              // Accept this trial solution
-              u = trial_u;
-              linesearch_converged = true;
-              break;
+              // std::cout << "Trying step with alpha=" << alpha << std::endl;
+              trial_u = u - alpha * du;
+
+              // Compute residual at trial solution.
+              residual_and_jacobian(&r, nullptr, trial_u);
+              mpfr_class trial_residual = 0.5 * dot(r,r);
+
+              // Check for feasibility of the solution
+              bool feasible = check_feasibility(trial_u);
+
+              if (!feasible
+                  || trial_residual > residual
+                  )
+                {
+                  alpha /= 2;
+
+                  // Debugging:
+                  // std::cout << "Trying step with alpha=" << alpha << std::endl;
+                }
+              else
+                {
+                  // Accept this trial solution
+                  linesearch_converged = true;
+                  break;
+                }
             }
-          else
-            alpha /= 2;
         }
 
-      // If the linesearch failed, stop iterating. Perhaps we could
-      // instead take a gradient descent step?
       if (!linesearch_converged)
         {
-          // It isn't actually terrible to allow a residual increase... since the
-          // algorithm doesn't really have any "history" it's like it starts again
-          // from a new initial guess and just keeps going.
-          //
-          // One thing I do see is when you encounter many linesearch failures in
-          // a row, it usually means that no more progress is going to be made.
-          // It might be good to detect this and stop iterating if this happens...
-
-          // std::cout << "Linesearch failed to find a residual reduction." << std::endl;
-          // break;
-
-          // Accept the step even though it's not a residual reduction and keep going?
-          subtract_scaled(u, alpha, du);
+          std::cout << "Linesearch failed to find acceptable step." << std::endl;
+          break;
         }
+
+      subtract_scaled(u, alpha, du);
 
       // Debugging: print du
       // std::cout << "du=" << std::endl;
