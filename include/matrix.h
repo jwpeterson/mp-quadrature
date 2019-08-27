@@ -75,6 +75,13 @@ public:
   void lu_solve(std::vector<T>& x, const std::vector<T>& b);
 
   /**
+   * Only for symmetric positive definite matrices. Factors the
+   * matrix into LL^T and then does back substitution. This overwrites
+   * the matrix.
+   */
+  void cholesky_solve(std::vector<T>& x, const std::vector<T>& b);
+
+  /**
    * Matrix-vector product
    * Returns y = (*this) * x
    */
@@ -99,6 +106,12 @@ private:
    */
   void _lu_decompose();
   void _lu_back_substitute(std::vector<T>& x, const std::vector<T>& b) const;
+
+  /**
+   * Ingredients of the cholesky_solve() function.
+   */
+  void _cholesky_decompose();
+  void _cholesky_back_substitute(std::vector<T>& x, const std::vector<T>& b) const;
 
   /**
    * Private data members.
@@ -231,6 +244,21 @@ void Matrix<T>::lu_solve(std::vector<T>& x, const std::vector<T>& b)
 
 
 
+template <class T>
+void Matrix<T>::cholesky_solve(std::vector<T>& x, const std::vector<T>& b)
+{
+  if (_n_rows != _n_cols)
+    {
+      std::cerr << "Error, cannot Cholesky solve non-square matrix!" << std::endl;
+      exit(1);
+    }
+
+  this->_cholesky_decompose();
+  this->_cholesky_back_substitute(x, b);
+}
+
+
+
 
 template <class T>
 void Matrix<T>::_lu_decompose()
@@ -272,7 +300,7 @@ void Matrix<T>::_lu_decompose()
         }
 
       // If the max abs entry found is zero, the matrix is singular
-      if (A(i,i) == 0.)
+      if (A(i,i) == T(0))
         throw std::runtime_error("Matrix is singular!");
 
       // Scale upper triangle entries of row i by the diagonal entry
@@ -338,6 +366,66 @@ void Matrix<T>::_lu_back_substitute(std::vector<T>& x, const std::vector<T>& b) 
     {
       for (int j=i+1; j<static_cast<int>(_n_rows); ++j)
         x[i] -= A(i,j)*x[j];
+    }
+}
+
+
+
+template <class T>
+void Matrix<T>::_cholesky_decompose()
+{
+  // A convenient reference to *this
+  Matrix<T> & A = *this;
+
+  for (unsigned int i=0; i<_n_rows; ++i)
+    for (unsigned int j=i; j<_n_cols; ++j)
+      {
+        for (unsigned int k=0; k<i; ++k)
+          A(i,j) -= A(i,k) * A(j,k);
+
+        if (i == j)
+          {
+            if (A(i,i) <= T(0))
+              throw std::runtime_error("Matrix is not SPD!");
+
+            A(i,i) = sqrt(A(i,j));
+          }
+        else
+          A(j,i) = A(i,j) / A(i,i);
+      }
+}
+
+
+
+template <class T>
+void Matrix<T>::_cholesky_back_substitute(std::vector<T>& x, const std::vector<T>& b) const
+{
+  // A convenient reference to *this
+  const Matrix<T> & A = *this;
+
+  // Now compute the solution to Ax =b using the factorization.
+  x.resize(_n_rows);
+
+  // Solve for Ly=b
+  for (unsigned int i=0; i<_n_cols; ++i)
+    {
+      T temp = b[i];
+
+      for (unsigned int k=0; k<i; ++k)
+        temp -= A(i,k) * x[k];
+
+      x[i] = temp / A(i,i);
+    }
+
+  // Solve for L^T x = y
+  for (unsigned int i=0; i<_n_cols; ++i)
+    {
+      const unsigned int ib = (_n_cols - 1) - i;
+
+      for (unsigned int k=(ib+1); k<_n_cols; ++k)
+        x[ib] -= A(k,ib) * x[k];
+
+      x[ib] /= A(ib,ib);
     }
 }
 
