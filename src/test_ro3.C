@@ -350,7 +350,7 @@ void test_ro3(unsigned int d,
           // nlcg(solver_data);
 
           // Root-finding step
-          // converged = newton(solver_data);
+          converged = newton(solver_data);
 
           // Report one residual value per cycle
           if (n_cycles > 1)
@@ -378,9 +378,12 @@ void test_ro3(unsigned int d,
         }
 
       // Debugging: we didn't converge, but maybe it was still promising?
-      std::cout << "Solution is *not* converged!" << std::endl;
-      std::cout << "u=" << std::endl;
-      print(u);
+      if (!converged)
+        {
+          std::cout << "Solution is *not* converged!" << std::endl;
+          std::cout << "u=" << std::endl;
+          print(u);
+        }
 
     } // end loop over n_tests
 }

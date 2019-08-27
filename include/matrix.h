@@ -1,12 +1,14 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+// C++ includes
 #include <iostream>
 #include <vector>
 #include <iomanip>
 #include <stdlib.h> // exit
 #include <stdexcept>
 #include <assert.h>
+#include <sstream>
 
 /**
  * Templated matrix class implementing operations needed for
@@ -386,7 +388,11 @@ void Matrix<T>::_cholesky_decompose()
         if (i == j)
           {
             if (A(i,i) <= T(0))
-              throw std::runtime_error("Matrix is not SPD!");
+              {
+                std::ostringstream oss;
+                oss << "Matrix is not SPD!\n" << "Cholesky: A(i,i) = " << A(i,i);
+                throw std::runtime_error(oss.str().c_str());
+              }
 
             A(i,i) = sqrt(A(i,j));
           }

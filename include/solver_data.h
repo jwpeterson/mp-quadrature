@@ -209,8 +209,9 @@ struct CheckFeasibility
       }
 
     // 1.) No parameters can be negative (or exactly zero).
+    // In fact, they probably shouldn't be too small, either!
     for (unsigned int q=0; q<trial_u.size(); ++q)
-      if (trial_u[q] <= 0.)
+      if (trial_u[q] <= 1.e-4)
         {
           // Debugging:
           // std::cout << "trial_u is infeasible due to parameter <= 0!"

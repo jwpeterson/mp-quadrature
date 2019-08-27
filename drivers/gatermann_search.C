@@ -34,12 +34,13 @@ int main()
   mpfr_set_default_prec(256);
 
   // Varies the sequence of pseudorandom numbers returned by random().
-  srandom(1566877491);
+  // srandom(1566877491);
+  // srandom(1566880715); // this seed converged for d==7
 
   // Use the current time since epoch as a seed.
-  // time_t seed = time(nullptr);
-  // std::cout << "seed=" << seed << std::endl;
-  // srandom(seed);
+  time_t seed = time(nullptr);
+  std::cout << "seed=" << seed << std::endl;
+  srandom(seed);
 
   // The max degree of polynomials the rule is supposed to integrate
   // exactly (user input).
@@ -66,7 +67,7 @@ int main()
   // Set parameters to be used by solvers
   SolverData solver_data;
   solver_data.verbose = true;
-  solver_data.maxits = 150;
+  solver_data.maxits = 50;
   solver_data.residual_and_jacobian = ResidualAndJacobian(d);
   solver_data.check_feasibility = CheckFeasibility(d);
   solver_data.do_backtracking = true;

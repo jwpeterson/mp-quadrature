@@ -80,7 +80,7 @@ bool newton(SolverData & solver_data)
           mpfr_class alpha = mpfr_class(1);
           bool linesearch_converged = false;
           // 2^(-50) ~ 9e-16
-          for (unsigned int back=0; back<50; ++back)
+          for (unsigned int back=0; back<25; ++back)
             {
               // std::cout << "Trying step with alpha=" << alpha << std::endl;
               trial_u = u - alpha * du;
@@ -131,6 +131,7 @@ bool newton(SolverData & solver_data)
               // subtract_scaled(u, alpha, du);
 
               // 2.) Quit
+              std::cout << "Linesearch failed to find acceptable step." << std::endl;
               break;
             }
         }
@@ -215,7 +216,7 @@ bool newton_min(SolverData & solver_data)
       hess.clear();
       hess.resize(n,n);
 
-      // One part of the Hessian is jac^T * jac
+      // One part of the Hessian is jac^T * jac. I think this is guaranteed to be SPD?!
       for (unsigned int i=0; i<n; ++i)
         for (unsigned int j=0; j<n; ++j)
           for (unsigned int k=0; k<n; ++k)
@@ -234,6 +235,10 @@ bool newton_min(SolverData & solver_data)
 
       // Finite differencing parameter. I tried several different values
       // for this, but the results did not seem to be very sensitve to it?
+      //
+      // Note: I confirmed that adding this contribution to the Hessian maintains
+      // its symmetry, but apparently makes it not SPD? Whereas J^T * J is always
+      // SPD...
       mpfr_class eps(1.e-12);
 
       for (unsigned int j=0; j<n; ++j)
@@ -261,16 +266,26 @@ bool newton_min(SolverData & solver_data)
       // hess.print();
 
       // Solve Hessian system for update, -du.
-      try
+      while (true)
         {
-          hess.lu_solve(du, grad_f);
-        }
-      catch (const std::exception & e)
-        {
-          // Matrix is singular, so we break out of the while loop
-          // with converged==false.
-          std::cout << "newton_min(): " << e.what() << std::endl;
-          break;
+          try
+            {
+              auto hess_copy = hess;
+              hess_copy.cholesky_solve(du, grad_f);
+              // std::cout << "Solve succeeded!" << std::endl;
+              break;
+            }
+          catch (const std::exception & e)
+            {
+              // Matrix is singular or not SPD. Let's add beta*I
+              // std::cout << "newton_min(): " << e.what() << std::endl;
+
+              // We can add some a factor which is proportional to the
+              // diagonal existing diagonal but that didn't work very well.
+              mpfr_class beta(1);
+              for (unsigned int i=0; i<n; ++i)
+                hess(i,i) += beta; // * abs(hess(i,i));
+            }
         }
 
       // Debugging
