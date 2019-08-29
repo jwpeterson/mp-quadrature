@@ -191,25 +191,75 @@ void test_ro3(unsigned int d,
 //          };
 
       // Debugging: set initial guess to known solution for 12 point, degree=7 case.
-// if (d==7)
-//      u =
+//      if (d==7)
 //        {
-//          2.65e-02, // w1
-//          6.23e-02, // x1
-//          6.75e-02, // y1
+//          u =
+//            {
+//              2.65e-02, // w1
+//              6.23e-02, // x1
+//              6.75e-02, // y1
 //
-//          4.38e-02, // w2
-//          5.52e-02, // x2
-//          3.21e-01, // y2
+//              4.38e-02, // w2
+//              5.52e-02, // x2
+//              3.21e-01, // y2
 //
-//          2.87e-02, // w3
-//          3.43e-02, // x3
-//          6.60e-01, // y3
+//              2.87e-02, // w3
+//              3.43e-02, // x3
+//              6.60e-01, // y3
 //
-//          6.74e-02, // w4
-//          5.15e-01, // x4
-//          2.77e-01, // y4
-//        };
+//              6.74e-02, // w4
+//              5.15e-01, // x4
+//              2.77e-01, // y4
+//            };
+//
+//          // Check that if we change the order of the orbits, this
+//          // is still a solution...
+//          std::cout << "u before permutation=" << std::endl;
+//          print(u);
+//
+//          // Permute orbits 1 and 2
+//          Matrix<mpfr_class> P12(u.size(), u.size());
+//          P12.get_values() =
+//            {
+//              0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+//              0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
+//              0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+//              1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+//              0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+//              0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+//              0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
+//              0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+//              0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
+//              0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+//              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+//              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+//            };
+//
+//          // Permute orbits 1 and 3
+//          Matrix<mpfr_class> P13(u.size(), u.size());
+//          P13.get_values() =
+//            {
+//              0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0,
+//              0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0,
+//              0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0,
+//              0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0,
+//              0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0,
+//              0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0,
+//              1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+//              0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+//              0, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+//              0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0,
+//              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+//              0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1,
+//            };
+//
+//          // Apply a sequence of permutations
+//          u = P12 * u;
+//          u = P13 * u;
+//
+//          std::cout << "u after permutation=" << std::endl;
+//          print(u);
+//        }
 
       // This rule is reported in Cools & Haegemans TW96 for degree=8
       // but it seems quite dubious to me as one of the weights is
@@ -346,7 +396,7 @@ void test_ro3(unsigned int d,
         {
           // Minimization step
           // gradient_descent(solver_data);
-          newton_min(solver_data);
+          // newton_min(solver_data);
           // nlcg(solver_data);
 
           // Root-finding step

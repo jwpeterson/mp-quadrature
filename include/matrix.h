@@ -102,6 +102,13 @@ public:
    */
   T asymmetry() const;
 
+  /**
+   * Allow direct access to read/write the entries of _val.
+   * Warning: Don't change the size of _val without also updating
+   * The _n_rows and _n_cols parameters!
+   */
+  std::vector<T> & get_values() { return _val; }
+
 private:
   /**
    * Ingredients of the lu_solve() function.
