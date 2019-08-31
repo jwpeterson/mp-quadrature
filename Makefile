@@ -34,13 +34,18 @@ MPQ_DIR ?= $(shell pwd)
 LIBNAME = libmpquad
 MPQ_LIB = -L./lib -lmpquad
 
-ALL_INCLUDES=$(GMP_INCLUDE) $(MPFR_INCLUDE) $(GMPFRXX_INCLUDE) $(MPQ_INCLUDE)
+# FIXME: configure for nlopt.
+NLOPT_DIR := /home/jwpeterson/software/libmesh_install/nlopt
+NLOPT_INCLUDE := -I$(NLOPT_DIR)/include
+NLOPT_LIBS := -L$(NLOPT_DIR)/lib -lnlopt
+
+ALL_INCLUDES=$(GMP_INCLUDE) $(MPFR_INCLUDE) $(GMPFRXX_INCLUDE) $(MPQ_INCLUDE) $(NLOPT_INCLUDE)
 
 # A note on static library linking (http://stackoverflow.com/questions/45135/linker-order-gcc)
 # If any [static] library A depends on symbols defined in library B,
 # then library A should appear first in the list supplied to the
 # linker.
-ALL_LIBS=$(MPQ_LIB) $(GMPFRXX_LIBS) $(MPFR_LIBS) $(GMP_LIBS)
+ALL_LIBS=$(MPQ_LIB) $(GMPFRXX_LIBS) $(MPFR_LIBS) $(GMP_LIBS) $(NLOPT_LIBS)
 
 # Flags to turn on extra debugging and print routines.
 #EXTRA_FLAGS=-g -DDEBUG
