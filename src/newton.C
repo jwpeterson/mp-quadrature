@@ -10,6 +10,9 @@ bool newton(SolverData & solver_data)
   mpfr_class divtol = solver_data.divtol;
   mpfr_class alphamin = solver_data.alphamin;
   bool do_backtracking = solver_data.do_backtracking;
+  // If do_backtracking is true, do we also require the backtracking
+  // to produce a residual reduction before accepting the step?
+  bool residual_reduction_required = solver_data.residual_reduction_required;
   unsigned iter = 0;
   unsigned int maxits = solver_data.maxits;
   bool converged = false;
@@ -91,8 +94,10 @@ bool newton(SolverData & solver_data)
               //   std::cout << "alpha = " << alpha
               //             << ", trial_residual = " << trial_residual << std::endl;
 
-              // Was the residual reduced?
-              // bool residual_reduced = trial_residual < residual_norm;
+              // Was the residual reduced? (Or do we actually care?)
+              // If we don't care, just set this flag to true.
+              bool residual_reduced =
+                residual_reduction_required ? (trial_residual < residual_norm) : true;
 
               // Check feasibility of the proposed solution.
               bool feasible = check_feasibility(trial_u);
@@ -109,7 +114,8 @@ bool newton(SolverData & solver_data)
               //             << ", trial solution was not feasible!"
               //             << std::endl;
 
-              if (/*residual_reduced &&*/feasible)
+
+              if (residual_reduced && feasible)
                 {
                   // Accept this trial solution
                   u = trial_u;

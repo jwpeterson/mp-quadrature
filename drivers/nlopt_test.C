@@ -97,6 +97,7 @@ int main()
   solver_data.residual_and_jacobian = ResidualAndJacobian(d);
   solver_data.check_feasibility = CheckFeasibility(d);
   solver_data.do_backtracking = true;
+  solver_data.residual_reduction_required = true;
 
   // "GN" = global derivative-free optimization
   // nlopt_algorithm alg = NLOPT_GN_DIRECT_L;
@@ -279,45 +280,53 @@ int main()
   //     2.77e-01, // y4
   //   };
 
-  std::vector<double> x;
-  if (n_centroid)
-    x.push_back(sixth * double(random())/RAND_MAX);
-
-  for (unsigned int i=0; i<n_ro3; ++i)
+  while (true)
     {
-      x.push_back(sixth * double(random())/RAND_MAX);
-      x.push_back(double(random())/RAND_MAX);
-      x.push_back(double(random())/RAND_MAX);
-    }
+      std::vector<double> x;
+      if (n_centroid)
+        x.push_back(sixth * double(random())/RAND_MAX);
 
-  // std::cout << "x=" << std::endl;
-  // print(x);
+      for (unsigned int i=0; i<n_ro3; ++i)
+        {
+          x.push_back(sixth * double(random())/RAND_MAX);
+          x.push_back(double(random())/RAND_MAX);
+          x.push_back(double(random())/RAND_MAX);
+        }
 
-  // Will be set to the minimum objective value, upon return.
-  double minf;
-  nlopt_result res = nlopt_optimize(opt, x.data(), &minf);
+      // std::cout << "x=" << std::endl;
+      // print(x);
 
-  // Call the optimization routine
-  if (res < 0) {
-    std::cout << "nlopt failed!\n";
-  }
-  else
-    {
-      std::cout << "nlopt converged with reason: " << nlopt_result_to_string(res) << std::endl;
-      std::cout << "found minimum " << minf << " at " << std::endl;
-      print(x);
+      // Will be set to the minimum objective value, upon return.
+      double minf;
+      nlopt_result res = nlopt_optimize(opt, x.data(), &minf);
 
-      // Set solver_data.u = x
-      solver_data.u.resize(dim);
-      for (unsigned int i=0; i<dim; ++i)
-        solver_data.u[i] = x[i];
+      // Call the optimization routine
+      if (res < 0) {
+        std::cout << "nlopt failed!\n";
+      }
+      else
+        {
+          std::cout << "nlopt converged with reason: " << nlopt_result_to_string(res) << std::endl;
+          std::cout << "found minimum " << minf << " at " << std::endl;
+          print(x);
 
-      // Call our Newton solver, using the nlopt solution as the initial guess.
-      bool converged = newton(solver_data);
+          // Set solver_data.u = x
+          solver_data.u.resize(dim);
+          for (unsigned int i=0; i<dim; ++i)
+            solver_data.u[i] = x[i];
 
-      if (!converged)
-        std::cout << "Solution is *not* converged." << std::endl;
-  }
+          // Call our Newton solver, using the nlopt solution as the initial guess.
+          bool converged = newton(solver_data);
+
+          if (!converged)
+            std::cout << "Solution is *not* converged." << std::endl;
+          else
+            {
+              std::cout << "Solution is converged!" << std::endl;
+              print(solver_data.u);
+            }
+        }
+    } // end while(true)
 
   // Clean up
   nlopt_destroy(opt);
