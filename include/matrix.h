@@ -1,10 +1,14 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+// C++ includes
 #include <iostream>
 #include <vector>
 #include <iomanip>
 #include <stdlib.h> // exit
+#include <stdexcept>
+#include <assert.h>
+#include <sstream>
 
 /**
  * Templated matrix class implementing operations needed for
@@ -72,12 +76,51 @@ public:
    */
   void lu_solve(std::vector<T>& x, const std::vector<T>& b);
 
+  /**
+   * Only for symmetric positive definite matrices. Factors the
+   * matrix into LL^T and then does back substitution. This overwrites
+   * the matrix.
+   */
+  void cholesky_solve(std::vector<T>& x, const std::vector<T>& b);
+
+  /**
+   * Matrix-vector product
+   * Returns y = (*this) * x
+   */
+  std::vector<T> operator * (const std::vector<T> & x);
+
+  /**
+   * Transposed Matrix-vector product
+   * Returns y = (*this)^T * x
+   */
+  std::vector<T> matvec_transpose (const std::vector<T> & x);
+
+  /**
+   * Compute a measure of the matrix asymmetry given by:
+   * |a(i,j) - a(j,i)|
+   *  Useful for debugging.
+   */
+  T asymmetry() const;
+
+  /**
+   * Allow direct access to read/write the entries of _val.
+   * Warning: Don't change the size of _val without also updating
+   * The _n_rows and _n_cols parameters!
+   */
+  std::vector<T> & get_values() { return _val; }
+
 private:
   /**
    * Ingredients of the lu_solve() function.
    */
   void _lu_decompose();
   void _lu_back_substitute(std::vector<T>& x, const std::vector<T>& b) const;
+
+  /**
+   * Ingredients of the cholesky_solve() function.
+   */
+  void _cholesky_decompose();
+  void _cholesky_back_substitute(std::vector<T>& x, const std::vector<T>& b) const;
 
   /**
    * Private data members.
@@ -103,8 +146,7 @@ Matrix<T>::Matrix(unsigned n_rows, unsigned n_cols)
 
 
 template <class T>
-Matrix<T>::~Matrix()
-{}
+Matrix<T>::~Matrix() = default;
 
 
 
@@ -211,6 +253,21 @@ void Matrix<T>::lu_solve(std::vector<T>& x, const std::vector<T>& b)
 
 
 
+template <class T>
+void Matrix<T>::cholesky_solve(std::vector<T>& x, const std::vector<T>& b)
+{
+  if (_n_rows != _n_cols)
+    {
+      std::cerr << "Error, cannot Cholesky solve non-square matrix!" << std::endl;
+      exit(1);
+    }
+
+  this->_cholesky_decompose();
+  this->_cholesky_back_substitute(x, b);
+}
+
+
+
 
 template <class T>
 void Matrix<T>::_lu_decompose()
@@ -252,11 +309,8 @@ void Matrix<T>::_lu_decompose()
         }
 
       // If the max abs entry found is zero, the matrix is singular
-      if (A(i,i) == 0.)
-        {
-          std::cerr << "Matrix is singular!" << std::endl;
-          exit(1);
-        }
+      if (A(i,i) == T(0))
+        throw std::runtime_error("Matrix is singular!");
 
       // Scale upper triangle entries of row i by the diagonal entry
       // Note: don't scale the diagonal entry itself!
@@ -324,5 +378,112 @@ void Matrix<T>::_lu_back_substitute(std::vector<T>& x, const std::vector<T>& b) 
     }
 }
 
+
+
+template <class T>
+void Matrix<T>::_cholesky_decompose()
+{
+  // A convenient reference to *this
+  Matrix<T> & A = *this;
+
+  for (unsigned int i=0; i<_n_rows; ++i)
+    for (unsigned int j=i; j<_n_cols; ++j)
+      {
+        for (unsigned int k=0; k<i; ++k)
+          A(i,j) -= A(i,k) * A(j,k);
+
+        if (i == j)
+          {
+            if (A(i,i) <= T(0))
+              {
+                std::ostringstream oss;
+                oss << "Matrix is not SPD!\n" << "Cholesky: A(i,i) = " << A(i,i);
+                throw std::runtime_error(oss.str().c_str());
+              }
+
+            A(i,i) = sqrt(A(i,j));
+          }
+        else
+          A(j,i) = A(i,j) / A(i,i);
+      }
+}
+
+
+
+template <class T>
+void Matrix<T>::_cholesky_back_substitute(std::vector<T>& x, const std::vector<T>& b) const
+{
+  // A convenient reference to *this
+  const Matrix<T> & A = *this;
+
+  // Now compute the solution to Ax =b using the factorization.
+  x.resize(_n_rows);
+
+  // Solve for Ly=b
+  for (unsigned int i=0; i<_n_cols; ++i)
+    {
+      T temp = b[i];
+
+      for (unsigned int k=0; k<i; ++k)
+        temp -= A(i,k) * x[k];
+
+      x[i] = temp / A(i,i);
+    }
+
+  // Solve for L^T x = y
+  for (unsigned int i=0; i<_n_cols; ++i)
+    {
+      const unsigned int ib = (_n_cols - 1) - i;
+
+      for (unsigned int k=(ib+1); k<_n_cols; ++k)
+        x[ib] -= A(k,ib) * x[k];
+
+      x[ib] /= A(ib,ib);
+    }
+}
+
+
+
+template <class T>
+std::vector<T>
+Matrix<T>::operator * (const std::vector<T> & x)
+{
+  std::vector<T> y(_n_rows);
+  for (unsigned int i=0; i<_n_rows; ++i)
+    for (unsigned int j=0; j<_n_cols; ++j)
+      y[i] += (*this)(i,j) * x[j];
+
+  return y;
+}
+
+
+
+template <class T>
+std::vector<T> Matrix<T>::matvec_transpose (const std::vector<T> & x)
+{
+  std::vector<T> y(_n_cols);
+  for (unsigned int i=0; i<_n_cols; ++i)
+    for (unsigned int j=0; j<_n_rows; ++j)
+      y[i] += (*this)(j,i) * x[j];
+
+  return y;
+}
+
+
+
+template <class T>
+T Matrix<T>::asymmetry() const
+{
+  // Only for square matrices
+  assert(_n_rows == _n_cols);
+
+  T asymmetry(0);
+
+  for (unsigned int i=0; i<_n_rows; ++i)
+    for (unsigned int j=i+1; j<_n_cols; ++j)
+      asymmetry += abs((*this)(i,j) - (*this)(j,i));
+
+  return asymmetry;
+}
 
 #endif // __matrix_h__
