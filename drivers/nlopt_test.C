@@ -18,6 +18,8 @@ int main()
 // mp-quadrature includes
 #include "solver_data.h"
 #include "newton.h"
+#include "gradient_descent.h"
+#include "nlcg.h"
 
 // nlopt includes
 #include <nlopt.h>
@@ -128,6 +130,15 @@ int main()
   // this is set by calling nlopt_set_local_optimizer().
   nlopt_algorithm alg = NLOPT_AUGLAG;
 
+  // MLSL also requires a local optimizer. MLSL is a multistart
+  // algorithm that performs a sequence of local optimizations, and
+  // uses a clustering heuristic to avoid repeated searches of the
+  // same local optima. Unfortunately, I let it run for a long time
+  // (over night) and it never produced any output even on the d==7
+  // problem which has a known solution, so I'm not really sure what
+  // it's doing or if it's even working?
+  // nlopt_algorithm alg = NLOPT_G_MLSL;
+
   // The problem dimension depends only on "d".
   unsigned int dim = (d*d + 3*d + 6)/6;
 
@@ -146,7 +157,8 @@ int main()
   // Set minimization algorithm and dimensionality
   nlopt_opt opt = nlopt_create(alg, dim);
 
-  if (alg == NLOPT_AUGLAG)
+  if (alg == NLOPT_AUGLAG ||
+      alg == NLOPT_G_MLSL)
     {
       // The objective function, bounds, and nonlinear-constraint
       // parameters of local_opt are ignored.
@@ -246,6 +258,42 @@ int main()
           x.push_back(double(random())/RAND_MAX);
         }
 
+      // For the d=10 case, the smallest objective function value
+      // (2.4432860276909146e-18) found was the
+      // following. Interestingly, it has all non-zero
+      // weights. Unfortunately, standard Newton iterations were not
+      // able to find a true solution nearby.  By doing some
+      // multiprecision Hessian iterations, I was able to reduce the
+      // objective function value ever so slightly to
+      // 2.277695250723979e-18, but it does in fact seem that it's a
+      // local minimum and *not* a zero of the original
+      // equations. This is immensely frustrating!
+      // if (d==10)
+      //   x = {
+      //     4.0982937046221364e-02,
+      //     1.9798492190714671e-02,
+      //     3.3095608903349873e-02,
+      //     3.8161345981027001e-01,
+      //     1.4994858159817931e-02,
+      //     1.0723552400713073e-01,
+      //     3.5017307536618969e-02,
+      //     3.6839421470875953e-02,
+      //     4.4070591601247633e-01,
+      //     1.4583079686880440e-01,
+      //     1.7605672332677621e-02,
+      //     3.8460650957081052e-02,
+      //     1.7059525415369317e-01,
+      //     2.0591306611632748e-02,
+      //     6.4450289076099920e-01,
+      //     3.2415668641540085e-01,
+      //     4.0452451678720927e-02,
+      //     1.7496389690339609e-01,
+      //     6.2927469367745104e-01,
+      //     2.7234852018090342e-03,
+      //     3.3649635977032091e-02,
+      //     9.6446038980717408e-01,
+      //   };
+
       // std::cout << "x=" << std::endl;
       // print(x);
 
@@ -269,7 +317,13 @@ int main()
             solver_data.u[i] = x[i];
 
           // Call our Newton solver, using the nlopt solution as the initial guess.
-          bool converged = newton(solver_data);
+          // One really frustrating thing that I found in the d==7 case was that,
+          // even when started very close to the true solution by using an initial
+          // guess converged by nlopt, Newton could still diverge.
+          // bool converged = newton(solver_data);
+          bool converged = newton_min(solver_data);
+          // bool converged = gradient_descent(solver_data);
+          // bool converged = nlcg(solver_data);
 
           if (!converged)
             std::cout << "Solution is *not* converged." << std::endl;
@@ -279,6 +333,9 @@ int main()
               print(solver_data.u);
             }
         }
+
+      // Debugging: exit after one iteration.
+      // break;
     } // end while(true)
 
   // Clean up

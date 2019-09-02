@@ -165,6 +165,7 @@ bool newton_min(SolverData & solver_data)
   mpfr_class alphamin = solver_data.alphamin;
   unsigned int maxits = solver_data.maxits;
   bool do_backtracking = solver_data.do_backtracking;
+  bool residual_reduction_required = solver_data.residual_reduction_required;
   unsigned iter = 0;
   bool converged = false;
 
@@ -217,6 +218,9 @@ bool newton_min(SolverData & solver_data)
       // std::cout << "grad_f=" << std::endl;
       // print(grad_f);
 
+      // if (solver_data.verbose)
+      //   std::cout << "|grad_f| = " << norm(grad_f) << std::endl;
+
       // Compute the Hessian. We will approximate the true Hessian by
       // finite differencing the Jacobian.
       hess.clear();
@@ -229,43 +233,40 @@ bool newton_min(SolverData & solver_data)
             hess(i,j) += jac(k,i) * jac(k,j);
 
       // Debugging: check symmetry of hessian
-      // std::cout << "asymmetry=" << hess.asymmetry() << std::endl;
+      // if (solver_data.verbose)
+      //   std::cout << "J^T * J asymmetry=" << hess.asymmetry() << std::endl;
 
-      // Choosing beta=1 initially is equivalent to taking one
-      // step of gradient descent. Note: this isn't part of the real
-      // Hessian, but it may be necessary to ensure the Hessian remains
-      // positive definite?
-      // mpfr_class beta(1);
-      // for (unsigned int i=0; i<n; ++i)
-      //   hess(i,i) += beta;
-
-      // Finite differencing parameter. I tried several different values
-      // for this, but the results did not seem to be very sensitve to it?
+      // Finite differencing parameter. I'm not sure I actually want
+      // to include this. J^T*J is guaranteed to be SPD, if we add
+      // this bit to it, that is no longer guaranteed. Also it's very
+      // expensive to do the finite differencing, and finally, the
+      // term we are adding is small when the residual is already
+      // small.
       //
       // Note: I confirmed that adding this contribution to the Hessian maintains
       // its symmetry, but apparently makes it not SPD? Whereas J^T * J is always
-      // SPD...
-      mpfr_class eps(1.e-12);
+      // SPD... One idea is that eps should probably depend on how close we are
+      // to the minimum, one way to do that is to have it be proportional to |grad_f|.
+//      mpfr_class eps = mpfr_class(1.e-8) * norm(grad_f);
+//      for (unsigned int j=0; j<n; ++j)
+//        {
+//          std::vector<mpfr_class> u_eps = u;
+//          u_eps[j] += eps;
+//
+//          // Compute Jacobian at u + eps
+//          residual_and_jacobian(nullptr, &djac, u_eps);
+//
+//          // Debugging
+//          // std::cout << "j=" << j << std::endl;
+//          // djac.print();
+//
+//          for (unsigned int k=0; k<n; ++k)
+//            for (unsigned int i=0; i<n; ++i)
+//              hess(i,j) += r[k] * (djac(k,i) - jac(k,i)) / eps;
+//        }
 
-      for (unsigned int j=0; j<n; ++j)
-        {
-          std::vector<mpfr_class> u_eps = u;
-          u_eps[j] += eps;
-
-          // Compute Jacobian at u + eps
-          residual_and_jacobian(nullptr, &djac, u_eps);
-
-          // Debugging
-          // std::cout << "j=" << j << std::endl;
-          // djac.print();
-
-          for (unsigned int k=0; k<n; ++k)
-            for (unsigned int i=0; i<n; ++i)
-              hess(i,j) += r[k] * (djac(k,i) - jac(k,i)) / eps;
-        }
-
-      // Debugging: check symmetry of hessian
-      // std::cout << "asymmetry=" << hess.asymmetry() << std::endl;
+//      if (solver_data.verbose)
+//        std::cout << "Full Hessian asymmetry=" << hess.asymmetry() << std::endl;
 
       // Debugging: print Hessian.
       // std::cout << "hess=" << std::endl;
@@ -277,8 +278,11 @@ bool newton_min(SolverData & solver_data)
           try
             {
               auto hess_copy = hess;
+              // Note: it seems to be possible to get different
+              // solutions depending on if you solve with Cholesky or
+              // LU...
               hess_copy.cholesky_solve(du, grad_f);
-              // std::cout << "Solve succeeded!" << std::endl;
+              // hess_copy.lu_solve(du, grad_f);
               break;
             }
           catch (const std::exception & e)
@@ -295,7 +299,11 @@ bool newton_min(SolverData & solver_data)
         }
 
       // Debugging
-      // print(du);
+      // if (solver_data.verbose)
+      //   {
+      //     std::cout << "du=" << std::endl;
+      //     print(du);
+      //   }
 
       // Line search
       mpfr_class alpha = mpfr_class(1);
@@ -303,7 +311,7 @@ bool newton_min(SolverData & solver_data)
 
       if (do_backtracking)
         {
-          for (unsigned int back=0; back<25; ++back)
+          for (unsigned int back=0; back<50; ++back)
             {
               // std::cout << "Trying step with alpha=" << alpha << std::endl;
               trial_u = u - alpha * du;
@@ -314,15 +322,19 @@ bool newton_min(SolverData & solver_data)
 
               // Check for feasibility of the solution
               bool feasible = check_feasibility(trial_u);
+              bool residual_reduced =
+                residual_reduction_required ? (trial_residual < residual) : true;
 
-              if (!feasible
-                  || trial_residual > residual
-                  )
+              // if (solver_data.verbose)
+              //   std::cout << "feasible = " << feasible << std::endl;
+
+              if (!feasible || !residual_reduced)
                 {
                   alpha /= 2;
 
                   // Debugging:
-                  // std::cout << "Trying step with alpha=" << alpha << std::endl;
+                  // if (solver_data.verbose)
+                  //   std::cout << "Trying step with alpha=" << alpha << std::endl;
                 }
               else
                 {
