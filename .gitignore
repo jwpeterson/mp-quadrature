@@ -14,6 +14,7 @@ drivers/dubiner_verify_double
 drivers/gatermann
 drivers/gatermann_search
 drivers/Ro3_deg6
+drivers/nlopt_test
 lib/
 *.a
 *.o

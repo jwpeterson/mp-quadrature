@@ -34,17 +34,24 @@ MPQ_DIR ?= $(shell pwd)
 LIBNAME = libmpquad
 MPQ_LIB = -L./lib -lmpquad
 
-ALL_INCLUDES=$(GMP_INCLUDE) $(MPFR_INCLUDE) $(GMPFRXX_INCLUDE) $(MPQ_INCLUDE)
+# Note: NLOPT_INCLUDE and NLOPT_LIB are set in Make.common
+ALL_INCLUDES=$(GMP_INCLUDE) $(MPFR_INCLUDE) $(GMPFRXX_INCLUDE) $(MPQ_INCLUDE) $(NLOPT_INCLUDE)
 
 # A note on static library linking (http://stackoverflow.com/questions/45135/linker-order-gcc)
 # If any [static] library A depends on symbols defined in library B,
 # then library A should appear first in the list supplied to the
 # linker.
-ALL_LIBS=$(MPQ_LIB) $(GMPFRXX_LIBS) $(MPFR_LIBS) $(GMP_LIBS)
+ALL_LIBS=$(MPQ_LIB) $(GMPFRXX_LIBS) $(MPFR_LIBS) $(GMP_LIBS) $(NLOPT_LIB)
 
 # Flags to turn on extra debugging and print routines.
 #EXTRA_FLAGS=-g -DDEBUG
 EXTRA_FLAGS=-Wall -O2 -std=c++11
+
+# Set a -D flag in EXTRA_FLAGS if we have nlopt. The alternative to this
+# is to use an mp_quadrature_config.h file that all sources include.
+ifeq ($(have_nlopt),yes)
+EXTRA_FLAGS += -DHAVE_NLOPT
+endif
 
 # The plus signs on these recursive make calls were required for Linux, otherwise I was getting:
 # warning: jobserver unavailable: using -j1.  Add `+' to parent make rule.

@@ -253,6 +253,7 @@ struct SolverData
     maxits(20),
     alphamin(1.e-3),
     do_backtracking(false),
+    residual_reduction_required(false),
     verbose(false) {}
 
   // Initial guess/solution vector
@@ -263,6 +264,7 @@ struct SolverData
   // smallest backtracking backtracking linesearch fraction
   mpfr_class alphamin;
   bool do_backtracking;
+  bool residual_reduction_required;
   bool verbose;
   ResidualAndJacobian residual_and_jacobian;
   CheckFeasibility check_feasibility;

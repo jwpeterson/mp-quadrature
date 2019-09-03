@@ -401,7 +401,7 @@ void Matrix<T>::_cholesky_decompose()
                 throw std::runtime_error(oss.str().c_str());
               }
 
-            A(i,i) = sqrt(A(i,j));
+            A(i,i) = sqrt(A(i,i));
           }
         else
           A(j,i) = A(i,j) / A(i,i);
