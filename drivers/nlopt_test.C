@@ -1,13 +1,28 @@
+// C++ includes
+#include <iostream>
+
+// nlopt includes. The preprocessor define is set on the compile line
+// with a -D flag.
+#ifndef HAVE_NLOPT
+
+int main()
+{
+  std::cout << "This driver requires nlopt. Install nlopt and then rerun configure, "
+            << "using the --with-nlopt-include and --with-nlopt-lib flags to specify "
+            << "its location." << std::endl;
+  return 0;
+}
+
+#else
+
 // mp-quadrature includes
 #include "solver_data.h"
 #include "newton.h"
 
-// nlopt includes
 #include <nlopt.h>
 
 // C/C++ includes
 #include <math.h>
-#include <iostream>
 #include <stdlib.h> // random
 
 double myfunc(unsigned n, const double *x, double *grad, void *my_func_data)
@@ -436,3 +451,5 @@ int main()
 // 2.9240305547971579e-02
 // 5.3756906280127539e-02
 // 2.0598528906603203e-01
+
+#endif // HAVE_NLOPT

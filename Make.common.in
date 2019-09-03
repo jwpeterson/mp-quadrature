@@ -8,10 +8,14 @@ hostos                = @host_os@
 CXX ?= g++
 CC  ?= gcc
 
+# Location of the (optional) NLOPT headers and libraries
+have_nlopt := @have_nlopt@
+NLOPT_INCLUDE=@NLOPT_INCLUDE@
+NLOPT_LIB=@NLOPT_LIB@
+
 # The libraries and include files for GMP & MPFR Unless the user
 # specifies something, these get set to /usr/include and /usr/lib,
 # which might be totally wrong for your system...
-
 GMP_INCLUDE=-I@withgmpinc@
 GMP_LIBS=-L@withgmplib@ -lgmpxx -L@withgmplib@ -lgmp
 
