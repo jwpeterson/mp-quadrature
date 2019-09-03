@@ -98,8 +98,14 @@ std::string nlopt_result_to_string(nlopt_result res)
 
 int main()
 {
-  std::cout.precision(16);
+  // You can't trust all these digits from doubles, but you can with
+  // mpfr_class objects.
+  std::cout.precision(32);
   std::cout.setf(std::ios_base::scientific);
+
+  // # of binary digits
+  // 53 binary digits is about what you normally get with a double.
+  mpfr_set_default_prec(256);
 
   // Use the current time since epoch as a seed.
   time_t seed = time(nullptr);
@@ -107,7 +113,7 @@ int main()
   std::cout << "seed=" << seed << std::endl;
   srandom(seed);
 
-  unsigned int d=7;
+  unsigned int d=10;
 
   SolverData solver_data;
   solver_data.verbose = true;
@@ -320,10 +326,11 @@ int main()
           // One really frustrating thing that I found in the d==7 case was that,
           // even when started very close to the true solution by using an initial
           // guess converged by nlopt, Newton could still diverge.
-          // bool converged = newton(solver_data);
-          bool converged = newton_min(solver_data);
-          // bool converged = gradient_descent(solver_data);
-          // bool converged = nlcg(solver_data);
+          bool converged = false;
+          converged = newton_min(solver_data);
+          converged = newton(solver_data);
+          // converged = gradient_descent(solver_data);
+          // converged = nlcg(solver_data);
 
           if (!converged)
             std::cout << "Solution is *not* converged." << std::endl;
