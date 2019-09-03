@@ -631,6 +631,9 @@ ac_includes_default="\
 
 ac_subst_vars='LTLIBOBJS
 LIBOBJS
+NLOPT_LIB
+NLOPT_INCLUDE
+have_nlopt
 CXXCPP
 ac_ct_CXX
 CXXFLAGS
@@ -672,6 +675,8 @@ withmpfrlib
 withmpfrinc
 withgmplib
 withgmpinc
+withnloptlib
+withnloptinc
 target_os
 target_vendor
 target_cpu
@@ -725,6 +730,8 @@ SHELL'
 ac_subst_files=''
 ac_user_opts='
 enable_option_checking
+with_nlopt_include
+with_nlopt_lib
 with_gmp_include
 with_gmp_lib
 with_mpfr_include
@@ -1373,6 +1380,9 @@ Optional Features:
 Optional Packages:
   --with-PACKAGE[=ARG]    use PACKAGE [ARG=yes]
   --without-PACKAGE       do not use PACKAGE (same as --with-PACKAGE=no)
+  --with-nlopt-include=PATH
+                          Specify the path for nlopt header files
+  --with-nlopt-lib=PATH   Specify the path for nlopt libraries
   --with-gmp-include=PATH Specify the path for GMP header files
   --with-gmp-lib=PATH     Specify the path for GMP libraries
   --with-mpfr-include=PATH
@@ -2354,6 +2364,28 @@ test -n "$target_alias" &&
 # that things like $abs_srcdir and $ac_abs_srcdir don't work at all
 # for this purpose...
 MY_TOP_SRCDIR=`pwd`
+
+# Specify location of nlopt headers (optional)
+
+# Check whether --with-nlopt-include was given.
+if test "${with_nlopt_include+set}" = set; then :
+  withval=$with_nlopt_include; withnloptinc=$withval
+else
+  withnloptinc=
+fi
+
+
+
+# Specify location of nlopt libs (optional)
+
+# Check whether --with-nlopt-lib was given.
+if test "${with_nlopt_lib+set}" = set; then :
+  withval=$with_nlopt_lib; withnloptlib=$withval
+else
+  withnloptlib=
+fi
+
+
 
 # Location of the GMP installation.  Defaults to `pwd`/gmp, which is
 # where the build_gmp_mpfr.sh script installs it.
@@ -15076,6 +15108,115 @@ else
 fi
 rm -f core conftest.err conftest.$ac_objext \
     conftest$ac_exeext conftest.$ac_ext
+
+
+# Test for working nlopt installation
+have_nlopt=no
+NLOPT_INCLUDE=
+NLOPT_LIB=
+
+if test "x$withnloptinc" != "x" && test "x$withnloptlib" != "x"; then :
+
+            NLOPT_INCLUDE="-I$withnloptinc"
+      NLOPT_LIB="-L$withnloptlib -lnlopt -lm"
+
+            CFLAGS_SAVED="$CFLAGS"
+      LIBS_SAVED="$LIBS"
+      CFLAGS="$CFLAGS $NLOPT_INCLUDE"
+      LIBS="$LIBS $NLOPT_LIB"
+
+            cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+/* end confdefs.h.  */
+
+
+          #include <math.h>
+          #include <nlopt.h>
+          #include <stdio.h>
+
+          double myfunc(unsigned n, const double *x, double *grad, void *my_func_data)
+          {
+          if (grad) {
+            grad[0] = 0.0;
+            grad[1] = 0.5 / sqrt(x[1]);
+           }
+           return sqrt(x[1]);
+          }
+
+          typedef struct
+          {
+            double a, b;
+          } my_constraint_data;
+
+          double myconstraint(unsigned n, const double *x, double *grad, void *data)
+          {
+            my_constraint_data *d = (my_constraint_data *) data;
+            double a = d->a, b = d->b;
+            if (grad) {
+              grad[0] = 3 * a * (a*x[0] + b) * (a*x[0] + b);
+              grad[1] = -1.0;
+            }
+            return ((a*x[0] + b) * (a*x[0] + b) * (a*x[0] + b) - x[1]);
+          }
+
+int
+main ()
+{
+
+          double lb[2] = { -HUGE_VAL, 0 }; /* lower bounds */
+          nlopt_opt opt;
+
+          opt = nlopt_create(NLOPT_LD_MMA, 2); /* algorithm and dimensionality */
+          nlopt_set_lower_bounds(opt, lb);
+          nlopt_set_min_objective(opt, myfunc, NULL);
+
+          my_constraint_data data[2] = { {2,0}, {-1,1} };
+          nlopt_add_inequality_constraint(opt, myconstraint, &data[0], 1e-8);
+          nlopt_add_inequality_constraint(opt, myconstraint, &data[1], 1e-8);
+          nlopt_set_xtol_rel(opt, 1e-4);
+          double x[2] = { 1.234, 5.678 };  /* some initial guess */
+          double minf; /* the minimum objective value, upon return */
+
+          if (nlopt_optimize(opt, x, &minf) < 0) {
+            printf("nlopt failed!\n");
+          }
+          else {
+            printf("found minimum at f(%g,%g) = %0.10g\n", x[0], x[1], minf);
+          }
+          nlopt_destroy(opt);
+          return 0;
+
+  ;
+  return 0;
+}
+
+_ACEOF
+if ac_fn_c_try_link "$LINENO"; then :
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: nlopt test program successfully linked!" >&5
+$as_echo "nlopt test program successfully linked!" >&6; }
+        have_nlopt=yes
+
+else
+
+        { $as_echo "$as_me:${as_lineno-$LINENO}: result: Trouble compiling/linking nlopt program, nlopt disabled" >&5
+$as_echo "Trouble compiling/linking nlopt program, nlopt disabled" >&6; }
+        have_nlopt=no
+        NLOPT_INCLUDE=
+        NLOPT_LIB=
+
+fi
+rm -f core conftest.err conftest.$ac_objext \
+    conftest$ac_exeext conftest.$ac_ext
+
+            CFLAGS="$CFLAGS_SAVED"
+      LIBS="$LIBS_SAVED"
+
+fi
+
+
+
+
+
 
 
 
