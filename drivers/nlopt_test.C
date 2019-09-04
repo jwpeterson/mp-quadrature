@@ -20,6 +20,7 @@ int main()
 #include "newton.h"
 #include "gradient_descent.h"
 #include "nlcg.h"
+#include "ro3.h"
 
 // nlopt includes
 #include <nlopt.h>
@@ -105,7 +106,8 @@ int main()
 
   // # of binary digits
   // 53 binary digits is about what you normally get with a double.
-  mpfr_set_default_prec(256);
+  // It's faster to comment this out while debugging.
+  // mpfr_set_default_prec(256);
 
   // Use the current time since epoch as a seed.
   time_t seed = time(nullptr);
@@ -113,9 +115,60 @@ int main()
   std::cout << "seed=" << seed << std::endl;
   srandom(seed);
 
-  unsigned int d=10;
+  // Test making d==3 Ro3 objects
+  // unsigned int d=3;
+  // Ro3 r(d, /*nc*/1, /*nv*/0, /*ne*/0, /*ng*/1); // 4 QP
+  // Ro3 r(d, /*nc*/0, /*nv*/0, /*ne*/2, /*ng*/0); // 6 QP
+  // Ro3 r(d, /*nc*/1, /*nv*/1, /*ne*/1, /*ng*/0); // 7 QP
 
-  SolverData solver_data;
+  // d==4, dim==5
+  // unsigned int d=4;
+  // Ro3 r(d, /*nc*/0, /*nv*/0, /*ne*/1, /*ng*/1); // 6 QP
+  // Ro3 r(d, /*nc*/1, /*nv*/1, /*ne*/0, /*ng*/1); // 7 QP
+  // Ro3 r(d, /*nc*/1, /*nv*/0, /*ne*/2, /*ng*/0); // 7 QP
+  // Ro3 r(d, /*nc*/0, /*nv*/1, /*ne*/2, /*ng*/0); // 9 QP
+
+  // d==7, dim=12
+  unsigned int d=7;
+  Ro3 r(d, /*nc*/0, /*nv*/0, /*ne*/0, /*ng*/4); // 12 QP
+
+  // d==10, dim=22
+  // unsigned int d=10;
+  // Ro3 r(d, /*nc*/1, /*nv*/0, /*ne*/0, /*ng*/7); // 22 QP
+  // Ro3 r(d, /*nc*/0, /*nv*/1, /*ne*/0, /*ng*/7); // 24 QP
+  // Ro3 r(d, /*nc*/0, /*nv*/0, /*ne*/2, /*ng*/6); // 24 QP
+  // Ro3 r(d, /*nc*/1, /*nv*/1, /*ne*/1, /*ng*/6); // 25 QP
+
+  // Print information.
+  // std::cout << "Rule has " << r.n_qp() << " quadrature points." << std::endl;
+  //
+  // std::cout << "CENTROID: ["
+  //           << r.first_dof(Ro3::CENTROID)
+  //           << ","
+  //           << r.last_dof(Ro3::CENTROID)
+  //           << ")" << std::endl;
+  //
+  // std::cout << "VERTEX: ["
+  //           << r.first_dof(Ro3::VERTEX)
+  //           << ","
+  //           << r.last_dof(Ro3::VERTEX)
+  //           << ")" << std::endl;
+  //
+  // std::cout << "EDGE: ["
+  //           << r.first_dof(Ro3::EDGE)
+  //           << ","
+  //           << r.last_dof(Ro3::EDGE)
+  //           << ")" << std::endl;
+  //
+  // std::cout << "GENERAL: ["
+  //           << r.first_dof(Ro3::GENERAL)
+  //           << ","
+  //           << r.last_dof(Ro3::GENERAL)
+  //           << ")" << std::endl;
+  //
+  // return 0;
+
+  SolverData solver_data(r);
   solver_data.verbose = true;
   solver_data.maxits = 50;
   solver_data.residual_and_jacobian = ResidualAndJacobian(d);
@@ -146,19 +199,7 @@ int main()
   // nlopt_algorithm alg = NLOPT_G_MLSL;
 
   // The problem dimension depends only on "d".
-  unsigned int dim = (d*d + 3*d + 6)/6;
-
-  // There will be no centroid if dim is a multiple of 3.
-  unsigned int n_centroid = dim % 3;
-
-  // The number of Ro3 orbits
-  unsigned int n_ro3 = dim / 3;
-
-  if (n_centroid == 2)
-    {
-      std::cout << "Error: rules with 2 centroid points don't make sense." << std::endl;
-      exit(1);
-    }
+  unsigned int dim = r.dim();
 
   // Set minimization algorithm and dimensionality
   nlopt_opt opt = nlopt_create(alg, dim);
@@ -178,19 +219,14 @@ int main()
   // default-constructed values of the std vector for lb. All weights
   // for 3-point orbits must be less than 1/6, which is (1/3)*(ref. element area).
   // Everything else must be less than 1.
-  std::vector<double> lb(dim);
+  std::vector<double> lb;
   std::vector<double> ub;
+  r.bounds(lb, ub);
 
-  double sixth = 1./6;
-  if (n_centroid)
-    ub.push_back(sixth);
-
-  for (unsigned int i=0; i<n_ro3; ++i)
-    {
-      ub.push_back(sixth);
-      ub.push_back(1);
-      ub.push_back(1);
-    }
+  // Debugging: Print entries of ub
+  // std::cout << "ub=" << std::endl;
+  // for (const auto & val : ub)
+  //   std::cout << val << std::endl;
 
   nlopt_set_lower_bounds(opt, lb.data());
   nlopt_set_upper_bounds(opt, ub.data());
@@ -200,9 +236,10 @@ int main()
   // per inequality constraint, and each time pass it the index of the
   // x DOF of the orbit which is to be constrained.
   std::vector<unsigned int> data;
-  for (unsigned int i=0; i<n_ro3; ++i)
-    data.push_back(3*i + 1 + n_centroid);
+  r.inequality_constraint_indices(data);
 
+  // Debugging:
+  // std::cout << "data=" << std::endl;
   // print(data);
 
   for (unsigned int c=0; c<data.size(); ++c)
@@ -217,18 +254,18 @@ int main()
   // that they can just run forever.
   // nlopt_set_maxeval(opt, 9999);
 
+  // Solution vector
+  std::vector<double> x;
+
   while (true)
     {
-      std::vector<double> x;
-      if (n_centroid)
-        x.push_back(sixth * double(random())/RAND_MAX);
+      // Generate random initial guess.
+      r.guess(x);
 
-      for (unsigned int i=0; i<n_ro3; ++i)
-        {
-          x.push_back(sixth * double(random())/RAND_MAX);
-          x.push_back(double(random())/RAND_MAX);
-          x.push_back(double(random())/RAND_MAX);
-        }
+      // Debugging: Print entries of x
+      // std::cout << "initial guess=" << std::endl;
+      // for (const auto & val : x)
+      //   std::cout << val << std::endl;
 
       // The d=7 solution with many digits of accuracy is:
       // 2.6517028157436251428754180460739e-2
@@ -244,25 +281,25 @@ int main()
       // 5.1584233435359177925746338682643e-1
       // 2.7771616697639178256958187139372e-1
 
-      // if (d==7)
-      // x =
-      //   {
-      //     2.65e-02, // w1
-      //     6.23e-02, // x1
-      //     6.75e-02, // y1
-      //
-      //     4.38e-02, // w2
-      //     5.52e-02, // x2
-      //     3.21e-01, // y2
-      //
-      //     2.87e-02, // w3
-      //     3.43e-02, // x3
-      //     6.60e-01, // y3
-      //
-      //     6.74e-02, // w4
-      //     5.15e-01, // x4
-      //     2.77e-01, // y4
-      //   };
+      if (d==7)
+        x =
+          {
+            2.65e-02, // w1
+            6.23e-02, // x1
+            6.75e-02, // y1
+
+            4.38e-02, // w2
+            5.52e-02, // x2
+            3.21e-01, // y2
+
+            2.87e-02, // w3
+            3.43e-02, // x3
+            6.60e-01, // y3
+
+            6.74e-02, // w4
+            5.15e-01, // x4
+            2.77e-01, // y4
+          };
 
       // For the d=10 case, the smallest objective function value
       // (2.4432860276909146e-18) found was the

@@ -5,6 +5,7 @@
 #include "matrix.h"
 #include "exact.h"
 #include "vect.h"
+#include "ro3.h"
 
 // Support library headers
 #include "mpfr.h"
@@ -247,14 +248,16 @@ struct CheckFeasibility
 // Parameters that control the behavior of solvers.
 struct SolverData
 {
-  SolverData() :
+  SolverData(const Ro3 & ro3_in) :
     tol(1.e-36),
     divtol(1.e16),
     maxits(20),
     alphamin(1.e-3),
     do_backtracking(false),
     residual_reduction_required(false),
-    verbose(false) {}
+    verbose(false),
+    ro3(ro3_in)
+  {}
 
   // Initial guess/solution vector
   std::vector<mpfr_class> u;
@@ -268,6 +271,7 @@ struct SolverData
   bool verbose;
   ResidualAndJacobian residual_and_jacobian;
   CheckFeasibility check_feasibility;
+  Ro3 ro3;
 };
 
 #endif

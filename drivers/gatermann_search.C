@@ -5,6 +5,7 @@
 #include "vect.h"
 #include "solver_data.h"
 #include "test_ro3.h"
+#include "ro3.h"
 
 // C++ includes
 #include <vector>
@@ -45,7 +46,10 @@ int main()
   // The max degree of polynomials the rule is supposed to integrate
   // exactly (user input).
   // Invalid degrees are: 2, 4, 11, 13, ...
+
+  // d==7, dim=12
   unsigned int d=7;
+  Ro3 r(d, /*nc*/0, /*nv*/0, /*ne*/0, /*ng*/4); // 12 QP
 
   // Testing
   // std::cout << mpfr_class(exact_tri(0,0)) << std::endl; // =0.5
@@ -65,7 +69,7 @@ int main()
   unsigned int n_tests = 1;
 
   // Set parameters to be used by solvers
-  SolverData solver_data;
+  SolverData solver_data(r);
   solver_data.verbose = true;
   solver_data.maxits = 50;
   solver_data.residual_and_jacobian = ResidualAndJacobian(d);
