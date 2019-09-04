@@ -46,7 +46,9 @@ bool newton(SolverData & solver_data)
       mpfr_class residual_norm = norm(r);
 
       if (solver_data.verbose)
-        std::cout << "Iteration " << iter << ", residual_norm=" << residual_norm << std::endl;
+        std::cout << "newton: Iteration " << iter
+                  << ", residual_norm=" << residual_norm
+                  << std::endl;
 
       if (residual_norm < tol)
         {
@@ -198,7 +200,9 @@ bool newton_min(SolverData & solver_data)
       mpfr_class residual = 0.5 * dot(r,r);
 
       if (solver_data.verbose)
-        std::cout << "Iteration " << iter << ", residual = " << residual << std::endl;
+        std::cout << "newton_min: Iteration " << iter
+                  << ", residual = " << residual
+                  << std::endl;
 
       // If the residual is small enough, return true.
       if (residual < tol)
