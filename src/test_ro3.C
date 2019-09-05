@@ -9,16 +9,15 @@
 // C++ includes
 #include <stdlib.h> // random()
 
-void test_ro3(unsigned int d,
-              unsigned int n_tests,
+void test_ro3(unsigned int n_tests,
               SolverData & solver_data)
 {
   // The number of unknowns
-  unsigned int N = (d*d + 3*d + 6)/6;
+  unsigned int N = solver_data.ro3.dim();
   // The number of centroid points (0 or 1)
-  unsigned int n_centroid = N % 3;
+  unsigned int n_centroid = solver_data.ro3.nc;
   // The number of Ro3 points
-  unsigned int n_ro3 = N / 3;
+  unsigned int n_ro3 = solver_data.ro3.ng;
 
   // Debugging
   std::cout << "N = " << N << std::endl;
@@ -406,7 +405,7 @@ void test_ro3(unsigned int d,
           if (n_cycles > 1)
             {
               std::vector<mpfr_class> r;
-              solver_data.residual_and_jacobian(&r, nullptr, u);
+              solver_data.ro3.residual_and_jacobian(&r, nullptr, u);
               norm_r = norm(r);
               std::cout << "cycle " << cycle << ", residual norm = " << norm_r << std::endl;
             }

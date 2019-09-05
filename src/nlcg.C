@@ -11,8 +11,7 @@ bool nlcg(SolverData & solver_data)
   unsigned iter = 0;
   bool converged = false;
 
-  ResidualAndJacobian & residual_and_jacobian =
-    solver_data.residual_and_jacobian;
+  Ro3 & ro3 = solver_data.ro3;
 
   std::vector<mpfr_class> & u = solver_data.u;
 
@@ -30,7 +29,7 @@ bool nlcg(SolverData & solver_data)
         break;
 
       // Compute the residual and Jacobian at the current guess.
-      residual_and_jacobian(&r, &jac, u);
+      ro3.residual_and_jacobian(&r, &jac, u);
 
       // Compute the size of the scalar function "f"
       // which we are trying to minimize, _not_ dot(r,r)^0.5.
@@ -108,7 +107,7 @@ bool nlcg(SolverData & solver_data)
         {
           // std::cout << "Trying step with alpha=" << alpha << std::endl;
           trial_u = u + alpha * s;
-          residual_and_jacobian(&r, nullptr, u);
+          ro3.residual_and_jacobian(&r, nullptr, u);
           mpfr_class trial_residual = 0.5 * dot(r,r);
           if (trial_residual < residual)
             break;

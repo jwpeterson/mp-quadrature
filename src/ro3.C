@@ -3,7 +3,12 @@
 
 Ro3::Ro3(unsigned int d_in, unsigned int nc_in, unsigned int nv_in,
          unsigned int ne_in, unsigned int ng_in) :
-  d(d_in), nc(nc_in), nv(nv_in), ne(ne_in), ng(ng_in)
+  d(d_in),
+  nc(nc_in),
+  nv(nv_in),
+  ne(ne_in),
+  ng(ng_in),
+  one_third(mpfr_class(1) / 3)
 {
   if (nc > 1 || nv > 1 || !check())
     {
@@ -47,7 +52,7 @@ Ro3::Ro3(unsigned int d_in, unsigned int nc_in, unsigned int nv_in,
 
 
 
-unsigned int Ro3::first_dof(Orbit orb)
+unsigned int Ro3::begin(Orbit orb)
 {
   switch (orb)
     {
@@ -70,7 +75,7 @@ unsigned int Ro3::first_dof(Orbit orb)
 
 
 
-unsigned int Ro3::last_dof(Orbit orb)
+unsigned int Ro3::end(Orbit orb)
 {
   switch (orb)
     {
@@ -101,22 +106,22 @@ void Ro3::bounds(std::vector<double> & lb, std::vector<double> & ub)
 
   // Centroid orbits have a single weight dof, and it just needs to
   // be less than the reference element volume.
-  for (unsigned int i=first_dof(CENTROID); i<last_dof(CENTROID); ++i)
+  for (unsigned int i=begin(CENTROID); i<end(CENTROID); ++i)
     ub[i] = 0.5;
 
   // Vertex orbits have a weight dof that appears three times.
-  for (unsigned int i=first_dof(VERTEX); i<last_dof(VERTEX); ++i)
+  for (unsigned int i=begin(VERTEX); i<end(VERTEX); ++i)
     ub[i] = 1. / 6;
 
   // Edge orbits have a weight dof (appearing 3 times) and a spatial dof.
-  for (unsigned int i=first_dof(EDGE); i<last_dof(EDGE); i+=2)
+  for (unsigned int i=begin(EDGE); i<end(EDGE); i+=2)
     {
       ub[i] = 1. / 6;
       ub[i+1] = 1.;
     }
 
   // General orbits have a weight dof and two spatial dofs.
-  for (unsigned int i=first_dof(GENERAL); i<last_dof(GENERAL); i+=3)
+  for (unsigned int i=begin(GENERAL); i<end(GENERAL); i+=3)
     {
       ub[i] = 1. / 6;
       ub[i+1] = 1.;
@@ -131,22 +136,22 @@ void Ro3::guess(std::vector<double> & x)
 
   // Centroid orbits have a single weight dof, and it just needs to
   // be less than the reference element volume.
-  for (unsigned int i=first_dof(CENTROID); i<last_dof(CENTROID); ++i)
+  for (unsigned int i=begin(CENTROID); i<end(CENTROID); ++i)
     x[i] = 0.5 * double(random())/RAND_MAX;
 
   // Vertex orbits have a weight dof that appears three times.
-  for (unsigned int i=first_dof(VERTEX); i<last_dof(VERTEX); ++i)
+  for (unsigned int i=begin(VERTEX); i<end(VERTEX); ++i)
     x[i] = 1. / 6 * double(random())/RAND_MAX;
 
   // Edge orbits have a weight dof (appearing 3 times) and a spatial dof.
-  for (unsigned int i=first_dof(EDGE); i<last_dof(EDGE); i+=2)
+  for (unsigned int i=begin(EDGE); i<end(EDGE); i+=2)
     {
       x[i] = 1. / 6 * double(random())/RAND_MAX;
       x[i+1] = 1. * double(random())/RAND_MAX;
     }
 
   // General orbits have a weight dof and two spatial dofs.
-  for (unsigned int i=first_dof(GENERAL); i<last_dof(GENERAL); i+=3)
+  for (unsigned int i=begin(GENERAL); i<end(GENERAL); i+=3)
     {
       x[i] = 1. / 6 * double(random())/RAND_MAX;
       x[i+1] = 1. * double(random())/RAND_MAX;
@@ -160,6 +165,155 @@ void Ro3::inequality_constraint_indices(std::vector<unsigned int> & indices)
   indices.clear();
 
   // Push back the index of each general orbit's x-coordinate.
-  for (unsigned int i=first_dof(GENERAL); i<last_dof(GENERAL); i+=3)
+  for (unsigned int i=begin(GENERAL); i<end(GENERAL); i+=3)
     indices.push_back(i+1);
+}
+
+
+
+void Ro3::residual_and_jacobian (std::vector<mpfr_class> * r,
+                                 Matrix<mpfr_class> * jac,
+                                 const std::vector<mpfr_class> & u)
+{
+  // If there's nothing to do, then there's nothing to do.
+  if (!r && !jac)
+    return;
+
+  // Avoid calling dim() multiple times.
+  const unsigned int N = dim();
+
+  // Zero any previous values and allocate space for residual and Jacobian, if required.
+  if (r)
+    {
+      r->clear();
+      r->resize(N);
+    }
+  if (jac)
+    {
+      jac->clear();
+      jac->resize(N, N);
+    }
+
+  // Compute residual and Jacobian contributions For each basis function i.
+  for (unsigned int i=0; i<N; i++)
+    {
+      // The powers of x and y in the monomial we are currently integrating.
+      unsigned int xpower = polys[i].first;
+      unsigned int ypower = polys[i].second;
+
+      // Residual contribution due to centroid point. The evaluation point is
+      // fixed at (x,y) = 1/3.
+      if (r && nc)
+        (*r)[i] += u[0] * pow(one_third, xpower) * pow(one_third, ypower);
+
+      // Jacobian contribution due to centroid point. This is easy
+      // because this term is linear in the weight parameter.
+      if (jac && nc)
+        (*jac)(i,0) += pow(one_third, xpower) * pow(one_third, ypower);
+
+      // Next loop Loop over all (w,x,y) triples in u and compute the residual
+      // and Jacobian contributions.
+      for (unsigned int q=nc; q<u.size(); q+=3)
+        {
+          // The unknowns are ordered in terms of (w,x,y) triples.
+          mpfr_class w = u[q];
+          mpfr_class x = u[q+1];
+          mpfr_class y = u[q+2];
+
+          // The implied third barycentric coordinate
+          mpfr_class z = mpfr_class(1) - x - y;
+
+          // The "spatial" part is needed by both the residual and Jacobian,
+          // so we can always compute it.
+          mpfr_class spatial =
+            pow(x, xpower) * pow(y, ypower) +
+            pow(z, xpower) * pow(x, ypower) +
+            pow(y, xpower) * pow(z, ypower);
+
+          // Compute residual contribution, if required.
+          if (r)
+            (*r)[i] += w * spatial;
+
+          // Compute Jacobian contribution, if required.
+          if (jac)
+            {
+              // Derivative wrt w
+              (*jac)(i, q) += spatial;
+
+              // We are differentiating polynomials, so if xpower or
+              // ypower is 0, the derivative of the corresponding term
+              // will be zero. In that case we don't want to subtract
+              // 1 from the unsigned variable which represents the
+              // exponent, since that would cause it to wrap, possibly
+              // leading to other issues. Therefore we will just
+              // define the power to still be zero in that case...
+              // Note that the -1 terms come from differentiating "z"
+              // wrt either x or y.
+              unsigned int xpm1 = xpower > 0 ? xpower-1 : 0;
+              unsigned int ypm1 = ypower > 0 ? ypower-1 : 0;
+
+              // Derivative wrt x
+              (*jac)(i,q+1) += w *
+                (xpower * pow(x, xpm1) * pow(y, ypower) +
+                 (mpfr_class(-1) * xpower * pow(z, xpm1) * pow(x, ypower) +
+                  pow(z, xpower) * ypower * pow(x, ypm1)) +
+                 pow(y, xpower) * mpfr_class(-1) * ypower * pow(z, ypm1));
+
+              // Derivative wrt y
+              (*jac)(i,q+2) += w *
+                (pow(x, xpower) * ypower * pow(y, ypm1) +
+                 mpfr_class(-1) * xpower * pow(z, xpm1) * pow(x, ypower) +
+                 (xpower * pow(y, xpm1) * pow(z, ypower) +
+                  pow(y, xpower) * mpfr_class(-1) * ypower * pow(z, ypm1)));
+            }
+        }
+
+      // Subtract off the true integral value, I(p_i)
+      if (r)
+        (*r)[i] -= exact_tri(xpower, ypower);
+    } // end loop over i
+}
+
+
+
+bool Ro3::check_feasibility (const std::vector<mpfr_class> & trial_u)
+{
+  const unsigned int N = dim();
+
+  if (N != trial_u.size())
+    {
+      std::cout << "Error, wrong size solution in check_feasibility()" << std::endl;
+      exit(1);
+    }
+
+  // 1.) No parameters can be negative.
+  for (unsigned int q=0; q<trial_u.size(); ++q)
+    if (trial_u[q] < 0.)
+      {
+        // Debugging:
+        // std::cout << "trial_u is infeasible due to parameter <= 0!"
+        //           << std::endl;
+        // print(trial_u);
+
+        return false;
+      }
+
+  // 2.) Check if 1-x-y < 0
+  for (unsigned int q=nc; q<trial_u.size(); q+=3)
+    {
+      mpfr_class x = trial_u[q+1];
+      mpfr_class y = trial_u[q+2];
+      if (mpfr_class(1) - x - y < 0)
+        {
+          // Debugging:
+          // std::cout << "trial_u is infeasible due to 1-x-y <= 0!"
+          //           << std::endl;
+          // print(trial_u);
+
+          return false;
+        }
+    }
+
+  // If we made it here without returning, must be feasible!
+  return true;
 }

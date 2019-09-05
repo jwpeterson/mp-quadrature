@@ -72,8 +72,6 @@ int main()
   SolverData solver_data(r);
   solver_data.verbose = true;
   solver_data.maxits = 50;
-  solver_data.residual_and_jacobian = ResidualAndJacobian(d);
-  solver_data.check_feasibility = CheckFeasibility(d);
   solver_data.do_backtracking = true;
 
   unsigned int testset_counter = 0;
@@ -81,7 +79,7 @@ int main()
     {
       ++testset_counter;
       std::cout << "Running test set " << testset_counter << std::endl;
-      test_ro3(d, n_tests, solver_data);
+      test_ro3(n_tests, solver_data);
       // Comment out this break to run forever.
       break;
     }

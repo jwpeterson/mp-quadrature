@@ -38,7 +38,7 @@ double myfunc(unsigned n, const double *x, double *grad, void *my_func_data)
   std::vector<mpfr_class> r;
   Matrix<mpfr_class> jac;
   std::vector<mpfr_class> u(x, x+n);
-  solver_data->residual_and_jacobian(&r, grad ? &jac : nullptr, u);
+  solver_data->ro3.residual_and_jacobian(&r, grad ? &jac : nullptr, u);
 
   // The gradient is grad_f = J^T * r
   if (grad)
@@ -116,54 +116,50 @@ int main()
   srandom(seed);
 
   // Test making d==3 Ro3 objects
-  // unsigned int d=3;
-  // Ro3 r(d, /*nc*/1, /*nv*/0, /*ne*/0, /*ng*/1); // 4 QP
-  // Ro3 r(d, /*nc*/0, /*nv*/0, /*ne*/2, /*ng*/0); // 6 QP
-  // Ro3 r(d, /*nc*/1, /*nv*/1, /*ne*/1, /*ng*/0); // 7 QP
+  // Ro3 r(/*d*/3, /*nc*/1, /*nv*/0, /*ne*/0, /*ng*/1); // 4 QP
+  // Ro3 r(/*d*/3, /*nc*/0, /*nv*/0, /*ne*/2, /*ng*/0); // 6 QP
+  // Ro3 r(/*d*/3, /*nc*/1, /*nv*/1, /*ne*/1, /*ng*/0); // 7 QP <-- test case
 
   // d==4, dim==5
-  // unsigned int d=4;
-  // Ro3 r(d, /*nc*/0, /*nv*/0, /*ne*/1, /*ng*/1); // 6 QP
-  // Ro3 r(d, /*nc*/1, /*nv*/1, /*ne*/0, /*ng*/1); // 7 QP
-  // Ro3 r(d, /*nc*/1, /*nv*/0, /*ne*/2, /*ng*/0); // 7 QP
-  // Ro3 r(d, /*nc*/0, /*nv*/1, /*ne*/2, /*ng*/0); // 9 QP
+  // Ro3 r(/*d*/4, /*nc*/0, /*nv*/0, /*ne*/1, /*ng*/1); // 6 QP
+  // Ro3 r(/*d*/4, /*nc*/1, /*nv*/1, /*ne*/0, /*ng*/1); // 7 QP
+  // Ro3 r(/*d*/4, /*nc*/1, /*nv*/0, /*ne*/2, /*ng*/0); // 7 QP
+  // Ro3 r(/*d*/4, /*nc*/0, /*nv*/1, /*ne*/2, /*ng*/0); // 9 QP
 
   // d==7, dim=12
-  unsigned int d=7;
-  Ro3 r(d, /*nc*/0, /*nv*/0, /*ne*/0, /*ng*/4); // 12 QP
+  Ro3 r(/*d*/7, /*nc*/0, /*nv*/0, /*ne*/0, /*ng*/4); // 12 QP
 
   // d==10, dim=22
-  // unsigned int d=10;
-  // Ro3 r(d, /*nc*/1, /*nv*/0, /*ne*/0, /*ng*/7); // 22 QP
-  // Ro3 r(d, /*nc*/0, /*nv*/1, /*ne*/0, /*ng*/7); // 24 QP
-  // Ro3 r(d, /*nc*/0, /*nv*/0, /*ne*/2, /*ng*/6); // 24 QP
-  // Ro3 r(d, /*nc*/1, /*nv*/1, /*ne*/1, /*ng*/6); // 25 QP
+  // Ro3 r(/*d*/10, /*nc*/1, /*nv*/0, /*ne*/0, /*ng*/7); // 22 QP
+  // Ro3 r(/*d*/10, /*nc*/0, /*nv*/1, /*ne*/0, /*ng*/7); // 24 QP
+  // Ro3 r(/*d*/10, /*nc*/0, /*nv*/0, /*ne*/2, /*ng*/6); // 24 QP
+  // Ro3 r(/*d*/10, /*nc*/1, /*nv*/1, /*ne*/1, /*ng*/6); // 25 QP
 
   // Print information.
   // std::cout << "Rule has " << r.n_qp() << " quadrature points." << std::endl;
   //
   // std::cout << "CENTROID: ["
-  //           << r.first_dof(Ro3::CENTROID)
+  //           << r.begin(Ro3::CENTROID)
   //           << ","
-  //           << r.last_dof(Ro3::CENTROID)
+  //           << r.end(Ro3::CENTROID)
   //           << ")" << std::endl;
   //
   // std::cout << "VERTEX: ["
-  //           << r.first_dof(Ro3::VERTEX)
+  //           << r.begin(Ro3::VERTEX)
   //           << ","
-  //           << r.last_dof(Ro3::VERTEX)
+  //           << r.end(Ro3::VERTEX)
   //           << ")" << std::endl;
   //
   // std::cout << "EDGE: ["
-  //           << r.first_dof(Ro3::EDGE)
+  //           << r.begin(Ro3::EDGE)
   //           << ","
-  //           << r.last_dof(Ro3::EDGE)
+  //           << r.end(Ro3::EDGE)
   //           << ")" << std::endl;
   //
   // std::cout << "GENERAL: ["
-  //           << r.first_dof(Ro3::GENERAL)
+  //           << r.begin(Ro3::GENERAL)
   //           << ","
-  //           << r.last_dof(Ro3::GENERAL)
+  //           << r.end(Ro3::GENERAL)
   //           << ")" << std::endl;
   //
   // return 0;
@@ -171,8 +167,6 @@ int main()
   SolverData solver_data(r);
   solver_data.verbose = true;
   solver_data.maxits = 50;
-  solver_data.residual_and_jacobian = ResidualAndJacobian(d);
-  solver_data.check_feasibility = CheckFeasibility(d);
   solver_data.do_backtracking = true;
   solver_data.residual_reduction_required = true;
 
@@ -281,7 +275,7 @@ int main()
       // 5.1584233435359177925746338682643e-1
       // 2.7771616697639178256958187139372e-1
 
-      if (d==7)
+      if (r.d==7)
         x =
           {
             2.65e-02, // w1
@@ -390,7 +384,7 @@ int main()
       // 3.75003057621806634713834682770539e-01
       // 3.19731089240110205595968295710918e-02
 
-      // if (d==10)
+      // if (r.d==10)
       //   x = {
       //     4.0982937046221364e-02,
       //     1.9798492190714671e-02,

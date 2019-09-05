@@ -44,12 +44,12 @@ struct Ro3
   // Returns the index of the first dof in the residual vector
   // corresponding to the type of Orbit, or dim() if there are no
   // orbits of the requested type.
-  unsigned int first_dof(Orbit orb);
+  unsigned int begin(Orbit orb);
 
   // Returns one past the index of the last dof in the residual vector
   // corresponding to the type of Orbit, or dim() if there are no
   // orbits of the requested type.
-  unsigned int last_dof(Orbit orb);
+  unsigned int end(Orbit orb);
 
   // Fill the passed-in vectors with upper and lower bounds for the current rule.
   void bounds(std::vector<double> & lb, std::vector<double> & ub);
@@ -60,6 +60,15 @@ struct Ro3
   // Fill the passed-in vector with the indices of the x-dof of each general orbit.
   // This is used by nlopt when setting inequality constraints.
   void inequality_constraint_indices(std::vector<unsigned int> & indices);
+
+  // Compute the residual and Jacobian at u.
+  void residual_and_jacobian (std::vector<mpfr_class> * r,
+                              Matrix<mpfr_class> * jac,
+                              const std::vector<mpfr_class> & u);
+
+  // Returns true if the trial_u solution is "feasible" (i.e. satisfies
+  // constraints, false otherwise.
+  bool check_feasibility (const std::vector<mpfr_class> & trial_u);
 
   // The dimension of the space of Ro3-invariant polynomials of degree d.
   unsigned int dim() { return (d*d + 3*d + 6)/6; }
@@ -89,7 +98,9 @@ struct Ro3
 
   // List of monomial exponents for each order that forms a basis for Ro3(d).
   std::vector<std::pair<unsigned int, unsigned int>> polys;
+
+  // A handy multi-precision constant
+  mpfr_class one_third;
 };
 
 #endif
-
