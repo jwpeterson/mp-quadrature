@@ -23,9 +23,9 @@ void usage();
 // a reference right triangle) on an equilateral triangle with
 // vertices (0,0), (1,0), and (1/2,sqrt(3)/2).  An output filename is
 // constructed from input_filename.
-void output_equilateral(const std::vector<Point<mpfr_class> > & generated_points,
-                        const std::vector<mpfr_class> & generated_weights,
-                        const std::string & input_filename);
+void output_equilateral(const std::string & input_filename,
+                        const std::vector<Point<mpfr_class> > & generated_points,
+                        const std::vector<mpfr_class> * generated_weights);
 
 // Compute the discrete residual function r_N for the current rule
 void compute_rN(const std::vector<Point<mpfr_class> > & generated_points,
@@ -42,19 +42,34 @@ int main(int argc, char** argv)
   // Filename must now be specified on the command line
   std::string filename = "";
 
+  // If the user passes -w on the command line, we also print the weights.
+  bool output_weights = false;
+
   // options descriptor - this associates several "long" and "short"
   // command line options.  The last element of the longopts array has
   // to be filled with zeros.
   static struct option longopts[] =
     {
       {"input-file",      required_argument, NULL, 'i'},
+      {"print-weights",   no_argument,       NULL, 'w'},
       {"help",            no_argument,       NULL, 'h'},
       { NULL,             0,                 NULL,  0 }
     };
 
   // Parse command line options using getopt_long()
+  //
+  // From 'man getopt_long'
+  // optstring is a string containing the legitimate option
+  // characters. If such a character is followed by a colon, the
+  // option requires an argument, so getopt() places a pointer to
+  // the following text in the same argv-element, or the text of the
+  // following argv-element, in optarg. Two colons mean an option
+  // takes an optional arg; if there is text in the current
+  // argv-element (i.e., in the same word as the option name itself,
+  // for example, "-oarg"), then it is returned in optarg, otherwise
+  // optarg is set to zero. This is a GNU extension.
   int ch = -1;
-  while ((ch = getopt_long(argc, argv, "i:h", longopts, NULL)) != -1)
+  while ((ch = getopt_long(argc, argv, "wi:h", longopts, NULL)) != -1)
     {
       switch (ch)
         {
@@ -62,6 +77,12 @@ int main(int argc, char** argv)
           {
             if (optarg != NULL)
               filename = std::string(optarg);
+            break;
+          }
+
+        case 'w':
+          {
+            output_weights = true;
             break;
           }
 
@@ -114,10 +135,12 @@ int main(int argc, char** argv)
     }
 
   // Output points on the equilateral triangle
-  // output_equilateral(generated_points, generated_weights, filename);
+  output_equilateral(filename,
+                     generated_points,
+                     output_weights ? &generated_weights : nullptr);
 
   // Compute the discrete residual function r_N
-  compute_rN(generated_points, generated_weights);
+  // compute_rN(generated_points, generated_weights);
 
   return 0;
 }
@@ -131,6 +154,7 @@ void usage()
   std::cout << "\n";
   std::cout << "Valid command line options are:\n";
   std::cout << "--input-file, -i filename = Read generators from file 'filename'\n";
+  std::cout << "--print-weights, -w       = Print weights in addition to points\n";
   std::cout << "--help, -h                = Print this message.\n";
   std::cout << "\n";
 }
@@ -138,9 +162,9 @@ void usage()
 
 
 
-void output_equilateral(const std::vector<Point<mpfr_class> > & generated_points,
-                        const std::vector<mpfr_class> & generated_weights,
-                        const std::string & input_filename)
+void output_equilateral(const std::string & input_filename,
+                        const std::vector<Point<mpfr_class> > & generated_points,
+                        const std::vector<mpfr_class> * generated_weights)
 {
   // Write to a file that is named similarly to the input filename
   std::string output_filename = input_filename;
@@ -153,8 +177,8 @@ void output_equilateral(const std::vector<Point<mpfr_class> > & generated_points
   // Erase file extension
   size_t dot_pos = output_filename.find_last_of('.');
   output_filename.erase(dot_pos);
-  output_filename += "_equilateral.dat";
-  std::cout << "output_filename=" << output_filename << std::endl;
+  output_filename += "_equilateral.csv";
+  std::cout << "output_filename = " << output_filename << std::endl;
 
   // Open a stream for output
   std::ofstream out(output_filename.c_str());
@@ -173,7 +197,13 @@ void output_equilateral(const std::vector<Point<mpfr_class> > & generated_points
         equilateral_x = xi + mpfr_class(0.5)*eta,
         equilateral_y = sqrt(mpfr_class(3.))*0.5*eta;
 
-      out << equilateral_x << ", " << equilateral_y << std::endl;
+      out << equilateral_x << ", " << equilateral_y;
+
+      // Also write out the weight if it was passed in.
+      if (generated_weights)
+        out << ", " << (*generated_weights)[i];
+
+      out << std::endl;
     }
 }
 
