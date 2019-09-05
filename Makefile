@@ -44,8 +44,11 @@ ALL_INCLUDES=$(GMP_INCLUDE) $(MPFR_INCLUDE) $(GMPFRXX_INCLUDE) $(MPQ_INCLUDE) $(
 ALL_LIBS=$(MPQ_LIB) $(GMPFRXX_LIBS) $(MPFR_LIBS) $(GMP_LIBS) $(NLOPT_LIB)
 
 # Flags to turn on extra debugging and print routines.
-#EXTRA_FLAGS=-g -DDEBUG
-EXTRA_FLAGS=-Wall -O2 -std=c++11
+# EXTRA_FLAGS=-g -O0 -DDEBUG
+EXTRA_FLAGS=-Wall -O2
+
+# C++11 is required.
+EXTRA_FLAGS += -std=c++11
 
 # Set a -D flag in EXTRA_FLAGS if we have nlopt. The alternative to this
 # is to use an mp_quadrature_config.h file that all sources include.
@@ -107,7 +110,7 @@ echo:
 clean:
 	@make -C gmpfrxx clean
 	@echo "Cleaning in mp-quadrature..."
-	@rm -rf *~ src/*~ $(objects) ./lib/* ./lib/.libs src/.libs drivers/.libs $(drivers) drivers/*.o $(src_depend) $(drivers_depend) $(libtool_objects) $(driver_libtool_objects)
+	@rm -rf *~ src/*~ drivers/*~ $(objects) ./lib/* ./lib/.libs src/.libs drivers/.libs $(drivers) drivers/*.o $(src_depend) $(drivers_depend) $(libtool_objects) $(driver_libtool_objects)
 
 # Include dependency rules we generated for all the sources
 -include $(src_depend) $(drivers_depend)

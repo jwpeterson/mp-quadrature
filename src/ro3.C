@@ -201,19 +201,110 @@ void Ro3::residual_and_jacobian (std::vector<mpfr_class> * r,
       unsigned int xpower = polys[i].first;
       unsigned int ypower = polys[i].second;
 
-      // Residual contribution due to centroid point. The evaluation point is
-      // fixed at (x,y) = 1/3.
-      if (r && nc)
-        (*r)[i] += u[0] * pow(one_third, xpower) * pow(one_third, ypower);
+      // Residual & Jacobian contributions due to centroid point, if any.
+      // The evaluation point is fixed at (x,y) = (1/3, 1/3).
+      for (unsigned int q=begin(CENTROID); q<end(CENTROID); ++q)
+        {
+          if (r)
+            (*r)[i] += u[q] * pow(one_third, xpower) * pow(one_third, ypower);
 
-      // Jacobian contribution due to centroid point. This is easy
-      // because this term is linear in the weight parameter.
-      if (jac && nc)
-        (*jac)(i,0) += pow(one_third, xpower) * pow(one_third, ypower);
+          if (jac)
+            (*jac)(i,q) += pow(one_third, xpower) * pow(one_third, ypower);
+        }
 
-      // Next loop Loop over all (w,x,y) triples in u and compute the residual
-      // and Jacobian contributions.
-      for (unsigned int q=nc; q<u.size(); q+=3)
+      // Residual & Jacobian contributions due to vertex points, if any.
+      for (unsigned int q=begin(VERTEX); q<end(VERTEX); ++q)
+        {
+          mpfr_class spatial(0);
+
+          if (xpower == 0 && ypower == 0)
+            spatial = mpfr_class(3);
+
+          else if ((xpower == 0 && ypower > 0) ||
+                   (xpower > 0 && ypower == 0))
+            spatial = mpfr_class(1);
+
+          else // both xpower > 0 && ypower > 0
+            spatial = 0;
+
+          if (r)
+            (*r)[i] += u[q] * spatial;
+
+          if (jac)
+            (*jac)(i,q) += spatial;
+        }
+
+      // Residual & Jacobian contributions due to edge orbits.
+      for (unsigned int q=begin(EDGE); q<end(EDGE); q+=2)
+        {
+          mpfr_class w = u[q];
+          mpfr_class x = u[q+1];
+          // mpfr_class y(0);
+
+          // The implied third barycentric coordinate.
+          // The three points of this orbit are: (x,0), (z,x), (0,z)
+          mpfr_class z = mpfr_class(1) - x; // - y
+
+          // The "spatial" part is needed by both the residual and Jacobian,
+          // so we can always compute it.
+
+          // Note: we go to some extra trouble here to absolutely
+          // avoid any possible issues with 0^0, even though I believe
+          // it should be guaranteed that pow(base, 0) returns 1 for
+          // any base. This way there is no possible confusion for the
+          // case of 0^0, which we also want to return 1 for.
+          mpfr_class spatial(0);
+
+          if (xpower == 0 && ypower == 0)
+            spatial = mpfr_class(3);
+
+          else if (xpower == 0 && ypower > 0)
+            spatial = pow(x, ypower) + pow(z, ypower);
+
+          else if (xpower > 0 && ypower == 0)
+            spatial = pow(x, xpower) + pow(z, xpower);
+
+          else // both xpower > 0 && ypower > 0
+            spatial = pow(z, xpower) * pow(x, ypower);
+
+          // Compute residual contribution, if required.
+          if (r)
+            (*r)[i] += w * spatial;
+
+          // Compute Jacobian contribution, if required.
+          if (jac)
+            {
+              // Derivative wrt w
+              (*jac)(i, q) += spatial;
+
+              // Derivative wrt x is zero for the constant polynomial case.
+              if (xpower == 0 && ypower == 0)
+                (*jac)(i, q+1) += 0;
+
+              else if (xpower == 0 && ypower > 0)
+                (*jac)(i, q+1) += w * ypower * (pow(x, ypower-1) - pow(z, ypower-1));
+
+              else if (xpower > 0 && ypower == 0)
+                (*jac)(i, q+1) += w * xpower * (pow(x, xpower-1) - pow(z, xpower-1));
+
+              else // both xpower > 0 && ypower > 0
+                {
+                  unsigned int xpm1 = xpower - 1;
+                  unsigned int ypm1 = ypower - 1;
+
+                  // Derivative wrt x. In this case, both
+                  // y**ypower = 0
+                  // y**xpower = 0
+                  // so we have dropped those terms.
+                  (*jac)(i, q+1) += w *
+                    (mpfr_class(-1) * xpower * pow(z, xpm1) * pow(x, ypower) +
+                     pow(z, xpower) * ypower * pow(x, ypm1));
+                }
+            }
+        }
+
+      // Residual & Jacobian contributions due to general orbits.
+      for (unsigned int q=begin(GENERAL); q<end(GENERAL); q+=3)
         {
           // The unknowns are ordered in terms of (w,x,y) triples.
           mpfr_class w = u[q];
@@ -298,8 +389,8 @@ bool Ro3::check_feasibility (const std::vector<mpfr_class> & trial_u)
         return false;
       }
 
-  // 2.) Check if 1-x-y < 0
-  for (unsigned int q=nc; q<trial_u.size(); q+=3)
+  // 2.) Check if 1-x-y < 0 in general orbits
+  for (unsigned int q=begin(GENERAL); q<end(GENERAL); q+=3)
     {
       mpfr_class x = trial_u[q+1];
       mpfr_class y = trial_u[q+2];

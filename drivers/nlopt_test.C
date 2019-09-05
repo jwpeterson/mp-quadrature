@@ -107,7 +107,7 @@ int main()
   // # of binary digits
   // 53 binary digits is about what you normally get with a double.
   // It's faster to comment this out while debugging.
-  // mpfr_set_default_prec(256);
+  mpfr_set_default_prec(256);
 
   // Use the current time since epoch as a seed.
   time_t seed = time(nullptr);
@@ -115,25 +115,51 @@ int main()
   std::cout << "seed=" << seed << std::endl;
   srandom(seed);
 
-  // Test making d==3 Ro3 objects
-  // Ro3 r(/*d*/3, /*nc*/1, /*nv*/0, /*ne*/0, /*ng*/1); // 4 QP
-  // Ro3 r(/*d*/3, /*nc*/0, /*nv*/0, /*ne*/2, /*ng*/0); // 6 QP
-  // Ro3 r(/*d*/3, /*nc*/1, /*nv*/1, /*ne*/1, /*ng*/0); // 7 QP <-- test case
+  // d==2, dim==2
+  // Note: This case is somewhat tricky despite also being the
+  // simplest non-trivial case!  The issue is that the Jacobian is
+  // singular at the root, so Newton iterations converge very slowly,
+  // and you don't obtain the full requested accuracy in the final
+  // solution.  I am a bit surprised that lu_solve() does not throw a
+  // singular matrix exception, I think the problem is that the matrix
+  // is only approximately singular, and we only throw if it's
+  // *exactly* singular.
+  // Ro3 r(/*d*/2, /*nc*/0, /*nv*/0, /*ne*/1, /*ng*/0); // 3 QP <-- Solution confirmed
+
+  // d==3, dim==4
+  // Ro3 r(/*d*/3, /*nc*/1, /*nv*/0, /*ne*/0, /*ng*/1); // 4 QP <-- only solution has -ve wt
+  // Ro3 r(/*d*/3, /*nc*/0, /*nv*/0, /*ne*/2, /*ng*/0); // 6 QP <-- No solution
+  // Ro3 r(/*d*/3, /*nc*/1, /*nv*/1, /*ne*/1, /*ng*/0); // 7 QP <-- test case for nv orbits
 
   // d==4, dim==5
-  // Ro3 r(/*d*/4, /*nc*/0, /*nv*/0, /*ne*/1, /*ng*/1); // 6 QP
-  // Ro3 r(/*d*/4, /*nc*/1, /*nv*/1, /*ne*/0, /*ng*/1); // 7 QP
-  // Ro3 r(/*d*/4, /*nc*/1, /*nv*/0, /*ne*/2, /*ng*/0); // 7 QP
-  // Ro3 r(/*d*/4, /*nc*/0, /*nv*/1, /*ne*/2, /*ng*/0); // 9 QP
+  // o The best known deg=4 PI rule is a D3-invariant rule with 6 QP.
+  // o We also found a degree=4 rule with 6 QPs having ne=ng=1.
+  // o For the case with nc=1, ne=2 there does not seem to be a solution, but
+  //   the same (global) minimum objective function value of ~2.57337-08
+  // is found by the algorithm regardless of starting point.
+  // Ro3 r(/*d*/4, /*nc*/0, /*nv*/0, /*ne*/1, /*ng*/1); // 6 QP <-- New (?) soln found!
+  // Ro3 r(/*d*/4, /*nc*/1, /*nv*/1, /*ne*/0, /*ng*/1); // 7 QP <-- No solution
+  // Ro3 r(/*d*/4, /*nc*/1, /*nv*/0, /*ne*/2, /*ng*/0); // 7 QP <-- No solution
+  // Ro3 r(/*d*/4, /*nc*/0, /*nv*/1, /*ne*/2, /*ng*/0); // 9 QP <-- No solution
+
+  // d==5, dim==7
+  // Ro3 r(/*d*/5, /*nc*/1, /*nv*/0, /*ne*/0, /*ng*/2); // 7 QP
 
   // d==7, dim=12
-  Ro3 r(/*d*/7, /*nc*/0, /*nv*/0, /*ne*/0, /*ng*/4); // 12 QP
+  // Ro3 r(/*d*/7, /*nc*/0, /*nv*/0, /*ne*/0, /*ng*/4); // 12 QP
 
   // d==10, dim=22
-  // Ro3 r(/*d*/10, /*nc*/1, /*nv*/0, /*ne*/0, /*ng*/7); // 22 QP
+  // Ro3 r(/*d*/10, /*nc*/1, /*nv*/0, /*ne*/0, /*ng*/7); // 22 QP <-- No solution
   // Ro3 r(/*d*/10, /*nc*/0, /*nv*/1, /*ne*/0, /*ng*/7); // 24 QP
   // Ro3 r(/*d*/10, /*nc*/0, /*nv*/0, /*ne*/2, /*ng*/6); // 24 QP
   // Ro3 r(/*d*/10, /*nc*/1, /*nv*/1, /*ne*/1, /*ng*/6); // 25 QP
+  Ro3 r(/*d*/10, /*nc*/1, /*nv*/0, /*ne*/3, /*ng*/5); // 25 QP
+  // Ro3 r(/*d*/10, /*nc*/0, /*nv*/1, /*ne*/3, /*ng*/5); // 27 QP
+  // Ro3 r(/*d*/10, /*nc*/0, /*nv*/0, /*ne*/5, /*ng*/4); // 27 QP
+  // Ro3 r(/*d*/10, /*nc*/1, /*nv*/1, /*ne*/4, /*ng*/4); // 28 QP
+  // Ro3 r(/*d*/10, /*nc*/1, /*nv*/0, /*ne*/6, /*ng*/3); // 28 QP
+  // Ro3 r(/*d*/10, /*nc*/1, /*nv*/0, /*ne*/7, /*ng*/2); // 28 QP
+  // Ro3 r(/*d*/10, /*nc*/0, /*nv*/1, /*ne*/7, /*ng*/2); // 30 QP
 
   // Print information.
   // std::cout << "Rule has " << r.n_qp() << " quadrature points." << std::endl;
@@ -240,7 +266,7 @@ int main()
     nlopt_add_inequality_constraint(opt, myconstraint, &data[c], 1e-8);
 
   // Set tolerance(s)
-  nlopt_set_xtol_rel(opt, 1.e-16);
+  nlopt_set_xtol_rel(opt, 1.e-8);
   nlopt_set_ftol_rel(opt, 1.e-16);
 
   // You can use this parameter to control how long some of the
@@ -256,10 +282,43 @@ int main()
       // Generate random initial guess.
       r.guess(x);
 
-      // Debugging: Print entries of x
+      // // Debugging: Print entries of x
       // std::cout << "initial guess=" << std::endl;
       // for (const auto & val : x)
       //   std::cout << val << std::endl;
+
+      // One can also solve for this rule "by hand" since if you
+      // assume the edge orbit is at 1/2 it becomes a linear system of
+      // equations that has a solution. This rule is not optimal since
+      // it has both points on the boundary and it has 7 QPs while the
+      // best known degree 3 rule has only 4 QPs. However, the weights
+      // are all positive and it was a useful test case for making
+      // sure that the VERTEX residual and Jacobian contributions were
+      // correct.
+      // if (r.d==3 && r.nc==1 && r.ne==1 && r.nv==1 && r.ng==0)
+      //   x =
+      //     {
+      //       2.2500000000000000000000000000000e-1,
+      //       2.5000000000000000000000000000000e-2,
+      //       6.6666666666666666666666666666667e-2,
+      //       5.0000000000000000000000000000000e-1
+      //     };
+
+      // This rule is different from the D3-invariant rule with 6 QP
+      // in libmesh which is from Lyness and Jesperson and has all
+      // points inside the reference element.  The rule also has 6
+      // points (ne=1, ng=1) but it contains 3 points on the element
+      // boundary, so the D3 rule should probably be considered superior,
+      // but this one seems .
+      // if (r.d==4 && r.ne==1 && r.ng==1)
+      //   x =
+      //     {
+      //       3.4009490250701580549995389768470e-2,
+      //       8.5705066495465124974799173176085e-1,
+      //       1.3265717641596508611667127689820e-1,
+      //       5.6577725671689651088265387031247e-1,
+      //       3.1774517297791196146365253427748e-1
+      //     };
 
       // The d=7 solution with many digits of accuracy is:
       // 2.6517028157436251428754180460739e-2
@@ -275,25 +334,25 @@ int main()
       // 5.1584233435359177925746338682643e-1
       // 2.7771616697639178256958187139372e-1
 
-      if (r.d==7)
-        x =
-          {
-            2.65e-02, // w1
-            6.23e-02, // x1
-            6.75e-02, // y1
-
-            4.38e-02, // w2
-            5.52e-02, // x2
-            3.21e-01, // y2
-
-            2.87e-02, // w3
-            3.43e-02, // x3
-            6.60e-01, // y3
-
-            6.74e-02, // w4
-            5.15e-01, // x4
-            2.77e-01, // y4
-          };
+      // if (r.d==7)
+      //   x =
+      //     {
+      //       2.65e-02, // w1
+      //       6.23e-02, // x1
+      //       6.75e-02, // y1
+      //
+      //       4.38e-02, // w2
+      //       5.52e-02, // x2
+      //       3.21e-01, // y2
+      //
+      //       2.87e-02, // w3
+      //       3.43e-02, // x3
+      //       6.60e-01, // y3
+      //
+      //       6.74e-02, // w4
+      //       5.15e-01, // x4
+      //       2.77e-01, // y4
+      //     };
 
       // For the d=10 case, the smallest objective function value
       // (2.4432860276909146e-18) found was the
