@@ -38,4 +38,5 @@ drivers/lu
 plots
 TAGS
 *.pvsm
-voronoi.pdf
+voronoi/*.pdf
+logs
