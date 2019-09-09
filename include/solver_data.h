@@ -28,8 +28,12 @@ struct SolverData
     ro3(ro3_in)
   {}
 
-  // Initial guess/solution vector
+  // Initial guess/solution vector, residual, and Jacobian.
   std::vector<mpfr_class> u;
+  std::vector<mpfr_class> r;
+  Matrix<mpfr_class> jac;
+
+  // Tolerances and other solver parameters.
   mpfr_class tol;
   mpfr_class divtol;
   unsigned int maxits;

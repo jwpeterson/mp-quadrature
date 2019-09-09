@@ -1,6 +1,3 @@
-// C++ includes
-#include <iostream>
-
 // nlopt includes. The preprocessor define is set on the compile line
 // with a -D flag.
 #ifndef HAVE_NLOPT
@@ -26,32 +23,13 @@ int main()
 #include <nlopt.h>
 
 // C/C++ includes
+#include <iostream>
 #include <math.h>
 #include <stdlib.h> // random()
+#include <getopt.h> // getopt_long()
 
-double myfunc(unsigned n, const double *x, double *grad, void *my_func_data)
-{
-  auto solver_data = static_cast<SolverData *>(my_func_data);
-
-  // Copy data. It would be better if we didn't have to do this. One idea
-  // would be to make the SolverData class templated on numerical type...
-  std::vector<mpfr_class> r;
-  Matrix<mpfr_class> jac;
-  std::vector<mpfr_class> u(x, x+n);
-  solver_data->ro3.residual_and_jacobian(&r, grad ? &jac : nullptr, u);
-
-  // The gradient is grad_f = J^T * r
-  if (grad)
-    {
-      std::vector<mpfr_class> grad_f = jac.matvec_transpose(r);
-      for (unsigned int i=0; i<n; ++i)
-        grad[i] = grad_f[i].get_d();
-    }
-
-  // The objective function value is 0.5 * dot(r,r)
-  return 0.5 * dot(r,r).get_d();
-}
-
+// Objective function f : R^n -> R and, if grad != nullptr, grad(f).
+double myfunc(unsigned n, const double * x, double * grad, void * my_func_data);
 
 // Constraints are of the form fc(x) <= 0, where fc is required to have
 // the same parameters as the objective function. In our case, there is
@@ -61,48 +39,65 @@ double myfunc(unsigned n, const double *x, double *grad, void *my_func_data)
 // x + y - 1 <= 0
 // So in this case, the incoming "data" pointer just needs to tell us
 // the index of the x dof for the orbit being constrained.
-double myconstraint(unsigned n, const double *x, double *grad, void *data)
-{
-  // x-index of orbit to which are applying the constraint.
-  auto kptr = static_cast<unsigned int *>(data);
-  auto k = *kptr;
-
-  if (grad)
-    {
-      grad[k] = 1.;
-      grad[k+1] = 1.;
-    }
-  return x[k] + x[k+1] - 1;
-}
+double myconstraint(unsigned n, const double *x, double *grad, void *data);
 
 // Convert a numerical nlopt_result successful return code to a human readable string.
-std::string nlopt_result_to_string(nlopt_result res)
-{
-  switch (res)
-    {
-    case 1: // generic success code
-      return std::string("NLOPT_SUCCESS");
-    case 2:
-      return std::string("NLOPT_STOPVAL_REACHED");
-    case 3:
-      return std::string("NLOPT_FTOL_REACHED");
-    case 4:
-      return std::string("NLOPT_XTOL_REACHED");
-    case 5:
-      return std::string("NLOPT_MAXEVAL_REACHED");
-    case 6:
-      return std::string("NLOPT_MAXTIME_REACHED");
-    default:
-      return std::string("Unrecognized nlopt_result " + std::to_string(res));
-    }
-}
+std::string nlopt_result_to_string(nlopt_result res);
 
-int main()
+// Call this function when the program is run with the wrong arguments.
+void usage();
+
+int main(int argc, char ** argv)
 {
   // You can't trust all these digits from doubles, but you can with
   // mpfr_class objects.
   std::cout.precision(32);
   std::cout.setf(std::ios_base::scientific);
+
+  // Process command line arguments
+  static struct option longopts[] =
+    {
+      {"degree",      required_argument, NULL, 'd'},
+      {"n-centroid",  required_argument, NULL, 'c'},
+      {"n-vertex",    required_argument, NULL, 'v'},
+      {"n-edge",      required_argument, NULL, 'e'},
+      {"n-general",   required_argument, NULL, 'g'},
+      {"help",        no_argument,       NULL, 'h'},
+      { NULL,         0,                 NULL,  0 }
+    };
+
+  // To be set from the command line
+  unsigned int d = 0;
+
+  // Number of centroid, vertex, edge, and general orbits.
+  unsigned int nc = 0;
+  unsigned int nv = 0;
+  unsigned int ne = 0;
+  unsigned int ng = 0;
+
+  // A colon following an option means it has an argument.
+  // If there's an unrecognized argument, getopt_long()
+  // prints a message, so we don't handle it in the cases below.
+  int ch = -1;
+  while ((ch = getopt_long(argc, argv, "hd:c:v:e:g:", longopts, NULL)) != -1)
+    {
+      switch (ch)
+        {
+        case 'd': { d = atoi(optarg); break; }
+        case 'c': { nc = atoi(optarg); break; }
+        case 'v': { nv = atoi(optarg); break; }
+        case 'e': { ne = atoi(optarg); break; }
+        case 'g': { ng = atoi(optarg); break; }
+        case 'h': { usage(); return 0; }
+        }
+    } // end while
+
+  if (d == 0 || nc > 1 || nv > 1)
+    {
+      std::cout << "Error, invalid command line arguments provided!" << std::endl;
+      usage();
+      return 1;
+    }
 
   // # of binary digits
   // 53 binary digits is about what you normally get with a double.
@@ -115,6 +110,9 @@ int main()
   std::cout << "seed=" << seed << std::endl;
   srandom(seed);
 
+  // Build ro3 rule object
+  Ro3 r(d, nc, nv, ne, ng);
+
   // d==2, dim==2
   // Note: This case is somewhat tricky despite also being the
   // simplest non-trivial case!  The issue is that the Jacobian is
@@ -124,12 +122,12 @@ int main()
   // singular matrix exception, I think the problem is that the matrix
   // is only approximately singular, and we only throw if it's
   // *exactly* singular.
-  // Ro3 r(/*d*/2, /*nc*/0, /*nv*/0, /*ne*/1, /*ng*/0); // 3 QP <-- Solution confirmed
+  // -d2 -c0 -v0 -e1 -g0 # 3 QP <-- Solution confirmed
 
   // d==3, dim==4
-  // Ro3 r(/*d*/3, /*nc*/1, /*nv*/0, /*ne*/0, /*ng*/1); // 4 QP <-- only solution has -ve wt
-  // Ro3 r(/*d*/3, /*nc*/0, /*nv*/0, /*ne*/2, /*ng*/0); // 6 QP <-- No solution
-  // Ro3 r(/*d*/3, /*nc*/1, /*nv*/1, /*ne*/1, /*ng*/0); // 7 QP <-- test case for nv orbits
+  // -d3 -c1 -v0 -e0 -g1 # 4 QP <-- No solution (-ve wt soln only)
+  // -d3 -c0 -v0 -e2 -g0 # 6 QP <-- No solution
+  // -d3 -c1 -v1 -e1 -g0 # 7 QP <-- New (?) solution
 
   // d==4, dim==5
   // o The best known deg=4 PI rule is a D3-invariant rule with 6 QP.
@@ -137,145 +135,145 @@ int main()
   // o For the case with nc=1, ne=2 there does not seem to be a solution, but
   //   the same (global) minimum objective function value of ~2.57337-08
   // is found by the algorithm regardless of starting point.
-  // Ro3 r(/*d*/4, /*nc*/0, /*nv*/0, /*ne*/1, /*ng*/1); // 6 QP <-- New (?) soln found!
-  // Ro3 r(/*d*/4, /*nc*/1, /*nv*/1, /*ne*/0, /*ng*/1); // 7 QP <-- No solution
-  // Ro3 r(/*d*/4, /*nc*/1, /*nv*/0, /*ne*/2, /*ng*/0); // 7 QP <-- No solution
-  // Ro3 r(/*d*/4, /*nc*/0, /*nv*/1, /*ne*/2, /*ng*/0); // 9 QP <-- No solution
+  // -d4 -c0 -v0 -e1 -g1 # 6 QP <-- New (?) soln found!
+  // -d4 -c1 -v1 -e0 -g1 # 7 QP <-- No solution
+  // -d4 -c1 -v0 -e2 -g0 # 7 QP <-- No solution
+  // -d4 -c0 -v1 -e2 -g0 # 9 QP <-- No solution
 
   // d==5, dim==7
-  // Ro3 r(/*d*/5, /*nc*/1, /*nv*/0, /*ne*/0, /*ng*/2); // 7 QP <-- Also a D3 rule in libmesh
+  // -d5 -c1 -v0 -e0 -g2 # 7 QP <-- Also a D3 rule in libmesh
 
   // d=6, dim==10
-  // Ro3 r(/*d*/6, /*nc*/1, /*nv*/0, /*ne*/0, /*ng*/3); // 10 QP <-- No solution
-  // Ro3 r(/*d*/6, /*nc*/0, /*nv*/1, /*ne*/0, /*ng*/3); // 12 QP <-- No solution
-  // Ro3 r(/*d*/6, /*nc*/0, /*nv*/0, /*ne*/2, /*ng*/2); // 12 QP <-- New (?) solution
-  // Ro3 r(/*d*/6, /*nc*/1, /*nv*/1, /*ne*/1, /*ng*/2); // 13 QP <-- No solution
-  // Ro3 r(/*d*/6, /*nc*/1, /*nv*/0, /*ne*/3, /*ng*/1); // 13 QP <-- No solution
-  // Ro3 r(/*d*/6, /*nc*/0, /*nv*/0, /*ne*/5, /*ng*/0); // 15 QP <-- No solution
-  // Ro3 r(/*d*/6, /*nc*/1, /*nv*/1, /*ne*/4, /*ng*/0); // 16 QP <-- No solution
+  // -d6 -c1 -v0 -e0 -g3 # 10 QP <-- No solution
+  // -d6 -c0 -v1 -e0 -g3 # 12 QP <-- No solution
+  // -d6 -c0 -v0 -e2 -g2 # 12 QP <-- New (?) solution
+  // -d6 -c1 -v1 -e1 -g2 # 13 QP <-- No solution
+  // -d6 -c1 -v0 -e3 -g1 # 13 QP <-- No solution
+  // -d6 -c0 -v0 -e5 -g0 # 15 QP <-- No solution
+  // -d6 -c1 -v1 -e4 -g0 # 16 QP <-- No solution
 
   // d==7, dim=12
-  // Ro3 r(/*d*/7, /*nc*/0, /*nv*/0, /*ne*/0, /*ng*/4); // 12 QP <-- Gatermann solution
-  // Ro3 r(/*d*/7, /*nc*/1, /*nv*/0, /*ne*/1, /*ng*/3); // 13 QP <-- New (?) solution
-  // Ro3 r(/*d*/7, /*nc*/0, /*nv*/1, /*ne*/1, /*ng*/3); // 15 QP <-- No solution
-  // Ro3 r(/*d*/7, /*nc*/0, /*nv*/0, /*ne*/3, /*ng*/2); // 15 QP <-- New (?) solution
-  // Ro3 r(/*d*/7, /*nc*/1, /*nv*/1, /*ne*/2, /*ng*/2); // 16 QP <-- New (?) solution
-  // Ro3 r(/*d*/7, /*nc*/1, /*nv*/0, /*ne*/4, /*ng*/1); // 16 QP <-- No solution
-  // Ro3 r(/*d*/7, /*nc*/0, /*nv*/1, /*ne*/4, /*ng*/1); // 18 QP <-- No solution
-  // Ro3 r(/*d*/7, /*nc*/1, /*nv*/1, /*ne*/5, /*ng*/0); // 18 QP <-- No solution
+  // -d 7 -c0 -v0 -e0 -g4 # 12 QP <-- Gatermann solution
+  // -d 7 -c1 -v0 -e1 -g3 # 13 QP <-- New (?) solution
+  // -d 7 -c0 -v1 -e1 -g3 # 15 QP <-- No solution
+  // -d 7 -c0 -v0 -e3 -g2 # 15 QP <-- New (?) solution
+  // -d 7 -c1 -v1 -e2 -g2 # 16 QP <-- New (?) solution
+  // -d 7 -c1 -v0 -e4 -g1 # 16 QP <-- No solution
+  // -d 7 -c0 -v1 -e4 -g1 # 18 QP <-- No solution
+  // -d 7 -c1 -v1 -e5 -g0 # 18 QP <-- No solution
 
   // d==8, dim=15, best PI degree 8 rule in libmesh has 16 QPs
-  // Ro3 r(/*d*/8, /*nc*/0, /*nv*/0, /*ne*/0, /*ng*/5); // 15 QP <-- No solution
-  // Ro3 r(/*d*/8, /*nc*/1, /*nv*/0, /*ne*/1, /*ng*/4); // 16 QP <-- New (?) solution
-  // Ro3 r(/*d*/8, /*nc*/0, /*nv*/1, /*ne*/1, /*ng*/4); // 18 QP <-- New (?) solution
-  // Ro3 r(/*d*/8, /*nc*/0, /*nv*/0, /*ne*/3, /*ng*/3); // 18 QP <-- No solution
-  // Ro3 r(/*d*/8, /*nc*/1, /*nv*/1, /*ne*/2, /*ng*/3); // 19 QP <-- New (?) solution
-  // Ro3 r(/*d*/8, /*nc*/1, /*nv*/0, /*ne*/4, /*ng*/2); // 19 QP <-- No solution
-  // Ro3 r(/*d*/8, /*nc*/0, /*nv*/1, /*ne*/4, /*ng*/2); // 21 QP <-- No solution
-  // Ro3 r(/*d*/8, /*nc*/0, /*nv*/0, /*ne*/6, /*ng*/1); // 21 QP <-- No solution
-  // Ro3 r(/*d*/8, /*nc*/1, /*nv*/1, /*ne*/5, /*ng*/1); // 22 QP <-- No solution
-  // Ro3 r(/*d*/8, /*nc*/1, /*nv*/0, /*ne*/7, /*ng*/0); // 22 QP <-- No solution
-  // Ro3 r(/*d*/8, /*nc*/0, /*nv*/1, /*ne*/7, /*ng*/0); // 24 QP <-- No solution
+  // -d8 -c0 -v0 -e0 -g5 # 15 QP <-- No solution
+  // -d8 -c1 -v0 -e1 -g4 # 16 QP <-- New (?) solution
+  // -d8 -c0 -v1 -e1 -g4 # 18 QP <-- New (?) solution
+  // -d8 -c0 -v0 -e3 -g3 # 18 QP <-- No solution
+  // -d8 -c1 -v1 -e2 -g3 # 19 QP <-- New (?) solution
+  // -d8 -c1 -v0 -e4 -g2 # 19 QP <-- No solution
+  // -d8 -c0 -v1 -e4 -g2 # 21 QP <-- No solution
+  // -d8 -c0 -v0 -e6 -g1 # 21 QP <-- No solution
+  // -d8 -c1 -v1 -e5 -g1 # 22 QP <-- No solution
+  // -d8 -c1 -v0 -e7 -g0 # 22 QP <-- No solution
+  // -d8 -c0 -v1 -e7 -g0 # 24 QP <-- No solution
 
   // d==9, dim=19, best PI degree 9 rule in libmesh has 19 QPs
-  // Ro3 r(/*d*/9, /*nc*/1, /*nv*/0, /*ne*/0, /*ng*/6); // 19 QP <-- No solution
-  // Ro3 r(/*d*/9, /*nc*/0, /*nv*/1, /*ne*/0, /*ng*/6); // 21 QP <-- New (?) solution
-  // Ro3 r(/*d*/9, /*nc*/0, /*nv*/0, /*ne*/2, /*ng*/5); // 21 QP <-- No solution
-  // Ro3 r(/*d*/9, /*nc*/1, /*nv*/1, /*ne*/1, /*ng*/5); // 22 QP <-- New (?) solution
-  // Ro3 r(/*d*/9, /*nc*/1, /*nv*/0, /*ne*/3, /*ng*/4); // 22 QP <-- No solution
-  // Ro3 r(/*d*/9, /*nc*/0, /*nv*/1, /*ne*/3, /*ng*/4); // 24 QP <-- New (?) solution
-  // Ro3 r(/*d*/9, /*nc*/0, /*nv*/0, /*ne*/5, /*ng*/3); // 24 QP <-- No solution
-  // Ro3 r(/*d*/9, /*nc*/1, /*nv*/1, /*ne*/4, /*ng*/3); // 25 QP <-- No solution
-  // Ro3 r(/*d*/9, /*nc*/1, /*nv*/0, /*ne*/6, /*ng*/2); // 25 QP <-- No solution
-  // Ro3 r(/*d*/9, /*nc*/0, /*nv*/1, /*ne*/6, /*ng*/2); // 27 QP <-- No solution
-  // Ro3 r(/*d*/9, /*nc*/0, /*nv*/0, /*ne*/8, /*ng*/1); // 27 QP <-- No solution
-  // Ro3 r(/*d*/9, /*nc*/1, /*nv*/1, /*ne*/7, /*ng*/1); // 28 QP <-- No solution
-  // Ro3 r(/*d*/9, /*nc*/1, /*nv*/0, /*ne*/9, /*ng*/0); // 28 QP <-- No solution
-  // Ro3 r(/*d*/9, /*nc*/0, /*nv*/1, /*ne*/9, /*ng*/0); // 30 QP <-- No solution
+  // -d9 -c1 -v0 -e0 -g6 # 19 QP <-- No solution
+  // -d9 -c0 -v1 -e0 -g6 # 21 QP <-- New (?) solution
+  // -d9 -c0 -v0 -e2 -g5 # 21 QP <-- No solution
+  // -d9 -c1 -v1 -e1 -g5 # 22 QP <-- New (?) solution
+  // -d9 -c1 -v0 -e3 -g4 # 22 QP <-- No solution
+  // -d9 -c0 -v1 -e3 -g4 # 24 QP <-- New (?) solution
+  // -d9 -c0 -v0 -e5 -g3 # 24 QP <-- No solution
+  // -d9 -c1 -v1 -e4 -g3 # 25 QP <-- No solution
+  // -d9 -c1 -v0 -e6 -g2 # 25 QP <-- No solution
+  // -d9 -c0 -v1 -e6 -g2 # 27 QP <-- No solution
+  // -d9 -c0 -v0 -e8 -g1 # 27 QP <-- No solution
+  // -d9 -c1 -v1 -e7 -g1 # 28 QP <-- No solution
+  // -d9 -c1 -v0 -e9 -g0 # 28 QP <-- No solution
+  // -d9 -c0 -v1 -e9 -g0 # 30 QP <-- No solution
 
   // d==10, dim=22, best PI degree 10 rule in libmesh has 25 QPs
-  // Ro3 r(/*d*/10, /*nc*/1, /*nv*/0, /*ne*/0, /*ng*/7); // 22 QP <-- No solution
-  // Ro3 r(/*d*/10, /*nc*/0, /*nv*/1, /*ne*/0, /*ng*/7); // 24 QP <-- No solution
-  Ro3 r(/*d*/10, /*nc*/0, /*nv*/0, /*ne*/2, /*ng*/6); // 24 QP <-- TWO New (?) solutions
-  // Ro3 r(/*d*/10, /*nc*/1, /*nv*/1, /*ne*/1, /*ng*/6); // 25 QP <-- New (?) solution
-  // Ro3 r(/*d*/10, /*nc*/1, /*nv*/0, /*ne*/3, /*ng*/5); // 25 QP <-- New (?) solution
-  // Ro3 r(/*d*/10, /*nc*/0, /*nv*/1, /*ne*/3, /*ng*/5); // 27 QP <-- New (?) solution
-  // Ro3 r(/*d*/10, /*nc*/0, /*nv*/0, /*ne*/5, /*ng*/4); // 27 QP <-- No solution
-  // Ro3 r(/*d*/10, /*nc*/1, /*nv*/1, /*ne*/4, /*ng*/4); // 28 QP <-- 4.9e-17
-  // Ro3 r(/*d*/10, /*nc*/1, /*nv*/0, /*ne*/6, /*ng*/3); // 28 QP
-  // Ro3 r(/*d*/10, /*nc*/1, /*nv*/0, /*ne*/7, /*ng*/2); // 28 QP
-  // Ro3 r(/*d*/10, /*nc*/0, /*nv*/1, /*ne*/7, /*ng*/2); // 30 QP
-  // Ro3 r(/*d*/10, /*nc*/0, /*nv*/0, /*ne*/8, /*ng*/2); // 30 QP
-  // Ro3 r(/*d*/10, /*nc*/1, /*nv*/0, /*ne*/9, /*ng*/1); // 31 QP
-  // Ro3 r(/*d*/10, /*nc*/0, /*nv*/1, /*ne*/9, /*ng*/1); // 33 QP
-  // Ro3 r(/*d*/10, /*nc*/1, /*nv*/1, /*ne*/10, /*ng*/0); // 34 QP
+  // -d10 -c1 -v0 -e0 -g7 # 22 QP <-- No solution
+  // -d10 -c0 -v1 -e0 -g7 # 24 QP <-- No solution
+  // -d10 -c0 -v0 -e2 -g6 # 24 QP <-- TWO New (?) solutions
+  // -d10 -c1 -v1 -e1 -g6 # 25 QP <-- New (?) solution
+  // -d10 -c1 -v0 -e3 -g5 # 25 QP <-- New (?) solution
+  // -d10 -c0 -v1 -e3 -g5 # 27 QP <-- New (?) solution
+  // -d10 -c0 -v0 -e5 -g4 # 27 QP <-- No solution
+  // -d10 -c1 -v1 -e4 -g4 # 28 QP <-- 4.9e-17
+  // -d10 -c1 -v0 -e6 -g3 # 28 QP
+  // -d10 -c1 -v0 -e7 -g2 # 28 QP
+  // -d10 -c0 -v1 -e7 -g2 # 30 QP
+  // -d10 -c0 -v0 -e8 -g2 # 30 QP
+  // -d10 -c1 -v0 -e9 -g1 # 31 QP
+  // -d10 -c0 -v1 -e9 -g1 # 33 QP
+  // -d10 -c1 -v1 -e10 -g0 # 34 QP
 
   // d==11, dim=26, best PI degree 11 rule in libmesh has 30 QPs
-  // Ro3 r(/*d*/11, /*nc*/0, /*nv*/0, /*ne*/1, /*ng*/8); // 27 QP
-  // Ro3 r(/*d*/11, /*nc*/1, /*nv*/1, /*ne*/0, /*ng*/8); // 28 QP
-  // Ro3 r(/*d*/11, /*nc*/1, /*nv*/0, /*ne*/2, /*ng*/7); // 28 QP
-  // Ro3 r(/*d*/11, /*nc*/0, /*nv*/1, /*ne*/2, /*ng*/7); // 30 QP
-  // Ro3 r(/*d*/11, /*nc*/0, /*nv*/0, /*ne*/4, /*ng*/6); // 30 QP
-  // Ro3 r(/*d*/11, /*nc*/1, /*nv*/1, /*ne*/3, /*ng*/6); // 31 QP
-  // Ro3 r(/*d*/11, /*nc*/1, /*nv*/0, /*ne*/5, /*ng*/5); // 31 QP
-  // Ro3 r(/*d*/11, /*nc*/0, /*nv*/1, /*ne*/5, /*ng*/5); // 33 QP
-  // Ro3 r(/*d*/11, /*nc*/0, /*nv*/0, /*ne*/7, /*ng*/4); // 33 QP
-  // Ro3 r(/*d*/11, /*nc*/1, /*nv*/1, /*ne*/6, /*ng*/4); // 34 QP
-  // Ro3 r(/*d*/11, /*nc*/1, /*nv*/0, /*ne*/8, /*ng*/3); // 34 QP
-  // Ro3 r(/*d*/11, /*nc*/0, /*nv*/1, /*ne*/8, /*ng*/3); // 36 QP
-  // Ro3 r(/*d*/11, /*nc*/0, /*nv*/0, /*ne*/10, /*ng*/2); // 36 QP
-  // Ro3 r(/*d*/11, /*nc*/1, /*nv*/1, /*ne*/9, /*ng*/2); // 37 QP
-  // Ro3 r(/*d*/11, /*nc*/1, /*nv*/0, /*ne*/11, /*ng*/1); // 37 QP
-  // Ro3 r(/*d*/11, /*nc*/0, /*nv*/1, /*ne*/11, /*ng*/1); // 39 QP
-  // Ro3 r(/*d*/11, /*nc*/0, /*nv*/0, /*ne*/13, /*ng*/0); // 39 QP
-  // Ro3 r(/*d*/11, /*nc*/1, /*nv*/1, /*ne*/12, /*ng*/0); // 40 QP
+  // -d11 -c0 -v0 -e1 -g8 # 27 QP <-- 1.36e-21
+  // -d11 -c1 -v1 -e0 -g8 # 28 QP <-- 7.47e-23
+  // -d11 -c1 -v0 -e2 -g7 # 28 QP <-- 1.66e-20
+  // -d11 -c0 -v1 -e2 -g7 # 30 QP <-- 3.05e-21
+  // -d11 -c0 -v0 -e4 -g6 # 30 QP <-- 3.05e-19
+  // -d11 -c1 -v1 -e3 -g6 # 31 QP <-- 4.23e-21
+  // -d11 -c1 -v0 -e5 -g5 # 31 QP <-- 4.21e-20
+  // -d11 -c0 -v1 -e5 -g5 # 33 QP <-- 3.97e-19
+  // -d11 -c0 -v0 -e7 -g4 # 33 QP
+  // -d11 -c1 -v1 -e6 -g4 # 34 QP
+  // -d11 -c1 -v0 -e8 -g3 # 34 QP
+  // -d11 -c0 -v1 -e8 -g3 # 36 QP
+  // -d11 -c0 -v0 -e10 -g2 # 36 QP
+  // -d11 -c1 -v1 -e9  -g2 # 37 QP
+  // -d11 -c1 -v0 -e11 -g1 # 37 QP
+  // -d11 -c0 -v1 -e11 -g1 # 39 QP
+  // -d11 -c0 -v0 -e13 -g0 # 39 QP
+  // -d11 -c1 -v1 -e12 -g0 # 40 QP
 
   // d==12, dim=31, best PI degree 12 rule in libmesh has 33 QPs
-  // Ro3 r(/*d*/12, /*nc*/1, /*nv*/0, /*ne*/0, /*ng*/10); // 31 QP
-  // Ro3 r(/*d*/12, /*nc*/0, /*nv*/1, /*ne*/0, /*ng*/10); // 33 QP
-  // Ro3 r(/*d*/12, /*nc*/0, /*nv*/0, /*ne*/2, /*ng*/9); // 33 QP
-  // Ro3 r(/*d*/12, /*nc*/1, /*nv*/1, /*ne*/1, /*ng*/9); // 34 QP
-  // Ro3 r(/*d*/12, /*nc*/1, /*nv*/0, /*ne*/3, /*ng*/8); // 34 QP
-  // Ro3 r(/*d*/12, /*nc*/0, /*nv*/1, /*ne*/3, /*ng*/8); // 36 QP
-  // Ro3 r(/*d*/12, /*nc*/0, /*nv*/0, /*ne*/5, /*ng*/7); // 36 QP
+  // -d12 -c1 -v0 -e0 -g10 # 31 QP
+  // -d12 -c0 -v1 -e0 -g10 # 33 QP
+  // -d12 -c0 -v0 -e2 -g9 # 33 QP
+  // -d12 -c1 -v1 -e1 -g9 # 34 QP
+  // -d12 -c1 -v0 -e3 -g8 # 34 QP
+  // -d12 -c0 -v1 -e3 -g8 # 36 QP
+  // -d12 -c0 -v0 -e5 -g7 # 36 QP
   // ...
 
   // d==13, dim=35, best PI degree 13 rule in libmesh has 37 QPs
-  // Ro3 r(/*d*/13, /*nc*/0, /*nv*/0, /*ne*/1, /*ng*/11); // 36 QP
-  // Ro3 r(/*d*/13, /*nc*/1, /*nv*/1, /*ne*/0, /*ng*/11); // 37 QP
-  // Ro3 r(/*d*/13, /*nc*/1, /*nv*/0, /*ne*/2, /*ng*/10); // 37 QP
-  // Ro3 r(/*d*/13, /*nc*/0, /*nv*/1, /*ne*/2, /*ng*/10); // 39 QP
-  // Ro3 r(/*d*/13, /*nc*/0, /*nv*/0, /*ne*/4, /*ng*/9); // 39 QP
-  // Ro3 r(/*d*/13, /*nc*/1, /*nv*/1, /*ne*/3, /*ng*/9); // 40 QP
-  // Ro3 r(/*d*/13, /*nc*/1, /*nv*/0, /*ne*/5, /*ng*/8); // 40 QP
-  // Ro3 r(/*d*/13, /*nc*/0, /*nv*/1, /*ne*/5, /*ng*/8); // 42 QP
+  // -d13 -c0 -v0 -e1 -g11 # 36 QP
+  // -d13 -c1 -v1 -e0 -g11 # 37 QP
+  // -d13 -c1 -v0 -e2 -g10 # 37 QP
+  // -d13 -c0 -v1 -e2 -g10 # 39 QP
+  // -d13 -c0 -v0 -e4 -g9 # 39 QP
+  // -d13 -c1 -v1 -e3 -g9 # 40 QP
+  // -d13 -c1 -v0 -e5 -g8 # 40 QP
+  // -d13 -c0 -v1 -e5 -g8 # 42 QP
   // ...
 
   // d==14, dim=40, best PI degree 14 rule in libmesh has 42 QPs
-  // Ro3 r(/*d*/14, /*nc*/1, /*nv*/0, /*ne*/0, /*ng*/13); // 40 QP
-  // Ro3 r(/*d*/14, /*nc*/0, /*nv*/0, /*ne*/2, /*ng*/12); // 42 QP
-  // Ro3 r(/*d*/14, /*nc*/1, /*nv*/1, /*ne*/1, /*ng*/12); // 43 QP
-  // Ro3 r(/*d*/14, /*nc*/1, /*nv*/0, /*ne*/3, /*ng*/11); // 43 QP
-  // Ro3 r(/*d*/14, /*nc*/0, /*nv*/1, /*ne*/3, /*ng*/11); // 45 QP
-  // Ro3 r(/*d*/14, /*nc*/0, /*nv*/0, /*ne*/5, /*ng*/10); // 45 QP
-  // Ro3 r(/*d*/14, /*nc*/1, /*nv*/1, /*ne*/4, /*ng*/10); // 46 QP
+  // -d14 -c1 -v0 -e0 -g13 # 40 QP
+  // -d14 -c0 -v0 -e2 -g12 # 42 QP
+  // -d14 -c1 -v1 -e1 -g12 # 43 QP
+  // -d14 -c1 -v0 -e3 -g11 # 43 QP
+  // -d14 -c0 -v1 -e3 -g11 # 45 QP
+  // -d14 -c0 -v0 -e5 -g10 # 45 QP
+  // -d14 -c1 -v1 -e4 -g10 # 46 QP
   // ...
 
   // d==18, dim=64, there is no PI degree 18 rule in libmesh, next highest has 73 pts.
-  // Ro3 r(/*d*/18, /*nc*/1, /*nv*/0, /*ne*/0, /*ng*/21); // 64 QP
-  // Ro3 r(/*d*/18, /*nc*/0, /*nv*/1, /*ne*/0, /*ng*/21); // 66 QP
-  // Ro3 r(/*d*/18, /*nc*/0, /*nv*/0, /*ne*/2, /*ng*/20); // 66 QP
-  // Ro3 r(/*d*/18, /*nc*/1, /*nv*/1, /*ne*/1, /*ng*/20); // 67 QP
-  // Ro3 r(/*d*/18, /*nc*/1, /*nv*/0, /*ne*/3, /*ng*/19); // 67 QP
-  // Ro3 r(/*d*/18, /*nc*/0, /*nv*/1, /*ne*/3, /*ng*/19); // 69 QP
-  // Ro3 r(/*d*/18, /*nc*/0, /*nv*/0, /*ne*/5, /*ng*/18); // 69 QP
-  // Ro3 r(/*d*/18, /*nc*/1, /*nv*/1, /*ne*/4, /*ng*/18); // 70 QP
-  // Ro3 r(/*d*/18, /*nc*/1, /*nv*/0, /*ne*/6, /*ng*/17); // 70 QP
-  // Ro3 r(/*d*/18, /*nc*/0, /*nv*/1, /*ne*/6, /*ng*/17); // 72 QP
-  // Ro3 r(/*d*/18, /*nc*/0, /*nv*/0, /*ne*/8, /*ng*/16); // 72 QP
-  // Ro3 r(/*d*/18, /*nc*/1, /*nv*/1, /*ne*/7, /*ng*/16); // 73 QP
-  // Ro3 r(/*d*/18, /*nc*/1, /*nv*/0, /*ne*/9, /*ng*/15); // 73 QP
-  // Ro3 r(/*d*/18, /*nc*/0, /*nv*/1, /*ne*/9, /*ng*/15); // 75 QP
+  // -d18 -c1 -v0 -e0 -g21 # 64 QP
+  // -d18 -c0 -v1 -e0 -g21 # 66 QP
+  // -d18 -c0 -v0 -e2 -g20 # 66 QP
+  // -d18 -c1 -v1 -e1 -g20 # 67 QP
+  // -d18 -c1 -v0 -e3 -g19 # 67 QP
+  // -d18 -c0 -v1 -e3 -g19 # 69 QP
+  // -d18 -c0 -v0 -e5 -g18 # 69 QP
+  // -d18 -c1 -v1 -e4 -g18 # 70 QP
+  // -d18 -c1 -v0 -e6 -g17 # 70 QP
+  // -d18 -c0 -v1 -e6 -g17 # 72 QP
+  // -d18 -c0 -v0 -e8 -g16 # 72 QP
+  // -d18 -c1 -v1 -e7 -g16 # 73 QP
+  // -d18 -c1 -v0 -e9 -g15 # 73 QP
+  // -d18 -c0 -v1 -e9 -g15 # 75 QP
   // ...
 
   // Print information.
@@ -884,6 +882,84 @@ int main()
   nlopt_destroy(opt);
 
   return 0;
+}
+
+
+double myfunc(unsigned n, const double * x, double * grad, void * my_func_data)
+{
+  auto solver_data = static_cast<SolverData *>(my_func_data);
+
+  // Get references to residual, Jacobian, and solution vector stored on the
+  // SolverData object.
+  Matrix<mpfr_class> & jac = solver_data->jac;
+  std::vector<mpfr_class> & u = solver_data->u;
+  std::vector<mpfr_class> & r = solver_data->r;
+
+  // Copy data. It would be better if we didn't have to do this. One idea
+  // would be to make the SolverData class templated on numerical type...
+  u.assign(x, x+n);
+  solver_data->ro3.residual_and_jacobian(&r, grad ? &jac : nullptr, u);
+
+  // The gradient is grad_f = J^T * r
+  if (grad)
+    {
+      std::vector<mpfr_class> grad_f =
+        jac.matvec_transpose(r);
+      for (unsigned int i=0; i<n; ++i)
+        grad[i] = grad_f[i].get_d();
+    }
+
+  // The objective function value is 0.5 * dot(r,r)
+  return 0.5 * dot(r,r).get_d();
+}
+
+
+
+double myconstraint(unsigned n, const double *x, double *grad, void *data)
+{
+  // x-index of orbit to which are applying the constraint.
+  auto kptr = static_cast<unsigned int *>(data);
+  auto k = *kptr;
+
+  if (grad)
+    {
+      grad[k] = 1.;
+      grad[k+1] = 1.;
+    }
+  return x[k] + x[k+1] - 1;
+}
+
+
+void usage()
+{
+  std::cout << "Usage: ./drivers/nlopt_test -d 10 -c 0 -v 1 -e 3 - g 5" << std::endl;
+  std::cout << "-d = polynomial degree of exactness" << std::endl;
+  std::cout << "-c = number of centroid orbits" << std::endl;
+  std::cout << "-v = number of vertex orbits" << std::endl;
+  std::cout << "-e = number of edge orbits" << std::endl;
+  std::cout << "-g = number of general orbits" << std::endl;
+}
+
+
+std::string nlopt_result_to_string(nlopt_result res)
+{
+  switch (res)
+    {
+    case 1: // generic success code
+      return std::string("NLOPT_SUCCESS");
+    case 2:
+      return std::string("NLOPT_STOPVAL_REACHED");
+    case 3:
+      return std::string("NLOPT_FTOL_REACHED");
+    case 4:
+      return std::string("NLOPT_XTOL_REACHED");
+    case 5:
+      return std::string("NLOPT_MAXEVAL_REACHED");
+    case 6:
+      return std::string("NLOPT_MAXTIME_REACHED");
+    default:
+      return std::string("Unrecognized nlopt_result " + std::to_string(res));
+    }
 }
 
 #endif // HAVE_NLOPT

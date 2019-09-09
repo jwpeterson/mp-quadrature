@@ -16,13 +16,14 @@ bool gradient_descent(SolverData & solver_data)
   Ro3 & ro3 = solver_data.ro3;
 
   std::vector<mpfr_class> & u = solver_data.u;
+  std::vector<mpfr_class> & r = solver_data.r;
+  Matrix<mpfr_class> & jac = solver_data.jac;
 
   // Problem size
   unsigned int n = u.size();
 
   // Storage needed for algorithm.
-  std::vector<mpfr_class> r(n), du(n), grad_f(n), grad_f_old(n), u_old(n), trial_u(n);
-  Matrix<mpfr_class> jac(n,n);
+  std::vector<mpfr_class> du(n), grad_f(n), grad_f_old(n), u_old(n), trial_u(n);
 
   while (true)
     {

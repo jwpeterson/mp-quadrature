@@ -21,11 +21,13 @@ bool newton(SolverData & solver_data)
   Ro3 & ro3 = solver_data.ro3;
 
   std::vector<mpfr_class> & u = solver_data.u;
+  std::vector<mpfr_class> & r = solver_data.r;
+  Matrix<mpfr_class> & jac = solver_data.jac;
+
   unsigned int n = u.size();
 
   // Storage for residual, Newton update, and Jacobian
-  std::vector<mpfr_class> r(n), du(n), trial_u(n);
-  Matrix<mpfr_class> jac(n,n);
+  std::vector<mpfr_class> du(n), trial_u(n);
 
   // Store previous residual norm. Used for simplified line searching technique.
   // mpfr_class old_residual_norm = 0.;
@@ -171,13 +173,15 @@ bool newton_min(SolverData & solver_data)
   Ro3 & ro3 = solver_data.ro3;
 
   std::vector<mpfr_class> & u = solver_data.u;
+  std::vector<mpfr_class> & r = solver_data.r;
+  Matrix<mpfr_class> & jac = solver_data.jac;
 
   // Problem size
   unsigned int n = u.size();
 
   // Storage for residual, Newton update, and Jacobian
-  std::vector<mpfr_class> r(n), du(n), grad_f(n), trial_u(n);
-  Matrix<mpfr_class> jac(n,n), djac(n,n), hess(n,n);
+  std::vector<mpfr_class> du(n), grad_f(n), trial_u(n);
+  Matrix<mpfr_class> djac(n,n), hess(n,n);
 
   while (true)
     {

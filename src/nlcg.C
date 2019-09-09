@@ -14,13 +14,14 @@ bool nlcg(SolverData & solver_data)
   Ro3 & ro3 = solver_data.ro3;
 
   std::vector<mpfr_class> & u = solver_data.u;
+  std::vector<mpfr_class> & r = solver_data.r;
+  Matrix<mpfr_class> & jac = solver_data.jac;
 
   // Problem size
   unsigned int n = u.size();
 
   // Storage needed for algorithm.
-  std::vector<mpfr_class> r(n), du(n), /*u_old(n),*/ du_old(n), grad_f(n), s(n), s_old(n), trial_u(n);
-  Matrix<mpfr_class> jac(n,n);
+  std::vector<mpfr_class> du(n), /*u_old(n),*/ du_old(n), grad_f(n), s(n), s_old(n), trial_u(n);
 
   while (true)
     {

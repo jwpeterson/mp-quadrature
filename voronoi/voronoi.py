@@ -61,29 +61,45 @@ def f2hex(f2rgb, f):
 # filename = 'quad_2d_p07_Ro3_1013_13QP_equilateral.csv'
 # filename = 'quad_2d_p07_Ro3_0032_15QP_equilateral.csv'
 # filename = 'quad_2d_p07_Ro3_1122_16QP_equilateral.csv'
+# d=7, Gatermann's Ro3-invariant  rule
+# filename = 'quad_2d_p07_gatermann_equilateral.csv'
+# d=7, D3-invariant rules
+# filename = 'quad_2d_p07_mine15_equilateral.csv'
+# filename = 'quad_2d_p07_hompack1_equilateral.csv'
+# filename = 'quad_2d_p07_dunavant_equilateral.csv'
+# filename = 'quad_2d_p07_zhang_underdetermined_equilateral.csv'
 
 # d=8
 # filename = 'quad_2d_p08_Ro3_1014_16QP_equilateral.csv'
 # filename = 'quad_2d_p08_Ro3_0114_18QP_equilateral.csv'
 # filename = 'quad_2d_p08_Ro3_1123_19QP_equilateral.csv'
+# d=8, D3-invariant rule
+# filename = 'quad_2d_p08_equilateral.csv'
 
 # d=9
 # filename = 'quad_2d_p09_Ro3_0106_21QP_equilateral.csv'
 # filename = 'quad_2d_p09_Ro3_1115_22QP_equilateral.csv'
 # filename = 'quad_2d_p09_Ro3_0134_24QP_equilateral.csv'
+# d=9, D3-invariant rule
+# filename = 'quad_2d_p09_equilateral.csv'
 
 # d=10
-filename = 'quad_2d_p10_Ro3_0026_24QP_equilateral.csv'
+# filename = 'quad_2d_p10_Ro3_0026_24QP_equilateral.csv'
 # filename = 'quad_2d_p10_Ro3_0026_24QP_second_equilateral.csv'
 # filename = 'quad_2d_p10_Ro3_1116_25QP_equilateral.csv'
 # filename = 'quad_2d_p10_Ro3_1035_25QP_equilateral.csv'
 # filename = 'quad_2d_p10_Ro3_0135_27QP_equilateral.csv'
-
 # d=10, D3-invariant rules (found before or previously known)
 # filename = 'quad_2d_p10_hompack1_equilateral.csv'
 # filename = 'quad_2d_p10_hompack2_equilateral.csv'
 # filename = 'quad_2d_p10_dunavant_equilateral.csv'
 # filename = 'quad_2d_p10_zhang_underdetermined_equilateral.csv'
+
+# d=11, D3-invariant rules
+# filename = 'quad_2d_p11_hompack1_equilateral.csv'
+# filename = 'quad_2d_p11_hompack2_equilateral.csv'
+# filename = 'quad_2d_p11_mine_equilateral.csv'
+filename = 'quad_2d_p11_zhang_underdetermined_equilateral.csv'
 
 ################################################################################
 
