@@ -37,3 +37,6 @@ gmpfrxx/example
 drivers/lu
 plots
 TAGS
+*.pvsm
+voronoi/*.pdf
+logs

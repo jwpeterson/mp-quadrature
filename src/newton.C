@@ -2,6 +2,7 @@
 #include "solver_data.h"
 #include "newton.h"
 #include "vect.h"
+#include "ro3.h"
 
 bool newton(SolverData & solver_data)
 {
@@ -17,18 +18,16 @@ bool newton(SolverData & solver_data)
   unsigned int maxits = solver_data.maxits;
   bool converged = false;
 
-  ResidualAndJacobian & residual_and_jacobian =
-    solver_data.residual_and_jacobian;
-
-  CheckFeasibility & check_feasibility =
-    solver_data.check_feasibility;
+  Ro3 & ro3 = solver_data.ro3;
 
   std::vector<mpfr_class> & u = solver_data.u;
+  std::vector<mpfr_class> & r = solver_data.r;
+  Matrix<mpfr_class> & jac = solver_data.jac;
+
   unsigned int n = u.size();
 
   // Storage for residual, Newton update, and Jacobian
-  std::vector<mpfr_class> r(n), du(n), trial_u(n);
-  Matrix<mpfr_class> jac(n,n);
+  std::vector<mpfr_class> du(n), trial_u(n);
 
   // Store previous residual norm. Used for simplified line searching technique.
   // mpfr_class old_residual_norm = 0.;
@@ -40,7 +39,7 @@ bool newton(SolverData & solver_data)
         break;
 
       // Compute the residual (vector) at the current guess.
-      residual_and_jacobian(&r, nullptr, u);
+      ro3.residual_and_jacobian(&r, nullptr, u);
 
       // Check the norm of the residual vector to see if we are done.
       mpfr_class residual_norm = norm(r);
@@ -61,7 +60,7 @@ bool newton(SolverData & solver_data)
         break;
 
       // Compute Jacobian (only) at the current guess.
-      residual_and_jacobian(nullptr, &jac, u);
+      ro3.residual_and_jacobian(nullptr, &jac, u);
 
       // Compute update: du = -jac^{-1} * r
       try
@@ -89,7 +88,7 @@ bool newton(SolverData & solver_data)
             {
               // std::cout << "Trying step with alpha=" << alpha << std::endl;
               trial_u = u - alpha * du;
-              residual_and_jacobian(&r, nullptr, trial_u);
+              ro3.residual_and_jacobian(&r, nullptr, trial_u);
               mpfr_class trial_residual = norm(r);
 
               // if (solver_data.verbose)
@@ -102,7 +101,7 @@ bool newton(SolverData & solver_data)
                 residual_reduction_required ? (trial_residual < residual_norm) : true;
 
               // Check feasibility of the proposed solution.
-              bool feasible = check_feasibility(trial_u);
+              bool feasible = ro3.check_feasibility(trial_u);
 
               // if (solver_data.verbose && !residual_reduced)
               //   std::cout << "newton: backtracking step "
@@ -171,20 +170,18 @@ bool newton_min(SolverData & solver_data)
   unsigned iter = 0;
   bool converged = false;
 
-  ResidualAndJacobian & residual_and_jacobian =
-    solver_data.residual_and_jacobian;
-
-  CheckFeasibility & check_feasibility =
-    solver_data.check_feasibility;
+  Ro3 & ro3 = solver_data.ro3;
 
   std::vector<mpfr_class> & u = solver_data.u;
+  std::vector<mpfr_class> & r = solver_data.r;
+  Matrix<mpfr_class> & jac = solver_data.jac;
 
   // Problem size
   unsigned int n = u.size();
 
   // Storage for residual, Newton update, and Jacobian
-  std::vector<mpfr_class> r(n), du(n), grad_f(n), trial_u(n);
-  Matrix<mpfr_class> jac(n,n), djac(n,n), hess(n,n);
+  std::vector<mpfr_class> du(n), grad_f(n), trial_u(n);
+  Matrix<mpfr_class> djac(n,n), hess(n,n);
 
   while (true)
     {
@@ -193,7 +190,7 @@ bool newton_min(SolverData & solver_data)
         break;
 
       // Compute the residual and Jacobian at the current guess.
-      residual_and_jacobian(&r, &jac, u);
+      ro3.residual_and_jacobian(&r, &jac, u);
 
       // Compute the size of the scalar function "f"
       // which we are trying to minimize, _not_ dot(r,r)^0.5.
@@ -258,7 +255,7 @@ bool newton_min(SolverData & solver_data)
 //          u_eps[j] += eps;
 //
 //          // Compute Jacobian at u + eps
-//          residual_and_jacobian(nullptr, &djac, u_eps);
+//          ro3.residual_and_jacobian(nullptr, &djac, u_eps);
 //
 //          // Debugging
 //          // std::cout << "j=" << j << std::endl;
@@ -321,11 +318,11 @@ bool newton_min(SolverData & solver_data)
               trial_u = u - alpha * du;
 
               // Compute residual at trial solution.
-              residual_and_jacobian(&r, nullptr, trial_u);
+              ro3.residual_and_jacobian(&r, nullptr, trial_u);
               mpfr_class trial_residual = 0.5 * dot(r,r);
 
               // Check for feasibility of the solution
-              bool feasible = check_feasibility(trial_u);
+              bool feasible = ro3.check_feasibility(trial_u);
               bool residual_reduced =
                 residual_reduction_required ? (trial_residual < residual) : true;
 

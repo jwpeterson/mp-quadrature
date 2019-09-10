@@ -13,20 +13,17 @@ bool gradient_descent(SolverData & solver_data)
   unsigned iter = 0;
   bool converged = false;
 
-  ResidualAndJacobian & residual_and_jacobian =
-    solver_data.residual_and_jacobian;
-
-  CheckFeasibility & check_feasibility =
-    solver_data.check_feasibility;
+  Ro3 & ro3 = solver_data.ro3;
 
   std::vector<mpfr_class> & u = solver_data.u;
+  std::vector<mpfr_class> & r = solver_data.r;
+  Matrix<mpfr_class> & jac = solver_data.jac;
 
   // Problem size
   unsigned int n = u.size();
 
   // Storage needed for algorithm.
-  std::vector<mpfr_class> r(n), du(n), grad_f(n), grad_f_old(n), u_old(n), trial_u(n);
-  Matrix<mpfr_class> jac(n,n);
+  std::vector<mpfr_class> du(n), grad_f(n), grad_f_old(n), u_old(n), trial_u(n);
 
   while (true)
     {
@@ -35,7 +32,7 @@ bool gradient_descent(SolverData & solver_data)
         break;
 
       // Compute the residual and Jacobian at the current guess.
-      residual_and_jacobian(&r, &jac, u);
+      ro3.residual_and_jacobian(&r, &jac, u);
 
       // Compute the size of the scalar function "f"
       // which we are trying to minimize, _not_ dot(r,r)^0.5.
@@ -88,7 +85,7 @@ bool gradient_descent(SolverData & solver_data)
           for (unsigned int back=0; back<50; ++back)
             {
               trial_u = u - gamma_n * grad_f;
-              bool feasible = check_feasibility(trial_u);
+              bool feasible = ro3.check_feasibility(trial_u);
 
               if (!feasible)
                 {

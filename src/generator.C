@@ -14,11 +14,16 @@ bool Generator::is_valid() const
   if (type == SINGLEPOINT && w != mpfr_class(0.) && a != mpfr_class(0.) && b != mpfr_class(0.))
     return true;
 
-  if (type == RO3 && w != mpfr_class(0.) && a != mpfr_class(0.) && b != mpfr_class(0.))
+  if (type == RO3 && w != mpfr_class(0.) && a != mpfr_class(0.))
     return true;
 
   // If we made it here, we're not valid
-  std::cout << "Generator type " << type << " not valid: weight = " << w << ", a = " << a << ", b = " << b << std::endl;
+  std::cout << "Generator type " << type
+            << " not valid: weight = " << w
+            << ", a = " << a
+            << ", b = " << b
+            << std::endl;
+
   return false;
 }
 
