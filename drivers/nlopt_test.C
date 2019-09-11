@@ -317,6 +317,27 @@ int main(int argc, char ** argv)
   // residual squared, i.e. an ftol of 1.e-16 corresponds to a true
   // residual of about 1.e-8. If maxeval is negative, then this
   // criterion is disabled.
+  //
+  // To give some idea about the relationship between maxeval and time
+  // spent optimizing, we ran a few seeds of a large (-d18) test case
+  // and recorded how long they took. In each case, the 'convergence'
+  // reason was NLOPT_MAXEVAL_REACHED. I am not sure whether
+  // specifying maxeval on the "local" optimizer effectively squares
+  // the number of evaluations that are done, or if the value is
+  // somehow cumulative.  Note that there seems to be a lot of
+  // variability possible even for a single value of maxeval. In fact,
+  // there can be overlap in the times required for 5k and 10k
+  // evals. Clearly if you make the maxeval too small you will not
+  // obtain any starting points close to anything like the global
+  // minimum. I think the main point here is to use a reasonably
+  // large value which is not infinite, so you don't spend too much
+  // time in local minima where you can't achieve the required ftol.
+  //
+  // maxeval   Time(s) for "nlopt_test -d18 -c1 -v0 -e0 -g21"
+  // 10000  &  83.72 & 36.37 & 45.09 & 81.59 & 38.72 & 142.19
+  //  5000  &  19.86 & 47.02 & 19.28 & 41.47 & 18.37
+  //  2500  &  9.60  & 10.32 & 9.58  & 9.46  & 21.34
+  //  1000  &  3.85  & 9.23  & 9.49  & 9.37  & 6.01
   double ftol_rel = 1.e-16;
   double xtol_rel = 1.e-8;
   int maxeval = 10000;
@@ -888,7 +909,7 @@ int main(int argc, char ** argv)
         }
 
       // Debugging: exit after one iteration.
-      // break;
+      break;
     } // end while(true)
 
   // Clean up
