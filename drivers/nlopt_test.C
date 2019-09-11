@@ -153,14 +153,14 @@ int main(int argc, char ** argv)
   // -d6 -c1 -v1 -e4 -g0 # 16 QP <-- No solution
 
   // d==7, dim=12
-  // -d 7 -c0 -v0 -e0 -g4 # 12 QP <-- Gatermann solution
-  // -d 7 -c1 -v0 -e1 -g3 # 13 QP <-- New (?) solution
-  // -d 7 -c0 -v1 -e1 -g3 # 15 QP <-- No solution
-  // -d 7 -c0 -v0 -e3 -g2 # 15 QP <-- New (?) solution
-  // -d 7 -c1 -v1 -e2 -g2 # 16 QP <-- New (?) solution
-  // -d 7 -c1 -v0 -e4 -g1 # 16 QP <-- No solution
-  // -d 7 -c0 -v1 -e4 -g1 # 18 QP <-- No solution
-  // -d 7 -c1 -v1 -e5 -g0 # 18 QP <-- No solution
+  // -d7 -c0 -v0 -e0 -g4 # 12 QP <-- Gatermann solution
+  // -d7 -c1 -v0 -e1 -g3 # 13 QP <-- New (?) solution
+  // -d7 -c0 -v1 -e1 -g3 # 15 QP <-- No solution
+  // -d7 -c0 -v0 -e3 -g2 # 15 QP <-- New (?) solution
+  // -d7 -c1 -v1 -e2 -g2 # 16 QP <-- New (?) solution
+  // -d7 -c1 -v0 -e4 -g1 # 16 QP <-- No solution
+  // -d7 -c0 -v1 -e4 -g1 # 18 QP <-- No solution
+  // -d7 -c1 -v1 -e5 -g0 # 18 QP <-- No solution
 
   // d==8, dim=15, best PI degree 8 rule in libmesh has 16 QPs
   // -d8 -c0 -v0 -e0 -g5 # 15 QP <-- No solution
