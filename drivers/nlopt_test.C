@@ -209,16 +209,16 @@ int main(int argc, char ** argv)
   // -d10 -c1 -v1 -e10 -g0 # 34 QP
 
   // d==11, dim=26, best PI degree 11 rule in libmesh has 30 QPs
-  // -d11 -c0 -v0 -e1 -g8 # 27 QP <-- 1.36e-21
-  // -d11 -c1 -v1 -e0 -g8 # 28 QP <-- 7.47e-23
-  // -d11 -c1 -v0 -e2 -g7 # 28 QP <-- 1.66e-20
-  // -d11 -c0 -v1 -e2 -g7 # 30 QP <-- 3.05e-21
-  // -d11 -c0 -v0 -e4 -g6 # 30 QP <-- 3.05e-19
-  // -d11 -c1 -v1 -e3 -g6 # 31 QP <-- 4.23e-21
-  // -d11 -c1 -v0 -e5 -g5 # 31 QP <-- 4.21e-20
+  // -d11 -c0 -v0 -e1 -g8 # 27 QP <-- 1.36e-21, instance-3
+  // -d11 -c1 -v1 -e0 -g8 # 28 QP <-- 7.47e-23, instance-4
+  // -d11 -c1 -v0 -e2 -g7 # 28 QP <-- 1.66e-20, instance-5
+  // -d11 -c0 -v1 -e2 -g7 # 30 QP <-- 3.05e-21, instance-6
+  // -d11 -c0 -v0 -e4 -g6 # 30 QP <-- 3.05e-19, instance-7
+  // -d11 -c1 -v1 -e3 -g6 # 31 QP <-- 4.23e-21, instance-8
+  // -d11 -c1 -v0 -e5 -g5 # 31 QP <-- 4.21e-20, instance-1
   // -d11 -c0 -v1 -e5 -g5 # 33 QP <-- 3.97e-19
-  // -d11 -c0 -v0 -e7 -g4 # 33 QP
-  // -d11 -c1 -v1 -e6 -g4 # 34 QP
+  // -d11 -c0 -v0 -e7 -g4 # 33 QP <-- 9.54e-16
+  // -d11 -c1 -v1 -e6 -g4 # 34 QP <-- 3.23e-16
   // -d11 -c1 -v0 -e8 -g3 # 34 QP
   // -d11 -c0 -v1 -e8 -g3 # 36 QP
   // -d11 -c0 -v0 -e10 -g2 # 36 QP
@@ -229,7 +229,7 @@ int main(int argc, char ** argv)
   // -d11 -c1 -v1 -e12 -g0 # 40 QP
 
   // d==12, dim=31, best PI degree 12 rule in libmesh has 33 QPs
-  // -d12 -c1 -v0 -e0 -g10 # 31 QP
+  // -d12 -c1 -v0 -e0 -g10 # 31 QP <-- instance-2
   // -d12 -c0 -v1 -e0 -g10 # 33 QP
   // -d12 -c0 -v0 -e2 -g9 # 33 QP
   // -d12 -c1 -v1 -e1 -g9 # 34 QP
@@ -311,6 +311,16 @@ int main(int argc, char ** argv)
   solver_data.do_backtracking = true;
   solver_data.residual_reduction_required = true;
 
+  // Tolerances used by the optimization routines (and the 'inner'
+  // optimization routine, if using AUGLAG). Recall that these are
+  // objective function values, so they are proportional to the "true"
+  // residual squared, i.e. an ftol of 1.e-16 corresponds to a true
+  // residual of about 1.e-8. If maxeval is negative, then this
+  // criterion is disabled.
+  double ftol_rel = 1.e-16;
+  double xtol_rel = 1.e-8;
+  int maxeval = 10000;
+
   // "GN" = global derivative-free optimization
   // nlopt_algorithm alg = NLOPT_GN_DIRECT_L;
 
@@ -343,10 +353,13 @@ int main(int argc, char ** argv)
       alg == NLOPT_G_MLSL)
     {
       // The objective function, bounds, and nonlinear-constraint
-      // parameters of local_opt are ignored.
+      // parameters of local_opt are ignored. A copy is made when
+      // calling set_local_optimizer, so it is safe to let the local
+      // copy be destroyed.
       nlopt_opt local_opt = nlopt_create(NLOPT_LD_SLSQP, dim);
-      nlopt_set_xtol_rel(local_opt, 1.e-8);
-      nlopt_set_ftol_rel(local_opt, 1.e-16);
+      nlopt_set_xtol_rel(local_opt, xtol_rel);
+      nlopt_set_ftol_rel(local_opt, ftol_rel);
+      nlopt_set_maxeval(local_opt, maxeval);
       nlopt_set_local_optimizer(opt, local_opt);
     }
 
@@ -381,13 +394,13 @@ int main(int argc, char ** argv)
     nlopt_add_inequality_constraint(opt, myconstraint, &data[c], 1e-8);
 
   // Set tolerance(s)
-  nlopt_set_xtol_rel(opt, 1.e-8);
-  nlopt_set_ftol_rel(opt, 1.e-16);
+  nlopt_set_xtol_rel(opt, xtol_rel);
+  nlopt_set_ftol_rel(opt, ftol_rel);
 
   // You can use this parameter to control how long some of the
   // gradient free optimization algorithms run, otherwise it seems
   // that they can just run forever.
-  // nlopt_set_maxeval(opt, 9999);
+  nlopt_set_maxeval(opt, maxeval);
 
   // Solution vector
   std::vector<double> x;
