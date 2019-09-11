@@ -909,7 +909,7 @@ int main(int argc, char ** argv)
         }
 
       // Debugging: exit after one iteration.
-      break;
+      // break;
     } // end while(true)
 
   // Clean up
