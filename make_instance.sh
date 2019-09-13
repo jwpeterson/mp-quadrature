@@ -9,6 +9,7 @@ sudo apt-get -y install g++
 sudo apt-get -y install libnlopt-dev
 sudo apt-get -y install libnlopt0
 sudo apt-get -y install make
+sudo apt-get -y install emacs
 
 # mkdir projects
 # cd projects

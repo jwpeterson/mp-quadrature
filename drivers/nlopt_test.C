@@ -209,13 +209,13 @@ int main(int argc, char ** argv)
   // -d10 -c1 -v1 -e10 -g0 # 34 QP
 
   // d==11, dim=26, best PI degree 11 rule in libmesh has 30 QPs
-  // -d11 -c0 -v0 -e1 -g8 # 27 QP <-- 1.36e-21, instance-3
-  // -d11 -c1 -v1 -e0 -g8 # 28 QP <-- 7.47e-23, instance-4
-  // -d11 -c1 -v0 -e2 -g7 # 28 QP <-- 1.66e-20, instance-5
-  // -d11 -c0 -v1 -e2 -g7 # 30 QP <-- 3.05e-21, instance-6
-  // -d11 -c0 -v0 -e4 -g6 # 30 QP <-- 3.05e-19, instance-7
-  // -d11 -c1 -v1 -e3 -g6 # 31 QP <-- 4.23e-21, instance-8
-  // -d11 -c1 -v0 -e5 -g5 # 31 QP <-- 4.21e-20, instance-1
+  // -d11 -c0 -v0 -e1 -g8 # 27 QP <-- 1.36e-21
+  // -d11 -c1 -v1 -e0 -g8 # 28 QP <-- 7.47e-23
+  // -d11 -c1 -v0 -e2 -g7 # 28 QP <-- 1.66e-20
+  // -d11 -c0 -v1 -e2 -g7 # 30 QP <-- 3.05e-21
+  // -d11 -c0 -v0 -e4 -g6 # 30 QP <-- 3.05e-19
+  // -d11 -c1 -v1 -e3 -g6 # 31 QP <-- 4.23e-21
+  // -d11 -c1 -v0 -e5 -g5 # 31 QP <-- 4.21e-20
   // -d11 -c0 -v1 -e5 -g5 # 33 QP <-- 3.97e-19
   // -d11 -c0 -v0 -e7 -g4 # 33 QP <-- 9.54e-16
   // -d11 -c1 -v1 -e6 -g4 # 34 QP <-- 3.23e-16
@@ -230,12 +230,13 @@ int main(int argc, char ** argv)
 
   // d==12, dim=31, best PI degree 12 rule in libmesh has 33 QPs
   // -d12 -c1 -v0 -e0 -g10 # 31 QP <-- instance-2
-  // -d12 -c0 -v1 -e0 -g10 # 33 QP
-  // -d12 -c0 -v0 -e2 -g9 # 33 QP
-  // -d12 -c1 -v1 -e1 -g9 # 34 QP
-  // -d12 -c1 -v0 -e3 -g8 # 34 QP
-  // -d12 -c0 -v1 -e3 -g8 # 36 QP
-  // -d12 -c0 -v0 -e5 -g7 # 36 QP
+  // -d12 -c0 -v1 -e0 -g10 # 33 QP <-- instance-1
+  // -d12 -c0 -v0 -e2 -g9 # 33 QP <-- instance-3
+  // -d12 -c1 -v1 -e1 -g9 # 34 QP <-- instance-4
+  // -d12 -c1 -v0 -e3 -g8 # 34 QP <-- instance-5
+  // -d12 -c0 -v1 -e3 -g8 # 36 QP <-- instance-6
+  // -d12 -c0 -v0 -e5 -g7 # 36 QP <-- instance-7
+  // -d12 -c1 -v1 -e4 -g7 # 37 QP <-- instance-8
   // ...
 
   // d==13, dim=35, best PI degree 13 rule in libmesh has 37 QPs
@@ -338,18 +339,29 @@ int main(int argc, char ** argv)
   //  5000  &  19.86 & 47.02 & 19.28 & 41.47 & 18.37
   //  2500  &  9.60  & 10.32 & 9.58  & 9.46  & 21.34
   //  1000  &  3.85  & 9.23  & 9.49  & 9.37  & 6.01
-  double ftol_rel = 1.e-16;
+  double ftol_rel = 1.e-30;
   double xtol_rel = 1.e-8;
-  int maxeval = 10000;
+  int maxeval = 20000;
 
   // "GN" = global derivative-free optimization
   // nlopt_algorithm alg = NLOPT_GN_DIRECT_L;
 
   // "LD" = local gradient based optimization
-  // nlopt_algorithm alg = NLOPT_LD_MMA; // method of moving asymptotes
-  // nlopt_algorithm alg = NLOPT_LD_SLSQP; // sequential quadratic programming
-  // nlopt_algorithm alg = NLOPT_LD_TNEWTON_PRECOND_RESTART; // Preconditioned truncated Newton
-  // nlopt_algorithm alg = NLOPT_LD_LBFGS; // Low storage BFGS
+
+  // .) MMA = method of moving asymptotes
+  // o gradient-based
+  // o globally-convergent
+  // o includes nonlinear constraints but not equality constraints
+  // nlopt_algorithm alg = NLOPT_LD_MMA;
+
+  // .) sequential quadratic programming
+  // nlopt_algorithm alg = NLOPT_LD_SLSQP;
+
+  // Preconditioned truncated Newton
+  // nlopt_algorithm alg = NLOPT_LD_TNEWTON_PRECOND_RESTART;
+
+  // Low storage BFGS
+  // nlopt_algorithm alg = NLOPT_LD_LBFGS;
 
   // You must use a local/subsidiary optimization algorithm with AUGLAG,
   // this is set by calling nlopt_set_local_optimizer().
@@ -373,11 +385,87 @@ int main(int argc, char ** argv)
   if (alg == NLOPT_AUGLAG ||
       alg == NLOPT_G_MLSL)
     {
+      ////////////////////////////////////////////////////////////////////////////////
+      // Evolutionary algorithms
+      ////////////////////////////////////////////////////////////////////////////////
+      nlopt_algorithm local_alg = NLOPT_GN_ISRES; // 5/15 converged, very slow
+      // nlopt_algorithm local_alg = NLOPT_GN_ESCH; // 5/28 converged, slow
+
+      ////////////////////////////////////////////////////////////////////////////////
+      // Derivative-free algorithms
+      // I doubt that any derivative-free optimization algorithm will
+      // ever be as good as the derivative-based ones, at least for a
+      // given maxeval. But I figured I might as well try them all
+      // anyway. Most ran surprisingly (to me) slow compared to the
+      // derivative based algorithms.
+      ////////////////////////////////////////////////////////////////////////////////
+
+      // nlopt_algorithm local_alg = NLOPT_LN_COBYLA; // 12/33 converged, slow
+      // nlopt_algorithm local_alg = NLOPT_LN_BOBYQA; // 1/22 converged, slow
+      // nlopt_algorithm local_alg = NLOPT_LN_NEWUOA; // solutions violate constraints?
+      // nlopt_algorithm local_alg = NLOPT_LN_NEWUOA_BOUND; // did not work?
+      // nlopt_algorithm local_alg = NLOPT_LN_PRAXIS; // 2/40 converged
+      // nlopt_algorithm local_alg = NLOPT_LN_NELDERMEAD; // none converged
+      // nlopt_algorithm local_alg = NLOPT_LN_SBPLX; // 3/28 converged
+
+      ////////////////////////////////////////////////////////////////////////////////
+      // Derivative-based algorithms
+      ////////////////////////////////////////////////////////////////////////////////
+
+      // Must set a maxeval for this otherwise it will run forever.
+      // Generally does not work as well as SLSQP even for the
+      // relatively simple degree=7 problem.
+      // nlopt_algorithm local_alg = NLOPT_LD_MMA;
+
+      // Instead of constructing local MMA approximations, constructs
+      // simple quadratic approximations. *Must* set a maxeval for this
+      // or else it will run forever. This is the only optimization algorithm
+      // in nlopt which supports a user-defined Hessian approximation/preconditioner.
+      // See: nlopt_set_precond_min_objective(). The function prototype for the
+      // preconditioner is
+      // void pre(unsigned n, const double *x, const double *v,
+      //          double *vpre, void *f_data);
+      // and you are meant to compute and return the action of H, vpre = H * v.
+      // nlopt_algorithm local_alg = NLOPT_LD_CCSAQ;
+
+      // Low storage BFGS. Runs really fast. Does not seem to respect
+      // the ftol we set, as it returns NLOPT_FTOL_REACHED even with
+      // the minimum is much larger than the tolerance? Does actually
+      // find some roots, but that may be because it runs so fast that
+      // I got more data for it... Also when it did converge, it
+      // seemed to be my Newton solver that was actually obtaining the
+      // root, and not really the optimization program.
+      // nlopt_algorithm local_alg = NLOPT_LD_LBFGS; // 10/89 converged
+
+      // Preconditioned truncated Newton. For some reason it seems to
+      // find many solutions which are pegged at multiple constraints?
+      // I'm not sure what would cause something like this... The
+      // versions with no preconditioning and no restart or
+      // preconditioning found a few converged solutions in the d=7
+      // case.  Seems to run reasonably fast.
+      // nlopt_algorithm local_alg = NLOPT_LD_TNEWTON_PRECOND_RESTART;
+      // nlopt_algorithm local_alg = NLOPT_LD_TNEWTON_PRECOND; // no restarting
+      // nlopt_algorithm local_alg = NLOPT_LD_TNEWTON_RESTART; // no preconditioning
+      // nlopt_algorithm local_alg = NLOPT_LD_TNEWTON; // no restart or preconditioning
+
+      // Shifted limited-memory variable metric, rank-2 and rank-1 versions.
+      // Seems to run quite fast and does find a few converged solutions (30/263
+      // and 29/253, respectively).
+      // nlopt_algorithm local_alg = NLOPT_LD_VAR2;
+      // nlopt_algorithm local_alg = NLOPT_LD_VAR1;
+
+      // So far this is the best local minimizer I've found to use in
+      // conjunction with AUGLAG... For the degree=7 problem, it
+      // converged for an impressive 79/115 initial guesses, but
+      // perhaps it does not scale as well as some of the other
+      // methods for larger problems?
+      // nlopt_algorithm local_alg = NLOPT_LD_SLSQP;
+
       // The objective function, bounds, and nonlinear-constraint
       // parameters of local_opt are ignored. A copy is made when
       // calling set_local_optimizer, so it is safe to let the local
       // copy be destroyed.
-      nlopt_opt local_opt = nlopt_create(NLOPT_LD_SLSQP, dim);
+      nlopt_opt local_opt = nlopt_create(local_alg, dim);
       nlopt_set_xtol_rel(local_opt, xtol_rel);
       nlopt_set_ftol_rel(local_opt, ftol_rel);
       nlopt_set_maxeval(local_opt, maxeval);
