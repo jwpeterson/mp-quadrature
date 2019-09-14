@@ -86,8 +86,16 @@ def f2hex(f2rgb, f):
 # d=10
 # filename = 'quad_2d_p10_Ro3_0026_24QP_equilateral.csv'
 # filename = 'quad_2d_p10_Ro3_0026_24QP_second_equilateral.csv'
+# filename = 'quad_2d_p10_Ro3_0026_24QP_third_equilateral.csv'
+# filename = 'quad_2d_p10_Ro3_0026_24QP_fourth_equilateral.csv'
+# filename = 'quad_2d_p10_Ro3_0026_24QP_fifth_equilateral.csv'
+# filename = 'quad_2d_p10_Ro3_0026_24QP_sixth_equilateral.csv'
+
 # filename = 'quad_2d_p10_Ro3_1116_25QP_equilateral.csv'
+
 # filename = 'quad_2d_p10_Ro3_1035_25QP_equilateral.csv'
+filename = 'quad_2d_p10_Ro3_1035_25QP_second_equilateral.csv'
+
 # filename = 'quad_2d_p10_Ro3_0135_27QP_equilateral.csv'
 # d=10, D3-invariant rules (found before or previously known)
 # filename = 'quad_2d_p10_hompack1_equilateral.csv'
@@ -99,7 +107,7 @@ def f2hex(f2rgb, f):
 # filename = 'quad_2d_p11_hompack1_equilateral.csv'
 # filename = 'quad_2d_p11_hompack2_equilateral.csv'
 # filename = 'quad_2d_p11_mine_equilateral.csv'
-filename = 'quad_2d_p11_zhang_underdetermined_equilateral.csv'
+# filename = 'quad_2d_p11_zhang_underdetermined_equilateral.csv'
 
 ################################################################################
 

@@ -394,7 +394,15 @@ bool Ro3::check_feasibility (const std::vector<mpfr_class> & trial_u)
         return false;
       }
 
-  // 2.) Check if 1-x-y < 0 in general orbits
+  // 2.) Check if x >= 1 in edge orbits
+  for (unsigned int q=begin(EDGE); q<end(EDGE); q+=2)
+    {
+      mpfr_class x = trial_u[q+1];
+      if (x >= mpfr_class(1))
+        return false;
+    }
+
+  // 3.) Check if 1-x-y < 0 in general orbits
   for (unsigned int q=begin(GENERAL); q<end(GENERAL); q+=3)
     {
       mpfr_class x = trial_u[q+1];
