@@ -195,9 +195,9 @@ int main(int argc, char ** argv)
   // -d10 -c1 -v0 -e0 -g7 # 22 QP <-- No solution
   // -d10 -c0 -v1 -e0 -g7 # 24 QP <-- No solution
   // -d10 -c0 -v0 -e2 -g6 # 24 QP <-- SIX New (?) solutions
-  // -d10 -c1 -v1 -e1 -g6 # 25 QP <-- New (?) solution, instance-1
-  // -d10 -c1 -v0 -e3 -g5 # 25 QP <-- TWO New (?) solutions, instance-2
-  // -d10 -c0 -v1 -e3 -g5 # 27 QP <-- New (?) solution, instance-3
+  // -d10 -c1 -v1 -e1 -g6 # 25 QP <-- New (?) solution
+  // -d10 -c1 -v0 -e3 -g5 # 25 QP <-- TWO New (?) solutions
+  // -d10 -c0 -v1 -e3 -g5 # 27 QP <-- New (?) solution
   // -d10 -c0 -v0 -e5 -g4 # 27 QP <-- No solution
   // -d10 -c1 -v1 -e4 -g4 # 28 QP <-- 4.9e-17
   // -d10 -c1 -v0 -e6 -g3 # 28 QP
@@ -210,7 +210,7 @@ int main(int argc, char ** argv)
 
   // d==11, dim=26, best PI degree 11 rule in libmesh has 30 QPs
   // -d11 -c0 -v0 -e1 -g8 # 27 QP <-- 1.36e-21
-  // -d11 -c1 -v1 -e0 -g8 # 28 QP <-- 7.47e-23, instance-4
+  // -d11 -c1 -v1 -e0 -g8 # 28 QP <-- 7.47e-23
   // -d11 -c1 -v0 -e2 -g7 # 28 QP <-- 1.66e-20
   // -d11 -c0 -v1 -e2 -g7 # 30 QP <-- 3.05e-21
   // -d11 -c0 -v0 -e4 -g6 # 30 QP <-- 3.05e-19
@@ -250,15 +250,31 @@ int main(int argc, char ** argv)
   // -d13 -c0 -v1 -e5 -g8 # 42 QP
   // ...
 
-  // d==14, dim=40, best PI degree 14 rule in libmesh has 42 QPs
-  // -d14 -c1 -v0 -e0 -g13 # 40 QP, <-- instance-5
-  // -d14 -c0 -v0 -e2 -g12 # 42 QP, <-- instance-6
-  // -d14 -c1 -v1 -e1 -g12 # 43 QP, <-- instance-7
-  // -d14 -c1 -v0 -e3 -g11 # 43 QP, <-- instance-8
-  // -d14 -c0 -v1 -e3 -g11 # 45 QP
-  // -d14 -c0 -v0 -e5 -g10 # 45 QP
-  // -d14 -c1 -v1 -e4 -g10 # 46 QP
+  // d==14, dim=40, best PI degree 14 rule in libmesh has 42 QPs.
+  // When plotted, Dunavant's 42 QP rule *appears* to have points on the
+  // boundary, but they are in fact only very *close* to the boundary
+  // and not on it, for example one QP is located at position
+  // (1.196e-1, 1.0984e-3) in the equilateral reference triangle.
+  // -d14 -c1 -v0 -e0 -g13 # 40 QP, <-- No solutions found
+  // -d14 -c0 -v0 -e2 -g12 # 42 QP, <-- No solutions found
+  // -d14 -c1 -v1 -e1 -g12 # 43 QP, <-- No solutions found
+  // -d14 -c1 -v0 -e3 -g11 # 43 QP, <-- One new solution found
+  // -d14 -c0 -v1 -e3 -g11 # 45 QP, <-- instance-1
+  // -d14 -c0 -v0 -e5 -g10 # 45 QP, <-- instance-2
+  // -d14 -c1 -v1 -e4 -g10 # 46 QP, <-- instance-3
   // ...
+
+  // d==15, dim=46, best PI rule in libmesh has 49 QPs
+  // -d15 -c1 -v0 -e0 -g15 # 46 QP, instance-4
+  // -d15 -c0 -v1 -e0 -g15 # 48 QP, instance-5
+  // -d15 -c1 -v1 -e1 -g14 # 49 QP, instance-6
+  // -d15 -c1 -v0 -e3 -g13 # 49 QP, instance-7
+  // -d15 -c0 -v1 -e3 -g13 # 51 QP, instance-8
+  // -d15 -c0 -v0 -e5 -g12 # 51 QP
+  // -d15 -c1 -v1 -e4 -g12 # 52 QP
+  // -d15 -c1 -v0 -e6 -g11 # 52 QP
+  // -d15 -c0 -v1 -e6 -g11 # 54 QP
+  // -d15 -c1 -v1 -e7 -g10 # 55 QP
 
   // d==18, dim=64, there is no PI degree 18 rule in libmesh, next highest has 73 pts.
   // -d18 -c1 -v0 -e0 -g21 # 64 QP
@@ -375,6 +391,7 @@ int main(int argc, char ** argv)
   // problem which has a known solution, so I'm not really sure what
   // it's doing or if it's even working?
   // nlopt_algorithm alg = NLOPT_G_MLSL;
+  // nlopt_algorithm alg = NLOPT_G_MLSL_LDS;
 
   // The problem dimension depends only on "d".
   unsigned int dim = r.dim();
@@ -390,14 +407,43 @@ int main(int argc, char ** argv)
       // Global optimization
       ////////////////////////////////////////////////////////////////////////////////
 
-      // The locally biased variant seemed to work well for d==7 case given a large maxeval.
-      // It converged almost every initial guess somehow...
+      // The locally biased variant seemed to work well for d==7 case
+      // given a large maxeval.  You have to be careful when using
+      // these, at least the first two *ignore* your initial guess, so
+      // if you run multiple times with the same maxeval, you will
+      // just get the same result every time... Another issue that
+      // makes these unsuitable for our use is they will often choose
+      // the same values for more than (w,x,y) triple, which generally
+      // leads to a singular Jacobian (although for some reason it can
+      // produce a small residual).
+      //
+      // All of the algorithms perform a "deterministic search based
+      // on systematic division of the search domain into smaller and
+      // smaller hyperrectangles". The "L" versions of the algorithms
+      // are specifically stated to "do well for small problems with a
+      // single global minimizer and only a few local minimizers"
+      // which I don't think describes our problem particularly
+      // well. A possible use of the algorithms is to "generate
+      // initial iterates for other sampling methods", which is
+      // something that seems relevant.
       // nlopt_algorithm local_alg = NLOPT_GN_DIRECT;
       // nlopt_algorithm local_alg = NLOPT_GN_DIRECT_L; // "locally biased" variant
       // nlopt_algorithm local_alg = NLOPT_GN_DIRECT_L_RAND; // randomized variant of DIRECT-L
+      // nlopt_algorithm local_alg = NLOPT_GN_DIRECT_NOSCAL; // Unscaled variant
+      // nlopt_algorithm local_alg = NLOPT_GN_DIRECT_L_NOSCAL; // Unscaled variant
+      // nlopt_algorithm local_alg = NLOPT_GN_DIRECT_L_RAND_NOSCAL; // Unscaled variant
+      // nlopt_algorithm local_alg = NLOPT_GN_ORIG_DIRECT; // implementation based on original Fortran
+      // nlopt_algorithm local_alg = NLOPT_GN_ORIG_DIRECT_L; // implementation based on original Fortran
 
       // Controlled random search. This one can also use the
-      // nl_set_population() flag.
+      // nl_set_population() flag. In my experience this one seemed to
+      // frequently produce "solutions" that contained many 0s or 1s,
+      // i.e. that were pegged at the lower or upper constraint, for
+      // some reason.  Possibly it is not designed to be used as an
+      // inner unconstrained optimization algorithm wrapped by AUGLAG,
+      // or perhaps there is some bug in the implementation. In
+      // contrast, the evolutionary algorithm seemed not to do this
+      // for whatever reason.
       // nlopt_algorithm local_alg = NLOPT_GN_CRS2_LM;
 
       ////////////////////////////////////////////////////////////////////////////////
@@ -405,9 +451,22 @@ int main(int argc, char ** argv)
       ////////////////////////////////////////////////////////////////////////////////
 
       // The population size for ISRES defaults to 20*(n+1) in n dimensions,
-      // this can be changed by nlopt_set_population().
-      // nlopt_algorithm local_alg = NLOPT_GN_ISRES; // 5/15 converged, very slow
-      nlopt_algorithm local_alg = NLOPT_GN_ESCH; // 5/28 converged, slow
+      // this can be changed by calling nlopt_set_population(). Both of these seem to provide
+      // somewhat reasonable looking initial guesses (i.e. not full of
+      // 0s and 1s like CRS2) and therefore have been my go-to for
+      // initial guess selection selection up to this point.
+      // For a -d15 problem, ISRES takes about 11.5 seconds while ESCH takes about 14, although
+      // some of that time was spent in newton_min.
+      // nlopt_algorithm local_alg = NLOPT_GN_ISRES;
+      nlopt_algorithm local_alg = NLOPT_GN_ESCH;
+
+      // Global optimization algorithms that use derivative
+      // information.  Requires a bound constrained problem. Original
+      // source code No longer seems to be available. Requires linking
+      // against the NLOPT C++ library, when I try to run it, it just
+      // returns error codes, and that could be why...
+      // nlopt_algorithm local_alg = NLOPT_GD_STOGO;
+      // nlopt_algorithm local_alg = NLOPT_GD_STOGO_RAND;
 
       ////////////////////////////////////////////////////////////////////////////////
       // Derivative-free algorithms
@@ -1117,6 +1176,52 @@ int main(int argc, char ** argv)
       //       1.3960746583857763185533320493072e-2,
       //       8.6097589069840721814036297772080e-2,
       //       3.8205053391734468157969505461413e-2
+      //     };
+
+      // A degree=14 rule with 43 QPs
+      // if (r.d==14 && r.nc==1 && r.nv==0 && r.ne==3 && r.ng==11)
+      //   x =
+      //     {
+      //       8.7602731941396900630735811947358e-3,
+      //       2.9370048439533343099581854148131e-3,
+      //       6.2569253700367656437599058972695e-1,
+      //       1.6722513059433337416138535964424e-3,
+      //       8.8680974748427433769925101370325e-2,
+      //       5.7390658454334448532157896567854e-4,
+      //       1.2799961839418472894118805041784e-2,
+      //       9.5083874542120944322747876929124e-3,
+      //       1.1710792836049738347970910075001e-1,
+      //       4.8441813220397451000822101304212e-2,
+      //       1.8325481630759103084118515572825e-2,
+      //       4.4083626500893020361210042699666e-1,
+      //       1.0532653095577596382329864081012e-1,
+      //       2.4395501721248301734401840100893e-2,
+      //       1.8192544578916314911386413213589e-1,
+      //       2.6274708469190746410044887848486e-1,
+      //       5.4733878981357532110672298946041e-3,
+      //       2.3614034101103065689516149293159e-2,
+      //       5.5365008543376860411186591718459e-2,
+      //       7.1580877387819418984424546237794e-3,
+      //       1.7805982025480138666710873201622e-2,
+      //       1.7988024351778182678727751998295e-1,
+      //       1.5382037527279956789320393864015e-2,
+      //       7.4413372874920121574666100186901e-1,
+      //       1.0096598858785286765560093338538e-1,
+      //       2.0770322555420189374486180714216e-2,
+      //       2.5755784039249370167366496740320e-1,
+      //       1.0490301583281400901946442066470e-1,
+      //       7.8294830776101924134496693934753e-3,
+      //       7.3350913065469368221226676165934e-1,
+      //       2.4892308231352947537903472219670e-1,
+      //       1.1093259959636639241345639892050e-2,
+      //       4.2927867298388176661985950025306e-1,
+      //       2.3217124123051175846242571349823e-2,
+      //       1.5272066925997130278476353288891e-2,
+      //       5.2264287574525983396476919517189e-2,
+      //       3.2561032239980910848464202797350e-1,
+      //       2.3355396378432121651365456587160e-2,
+      //       3.4651207179134267642714477679978e-1,
+      //       2.2593051901338893848890937988649e-1
       //     };
 
       // std::cout << "x=" << std::endl;

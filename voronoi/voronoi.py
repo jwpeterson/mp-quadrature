@@ -92,11 +92,10 @@ def f2hex(f2rgb, f):
 # filename = 'quad_2d_p10_Ro3_0026_24QP_sixth_equilateral.csv'
 
 # filename = 'quad_2d_p10_Ro3_1116_25QP_equilateral.csv'
-
 # filename = 'quad_2d_p10_Ro3_1035_25QP_equilateral.csv'
-filename = 'quad_2d_p10_Ro3_1035_25QP_second_equilateral.csv'
-
+# filename = 'quad_2d_p10_Ro3_1035_25QP_second_equilateral.csv'
 # filename = 'quad_2d_p10_Ro3_0135_27QP_equilateral.csv'
+
 # d=10, D3-invariant rules (found before or previously known)
 # filename = 'quad_2d_p10_hompack1_equilateral.csv'
 # filename = 'quad_2d_p10_hompack2_equilateral.csv'
@@ -108,6 +107,14 @@ filename = 'quad_2d_p10_Ro3_1035_25QP_second_equilateral.csv'
 # filename = 'quad_2d_p11_hompack2_equilateral.csv'
 # filename = 'quad_2d_p11_mine_equilateral.csv'
 # filename = 'quad_2d_p11_zhang_underdetermined_equilateral.csv'
+
+# d=14
+# filename = 'quad_2d_p14_Ro3_1-0-3-11_43QP_equilateral.csv'
+
+# d=14, D3-invariant rule. This rule appears to have 6 points
+# on the boundary, but I still need to confirm whether they
+# are actually on the boundary or just very close to it.
+filename = 'quad_2d_p14_dunavant_equilateral.csv'
 
 ################################################################################
 
