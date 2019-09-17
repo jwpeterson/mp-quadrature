@@ -108,8 +108,9 @@ def f2hex(f2rgb, f):
 # filename = 'quad_2d_p11_mine_equilateral.csv'
 # filename = 'quad_2d_p11_zhang_underdetermined_equilateral.csv'
 
-# d=14
+# d=14, Ro3-invariant rules
 # filename = 'quad_2d_p14_Ro3_1-0-3-11_43QP_equilateral.csv'
+filename = 'quad_2d_p14_Ro3_0-1-3-11_45QP_equilateral.csv'
 
 # d=14, D3-invariant rule. This rule appears to have 6 points on the
 # boundary, but they are just very close and not actually on it.
@@ -130,7 +131,7 @@ def f2hex(f2rgb, f):
 # filename = 'quad_2d_p17_mine63c_equilateral.csv'
 # filename = 'quad_2d_p17_mine63e_equilateral.csv'
 # filename = 'quad_2d_p17_dunavant_underdetermined_equilateral.csv'
-filename = 'quad_2d_p17_zhang_xiao_underdetermined_equilateral.csv'
+# filename = 'quad_2d_p17_zhang_xiao_underdetermined_equilateral.csv'
 
 ################################################################################
 

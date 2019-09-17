@@ -209,14 +209,14 @@ int main(int argc, char ** argv)
   // -d10 -c1 -v1 -e10 -g0 # 34 QP
 
   // d==11, dim=26, best PI degree 11 rule in libmesh has 30 QPs
-  // -d11 -c0 -v0 -e1 -g8 # 27 QP <-- 1.36e-21
-  // -d11 -c1 -v1 -e0 -g8 # 28 QP <-- 7.47e-23
-  // -d11 -c1 -v0 -e2 -g7 # 28 QP <-- 1.66e-20
-  // -d11 -c0 -v1 -e2 -g7 # 30 QP <-- 3.05e-21
-  // -d11 -c0 -v0 -e4 -g6 # 30 QP <-- 3.05e-19
-  // -d11 -c1 -v1 -e3 -g6 # 31 QP <-- 4.23e-21
-  // -d11 -c1 -v0 -e5 -g5 # 31 QP <-- 4.21e-20
-  // -d11 -c0 -v1 -e5 -g5 # 33 QP <-- 3.97e-19
+  // -d11 -c0 -v0 -e1 -g8 # 27 QP <-- instance-1
+  // -d11 -c1 -v1 -e0 -g8 # 28 QP <-- instance-2
+  // -d11 -c1 -v0 -e2 -g7 # 28 QP <-- instance-3
+  // -d11 -c0 -v1 -e2 -g7 # 30 QP <-- instance-4
+  // -d11 -c0 -v0 -e4 -g6 # 30 QP <-- instance-5
+  // -d11 -c1 -v1 -e3 -g6 # 31 QP <-- instance-6
+  // -d11 -c1 -v0 -e5 -g5 # 31 QP <-- instance-7
+  // -d11 -c0 -v1 -e5 -g5 # 33 QP <-- instance-8
   // -d11 -c0 -v0 -e7 -g4 # 33 QP <-- 9.54e-16
   // -d11 -c1 -v1 -e6 -g4 # 34 QP <-- 3.23e-16
   // -d11 -c1 -v0 -e8 -g3 # 34 QP
@@ -259,17 +259,17 @@ int main(int argc, char ** argv)
   // -d14 -c0 -v0 -e2 -g12 # 42 QP, <-- No solutions found
   // -d14 -c1 -v1 -e1 -g12 # 43 QP, <-- No solutions found
   // -d14 -c1 -v0 -e3 -g11 # 43 QP, <-- One new solution found
-  // -d14 -c0 -v1 -e3 -g11 # 45 QP, <-- instance-1
-  // -d14 -c0 -v0 -e5 -g10 # 45 QP, <-- instance-2
-  // -d14 -c1 -v1 -e4 -g10 # 46 QP, <-- instance-3
+  // -d14 -c0 -v1 -e3 -g11 # 45 QP, <-- One new solution found
+  // -d14 -c0 -v0 -e5 -g10 # 45 QP, <-- No solutions found
+  // -d14 -c1 -v1 -e4 -g10 # 46 QP, <-- No solutions found
   // ...
 
   // d==15, dim=46, best PI rule in libmesh has 49 QPs
-  // -d15 -c1 -v0 -e0 -g15 # 46 QP, instance-4
-  // -d15 -c0 -v1 -e0 -g15 # 48 QP, instance-5
-  // -d15 -c1 -v1 -e1 -g14 # 49 QP, instance-6
-  // -d15 -c1 -v0 -e3 -g13 # 49 QP, instance-7
-  // -d15 -c0 -v1 -e3 -g13 # 51 QP, instance-8
+  // -d15 -c1 -v0 -e0 -g15 # 46 QP, <-- No solutions found
+  // -d15 -c0 -v1 -e0 -g15 # 48 QP, <-- No solutions found
+  // -d15 -c1 -v1 -e1 -g14 # 49 QP, <-- No solutions found
+  // -d15 -c1 -v0 -e3 -g13 # 49 QP, <-- No solutions found
+  // -d15 -c0 -v1 -e3 -g13 # 51 QP, <-- No solutions found
   // -d15 -c0 -v0 -e5 -g12 # 51 QP
   // -d15 -c1 -v1 -e4 -g12 # 52 QP
   // -d15 -c1 -v0 -e6 -g11 # 52 QP
@@ -381,7 +381,7 @@ int main(int argc, char ** argv)
 
   // You must use a local/subsidiary optimization algorithm with AUGLAG,
   // this is set by calling nlopt_set_local_optimizer().
-  nlopt_algorithm alg = NLOPT_AUGLAG;
+  // nlopt_algorithm alg = NLOPT_AUGLAG;
 
   // MLSL also requires a local optimizer. MLSL is a multistart
   // algorithm that performs a sequence of local optimizations, and
@@ -392,6 +392,11 @@ int main(int argc, char ** argv)
   // it's doing or if it's even working?
   // nlopt_algorithm alg = NLOPT_G_MLSL;
   // nlopt_algorithm alg = NLOPT_G_MLSL_LDS;
+
+  // Improved Stochastic Ranking Evolution Strategy.
+  // "This method supports arbitrary nonlinear inequality and equality
+  // constraints in addition to the bound constraints"
+  nlopt_algorithm alg = NLOPT_GN_ISRES;
 
   // The problem dimension depends only on "d".
   unsigned int dim = r.dim();
@@ -1222,6 +1227,52 @@ int main(int argc, char ** argv)
       //       2.3355396378432121651365456587160e-2,
       //       3.4651207179134267642714477679978e-1,
       //       2.2593051901338893848890937988649e-1
+      //     };
+
+      // A degree=14 rule with 45 QPs
+      // if (r.d==14 && r.nc==0 && r.nv==1 && r.ne==3 && r.ng==11)
+      //   x =
+      //     {
+      //       3.3341899592961390239330691261075e-4,
+      //       3.0804695636428859775836998484786e-3,
+      //       6.3949508844000101530322090060017e-1,
+      //       1.3467792723446368940584261873350e-3,
+      //       8.9865581126975221365647380324030e-1,
+      //       1.5808612604308310282152033095180e-3,
+      //       8.2584471866031358855731003566467e-2,
+      //       1.5517179962432558030079423848826e-2,
+      //       3.2737328694989254537979410999909e-1,
+      //       6.1224845612522570738777194715772e-1,
+      //       5.8662491339398932703718253350689e-3,
+      //       3.4850864435982021385019048236532e-2,
+      //       4.5197798839280629001552417799081e-2,
+      //       1.3100196828241954768175386975552e-2,
+      //       1.0211868224797030928841192894071e-1,
+      //       1.1807074456720143580973186137872e-1,
+      //       5.7384174774244469979829896128327e-3,
+      //       1.2103222706495347272600039299542e-2,
+      //       6.9871209216410311139155281266307e-1,
+      //       8.8257700451123060137611409110076e-3,
+      //       2.6608472404768591546336780338015e-2,
+      //       1.9182589356278665756923992509375e-1,
+      //       2.0328946435433698309360010474528e-2,
+      //       2.7548450177012763711574099989473e-1,
+      //       9.8017236746459420569439397915450e-2,
+      //       1.2337108101872235990810963734127e-2,
+      //       4.5072480205695292700062605730619e-1,
+      //       2.7784943748007040744651153745007e-2,
+      //       8.7367504162729152038456560338039e-3,
+      //       1.5863306115852773909310196554799e-1,
+      //       3.3841769725060766849846547666604e-2,
+      //       2.6166451247689517218959272227204e-2,
+      //       4.4733762244797522632545143088875e-1,
+      //       2.8250580286951273987516423182381e-1,
+      //       2.0031633502453665041956251163153e-2,
+      //       1.6277387226616365612347189484367e-1,
+      //       2.2247245619331818629709299504105e-1,
+      //       2.3676434423445508019113110092622e-2,
+      //       4.3244235515783959316476754659812e-1,
+      //       1.3816549030011917242370306253053e-1
       //     };
 
       // std::cout << "x=" << std::endl;
