@@ -111,10 +111,26 @@ def f2hex(f2rgb, f):
 # d=14
 # filename = 'quad_2d_p14_Ro3_1-0-3-11_43QP_equilateral.csv'
 
-# d=14, D3-invariant rule. This rule appears to have 6 points
-# on the boundary, but I still need to confirm whether they
-# are actually on the boundary or just very close to it.
-filename = 'quad_2d_p14_dunavant_equilateral.csv'
+# d=14, D3-invariant rule. This rule appears to have 6 points on the
+# boundary, but they are just very close and not actually on it.
+# filename = 'quad_2d_p14_dunavant_equilateral.csv'
+
+# d=15, D3-invariant rules. The Wandzura rule is rank-deficient.
+# filename = 'quad_2d_p15_mine49_equilateral.csv'
+# filename = 'quad_2d_p15_mine51_equilateral.csv'
+# filename = 'quad_2d_p15_mine52c_equilateral.csv'
+# filename = 'quad_2d_p15_zhang_witherden_equilateral.csv'
+# filename = 'quad_2d_p15_wandzura_equilateral.csv'
+
+# d=16, D3-invariant rules.
+# filename = 'quad_2d_p16_mine55_equilateral.csv'
+# filename = 'quad_2d_p16_zhang_underdetermined_equilateral.csv'
+
+# d=17, D3-invariant rules.
+# filename = 'quad_2d_p17_mine63c_equilateral.csv'
+# filename = 'quad_2d_p17_mine63e_equilateral.csv'
+# filename = 'quad_2d_p17_dunavant_underdetermined_equilateral.csv'
+filename = 'quad_2d_p17_zhang_xiao_underdetermined_equilateral.csv'
 
 ################################################################################
 
