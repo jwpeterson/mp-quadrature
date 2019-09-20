@@ -102,15 +102,20 @@ def f2hex(f2rgb, f):
 # filename = 'quad_2d_p10_dunavant_equilateral.csv'
 # filename = 'quad_2d_p10_zhang_underdetermined_equilateral.csv'
 
+# d=11, Ro3-invariant rules
+# filename = 'quad_2d_p11_Ro3_0018_27QP_equilateral.csv'
+# filename = 'quad_2d_p11_Ro3_0127_30QP_equilateral.csv'
+filename = 'quad_2d_p11_Ro3_1136_31QP_equilateral.csv'
+
 # d=11, D3-invariant rules
-# filename = 'quad_2d_p11_hompack1_equilateral.csv'
-# filename = 'quad_2d_p11_hompack2_equilateral.csv'
-# filename = 'quad_2d_p11_mine_equilateral.csv'
-# filename = 'quad_2d_p11_zhang_underdetermined_equilateral.csv'
+# filename = 'quad_2d_p11_hompack1_30QP_equilateral.csv'
+# filename = 'quad_2d_p11_hompack2_30QP_equilateral.csv'
+# filename = 'quad_2d_p11_mine_30QP_equilateral.csv'
+# filename = 'quad_2d_p11_zhang_underdetermined_28QP_equilateral.csv'
 
 # d=14, Ro3-invariant rules
 # filename = 'quad_2d_p14_Ro3_1-0-3-11_43QP_equilateral.csv'
-filename = 'quad_2d_p14_Ro3_0-1-3-11_45QP_equilateral.csv'
+# filename = 'quad_2d_p14_Ro3_0-1-3-11_45QP_equilateral.csv'
 
 # d=14, D3-invariant rule. This rule appears to have 6 points on the
 # boundary, but they are just very close and not actually on it.
