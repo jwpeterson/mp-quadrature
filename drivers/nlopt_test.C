@@ -140,7 +140,7 @@ int main(int argc, char ** argv)
   // -d4 -c1 -v0 -e2 -g0 # 7 QP <-- No solution
   // -d4 -c0 -v1 -e2 -g0 # 9 QP <-- No solution
 
-  // d==5, dim==7
+  // d==5, dim==7. Best known PI rule has 7 QP.
   // -d5 -c1 -v0 -e0 -g2 # 7 QP <-- Also a D3 rule in libmesh
 
   // d=6, dim==10

@@ -49,12 +49,20 @@ def f2hex(f2rgb, f):
 # filename = 'quad_2d_p03_Ro3_1110_07QP_equilateral.csv'
 
 # d=4
+# filename = 'quad_2d_p04_06QP_equilateral.csv'
 # filename = 'quad_2d_p04_Ro3_0011_06QP_equilateral.csv'
 
-# d=5 (this rule is not new)
+# d=5. These are actually the same. In the Ro3-invariant case, the
+# two general orbits converge to "median" orbits and the result matches
+# the D3-invariant case.
 # filename = 'quad_2d_p05_Ro3_1002_07QP_equilateral.csv'
+# filename = 'quad_2d_p05_07QP_equilateral.csv'
 
 # d=6
+# D3-invariant rules.
+# filename = 'quad_2d_p06_dunavant_12QP_equilateral.csv'
+ #filename = 'quad_2d_p06_hompack1_12QP_equilateral.csv'
+# Ro3-invariant rules
 # filename = 'quad_2d_p06_Ro3_0022_12QP_equilateral.csv'
 
 # d=7
@@ -64,9 +72,9 @@ def f2hex(f2rgb, f):
 # d=7, Gatermann's Ro3-invariant  rule
 # filename = 'quad_2d_p07_gatermann_equilateral.csv'
 # d=7, D3-invariant rules
-# filename = 'quad_2d_p07_mine15_equilateral.csv'
-# filename = 'quad_2d_p07_hompack1_equilateral.csv'
-# filename = 'quad_2d_p07_dunavant_equilateral.csv'
+# filename = 'quad_2d_p07_mine_15QP_equilateral.csv'
+filename = 'quad_2d_p07_hompack1_15QP_equilateral.csv'
+# filename = 'quad_2d_p07_dunavant_13QP_equilateral.csv'
 # filename = 'quad_2d_p07_zhang_underdetermined_equilateral.csv'
 
 # d=8
@@ -105,7 +113,7 @@ def f2hex(f2rgb, f):
 # d=11, Ro3-invariant rules
 # filename = 'quad_2d_p11_Ro3_0018_27QP_equilateral.csv'
 # filename = 'quad_2d_p11_Ro3_0127_30QP_equilateral.csv'
-filename = 'quad_2d_p11_Ro3_1136_31QP_equilateral.csv'
+# filename = 'quad_2d_p11_Ro3_1136_31QP_equilateral.csv'
 
 # d=11, D3-invariant rules
 # filename = 'quad_2d_p11_hompack1_30QP_equilateral.csv'
