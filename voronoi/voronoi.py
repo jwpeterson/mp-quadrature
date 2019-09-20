@@ -70,26 +70,26 @@ def f2hex(f2rgb, f):
 # filename = 'quad_2d_p07_Ro3_0032_15QP_equilateral.csv'
 # filename = 'quad_2d_p07_Ro3_1122_16QP_equilateral.csv'
 # d=7, Gatermann's Ro3-invariant  rule
-# filename = 'quad_2d_p07_gatermann_equilateral.csv'
+# filename = 'quad_2d_p07_gatermann_12QP_equilateral.csv'
 # d=7, D3-invariant rules
 # filename = 'quad_2d_p07_mine_15QP_equilateral.csv'
 # filename = 'quad_2d_p07_hompack1_15QP_equilateral.csv'
 # filename = 'quad_2d_p07_dunavant_13QP_equilateral.csv'
-# filename = 'quad_2d_p07_zhang_underdetermined_equilateral.csv'
+# filename = 'quad_2d_p07_zhang_underdetermined_15QP_equilateral.csv'
 
 # d=8
 # filename = 'quad_2d_p08_Ro3_1014_16QP_equilateral.csv'
 # filename = 'quad_2d_p08_Ro3_0114_18QP_equilateral.csv'
 # filename = 'quad_2d_p08_Ro3_1123_19QP_equilateral.csv'
 # d=8, D3-invariant rule
-# filename = 'quad_2d_p08_equilateral.csv'
+# filename = 'quad_2d_p08_16QP_equilateral.csv'
 
 # d=9
 # filename = 'quad_2d_p09_Ro3_0106_21QP_equilateral.csv'
 # filename = 'quad_2d_p09_Ro3_1115_22QP_equilateral.csv'
 # filename = 'quad_2d_p09_Ro3_0134_24QP_equilateral.csv'
 # d=9, D3-invariant rule
-# filename = 'quad_2d_p09_equilateral.csv'
+# filename = 'quad_2d_p09_19QP_equilateral.csv'
 
 # d=10
 # filename = 'quad_2d_p10_Ro3_0026_24QP_equilateral.csv'
@@ -105,14 +105,14 @@ def f2hex(f2rgb, f):
 # filename = 'quad_2d_p10_Ro3_0135_27QP_equilateral.csv'
 
 # d=10, D3-invariant rules (found before or previously known)
-# filename = 'quad_2d_p10_hompack1_equilateral.csv'
-# filename = 'quad_2d_p10_hompack2_equilateral.csv'
-# filename = 'quad_2d_p10_dunavant_equilateral.csv'
-# filename = 'quad_2d_p10_zhang_underdetermined_equilateral.csv'
+# filename = 'quad_2d_p10_hompack1_25QP_equilateral.csv'
+# filename = 'quad_2d_p10_hompack2_25QP_equilateral.csv'
+# filename = 'quad_2d_p10_dunavant_25QP_equilateral.csv'
+# filename = 'quad_2d_p10_zhang_underdetermined_25QP_equilateral.csv'
 
 # d=11, Ro3-invariant rules
 # filename = 'quad_2d_p11_Ro3_0018_27QP_equilateral.csv'
-filename = 'quad_2d_p11_Ro3_0018_27QP_second_equilateral.csv'
+# filename = 'quad_2d_p11_Ro3_0018_27QP_second_equilateral.csv'
 # filename = 'quad_2d_p11_Ro3_0127_30QP_equilateral.csv'
 # filename = 'quad_2d_p11_Ro3_1136_31QP_equilateral.csv'
 
@@ -122,30 +122,37 @@ filename = 'quad_2d_p11_Ro3_0018_27QP_second_equilateral.csv'
 # filename = 'quad_2d_p11_mine_30QP_equilateral.csv'
 # filename = 'quad_2d_p11_zhang_underdetermined_28QP_equilateral.csv'
 
+# d=12, D3-invariant rules
+# filename = 'quad_2d_p12_dunavant_33QP_equilateral.csv'
+# filename = 'quad_2d_p12_mine_33QP_equilateral.csv'
+
+# d=13, D3-invariant rules
+# filename = 'quad_2d_p13_zhang_37QP_equilateral.csv'
+
 # d=14, Ro3-invariant rules
 # filename = 'quad_2d_p14_Ro3_1-0-3-11_43QP_equilateral.csv'
 # filename = 'quad_2d_p14_Ro3_0-1-3-11_45QP_equilateral.csv'
 
 # d=14, D3-invariant rule. This rule appears to have 6 points on the
 # boundary, but they are just very close and not actually on it.
-# filename = 'quad_2d_p14_dunavant_equilateral.csv'
+# filename = 'quad_2d_p14_dunavant_42QP_equilateral.csv'
 
 # d=15, D3-invariant rules. The Wandzura rule is rank-deficient.
-# filename = 'quad_2d_p15_mine49_equilateral.csv'
-# filename = 'quad_2d_p15_mine51_equilateral.csv'
-# filename = 'quad_2d_p15_mine52c_equilateral.csv'
-# filename = 'quad_2d_p15_zhang_witherden_equilateral.csv'
-# filename = 'quad_2d_p15_wandzura_equilateral.csv'
+# filename = 'quad_2d_p15_mine_49QP_equilateral.csv'
+# filename = 'quad_2d_p15_mine_51QP_equilateral.csv'
+# filename = 'quad_2d_p15_mine_52QP_equilateral.csv'
+# filename = 'quad_2d_p15_zhang_witherden_49QP_equilateral.csv'
+# filename = 'quad_2d_p15_wandzura_54QP_equilateral.csv'
 
 # d=16, D3-invariant rules.
-# filename = 'quad_2d_p16_mine55_equilateral.csv'
-# filename = 'quad_2d_p16_zhang_underdetermined_equilateral.csv'
+# filename = 'quad_2d_p16_mine_55QP_equilateral.csv'
+# filename = 'quad_2d_p16_zhang_underdetermined_55QP_equilateral.csv'
 
 # d=17, D3-invariant rules.
-# filename = 'quad_2d_p17_mine63c_equilateral.csv'
-# filename = 'quad_2d_p17_mine63e_equilateral.csv'
-# filename = 'quad_2d_p17_dunavant_underdetermined_equilateral.csv'
-# filename = 'quad_2d_p17_zhang_xiao_underdetermined_equilateral.csv'
+# filename = 'quad_2d_p17_mine_63QP_equilateral.csv'
+# filename = 'quad_2d_p17_mine_63QP_second_equilateral.csv'
+# filename = 'quad_2d_p17_dunavant_underdetermined_61QP_equilateral.csv'
+filename = 'quad_2d_p17_zhang_xiao_underdetermined_60QP_equilateral.csv'
 
 ################################################################################
 

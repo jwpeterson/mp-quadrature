@@ -113,7 +113,7 @@ int main(int argc, char ** argv)
   // Build ro3 rule object
   Ro3 r(d, nc, nv, ne, ng);
 
-  // d==2, dim==2
+  // d==2, dim==2. Betst known PI rule has 3 QP.
   // Note: This case is somewhat tricky despite also being the
   // simplest non-trivial case!  The issue is that the Jacobian is
   // singular at the root, so Newton iterations converge very slowly,
@@ -124,7 +124,7 @@ int main(int argc, char ** argv)
   // *exactly* singular.
   // -d2 -c0 -v0 -e1 -g0 # 3 QP <-- Solution confirmed
 
-  // d==3, dim==4
+  // d==3, dim==4. Best known PI rule is a conical product rule with 4 QP.
   // -d3 -c1 -v0 -e0 -g1 # 4 QP <-- No solution (-ve wt soln only)
   // -d3 -c0 -v0 -e2 -g0 # 6 QP <-- No solution
   // -d3 -c1 -v1 -e1 -g0 # 7 QP <-- New (?) solution
@@ -143,7 +143,7 @@ int main(int argc, char ** argv)
   // d==5, dim==7. Best known PI rule has 7 QP.
   // -d5 -c1 -v0 -e0 -g2 # 7 QP <-- Also a D3 rule in libmesh
 
-  // d=6, dim==10
+  // d=6, dim==10. Best known PI rule has 12 QP.
   // -d6 -c1 -v0 -e0 -g3 # 10 QP <-- No solution
   // -d6 -c0 -v1 -e0 -g3 # 12 QP <-- No solution
   // -d6 -c0 -v0 -e2 -g2 # 12 QP <-- New (?) solution
@@ -152,7 +152,7 @@ int main(int argc, char ** argv)
   // -d6 -c0 -v0 -e5 -g0 # 15 QP <-- No solution
   // -d6 -c1 -v1 -e4 -g0 # 16 QP <-- No solution
 
-  // d==7, dim=12
+  // d==7, dim=12. Best known PI rule is Gatermann's rule.
   // -d7 -c0 -v0 -e0 -g4 # 12 QP <-- Gatermann solution
   // -d7 -c1 -v0 -e1 -g3 # 13 QP <-- New (?) solution
   // -d7 -c0 -v1 -e1 -g3 # 15 QP <-- No solution
