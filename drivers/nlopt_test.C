@@ -176,7 +176,7 @@ int main(int argc, char ** argv)
   // -d8 -c0 -v1 -e7 -g0 # 24 QP <-- No solution
 
   // d==9, dim=19, best PI degree 9 rule in libmesh has 19 QPs
-  // -d9 -c1 -v0 -e0 -g6 # 19 QP <-- No solution, all instances
+  // -d9 -c1 -v0 -e0 -g6 # 19 QP <-- One solution found, same as D3!
   // -d9 -c0 -v1 -e0 -g6 # 21 QP <-- New (?) solution
   // -d9 -c0 -v0 -e2 -g5 # 21 QP <-- No solution
   // -d9 -c1 -v1 -e1 -g5 # 22 QP <-- New (?) solution
@@ -199,7 +199,7 @@ int main(int argc, char ** argv)
   // -d10 -c1 -v0 -e3 -g5 # 25 QP <-- TWO New (?) solutions
   // -d10 -c0 -v1 -e3 -g5 # 27 QP <-- New (?) solution
   // -d10 -c0 -v0 -e5 -g4 # 27 QP <-- No solution
-  // -d10 -c1 -v1 -e4 -g4 # 28 QP <-- 4.9e-17
+  // -d10 -c1 -v1 -e4 -g4 # 28 QP <-- No solutions found
   // -d10 -c1 -v0 -e6 -g3 # 28 QP
   // -d10 -c1 -v0 -e7 -g2 # 28 QP
   // -d10 -c0 -v1 -e7 -g2 # 30 QP
@@ -229,9 +229,9 @@ int main(int argc, char ** argv)
   // -d11 -c1 -v1 -e12 -g0 # 40 QP
 
   // d==12, dim=31, best PI degree 12 rule in libmesh has 33 QPs
-  // -d12 -c1 -v0 -e0 -g10 # 31 QP <-- No solutions found
-  // -d12 -c0 -v1 -e0 -g10 # 33 QP <-- No solutions found
-  // -d12 -c0 -v0 -e2 -g9 # 33 QP <-- No solutions found
+  // -d12 -c1 -v0 -e0 -g10 # 31 QP <-- No solutions found, instance-1, instance-4, instance-7
+  // -d12 -c0 -v1 -e0 -g10 # 33 QP <-- No solutions found, instance-2, instance-5, instance-8
+  // -d12 -c0 -v0 -e2 -g9 # 33 QP <-- No solutions found, instance-3, instance-6
   // -d12 -c1 -v1 -e1 -g9 # 34 QP <-- No solutions found
   // -d12 -c1 -v0 -e3 -g8 # 34 QP <-- No solutions found
   // -d12 -c0 -v1 -e3 -g8 # 36 QP <-- No solutions found
@@ -822,6 +822,33 @@ int main(int argc, char ** argv)
       //       6.1512488037728468907811464063495e-1,
       //       8.1799808561019703180235467829817e-2
       //     };
+
+      // A degree=9 1-0-0-6 rule with 19 QPs, this ties the current minimum!
+      // Actually this is the same as the previously-known D3-invariant rule
+      // with 19 QPs.
+      // if (r.d==9 && r.nc==1 && r.nv==0 && r.ne==0 && r.ng==6)
+      // x =
+      //   {
+      //     4.8567898141399416909620991253644e-2,
+      //     3.9823869463605126516445887132023e-2,
+      //     1.8820353561903273024096128046734e-1,
+      //     1.8820353561903273024096128046734e-1,
+      //     1.5667350113569535268427415643605e-2,
+      //     4.8968251919873762778370692483619e-1,
+      //     2.0634961602524744432586150327614e-2,
+      //     2.1641769688644688644688644688645e-2,
+      //     7.4119859878449802069007987352342e-1,
+      //     2.2196298916076569567510252769319e-1,
+      //     1.2788837829349015630839399279500e-2,
+      //     4.4729513394452709865106589966276e-2,
+      //     4.4729513394452709865106589966276e-2,
+      //     2.1641769688644688644688644688645e-2,
+      //     7.4119859878449802069007987352342e-1,
+      //     3.6838412054736283634817598783385e-2,
+      //     3.8913770502387139658369678149702e-2,
+      //     4.3708959149293663726993036443535e-1,
+      //     1.2582081701412672546013927112929e-1
+      //   };
 
       // A degree=9 rule with 21 QPs
       // if (r.d==9 && r.nc==0 && r.nv==1 && r.ne==0 && r.ng==6)
