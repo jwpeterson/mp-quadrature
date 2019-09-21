@@ -113,8 +113,11 @@ def f2hex(f2rgb, f):
 # d=11, Ro3-invariant rules
 # filename = 'quad_2d_p11_Ro3_0018_27QP_equilateral.csv'
 # filename = 'quad_2d_p11_Ro3_0018_27QP_second_equilateral.csv'
+filename = 'quad_2d_p11_Ro3_1027_28QP_equilateral.csv'
 # filename = 'quad_2d_p11_Ro3_0127_30QP_equilateral.csv'
+# filename = 'quad_2d_p11_Ro3_0046_30QP_equilateral.csv'
 # filename = 'quad_2d_p11_Ro3_1136_31QP_equilateral.csv'
+# filename = 'quad_2d_p11_Ro3_1136_31QP_second_equilateral.csv'
 
 # d=11, D3-invariant rules
 # filename = 'quad_2d_p11_hompack1_30QP_equilateral.csv'
@@ -152,7 +155,7 @@ def f2hex(f2rgb, f):
 # filename = 'quad_2d_p17_mine_63QP_equilateral.csv'
 # filename = 'quad_2d_p17_mine_63QP_second_equilateral.csv'
 # filename = 'quad_2d_p17_dunavant_underdetermined_61QP_equilateral.csv'
-filename = 'quad_2d_p17_zhang_xiao_underdetermined_60QP_equilateral.csv'
+# filename = 'quad_2d_p17_zhang_xiao_underdetermined_60QP_equilateral.csv'
 
 ################################################################################
 
