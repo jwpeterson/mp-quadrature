@@ -113,7 +113,7 @@ int main(int argc, char ** argv)
   // Build ro3 rule object
   Ro3 r(d, nc, nv, ne, ng);
 
-  // d==2, dim==2
+  // d==2, dim==2. Betst known PI rule has 3 QP.
   // Note: This case is somewhat tricky despite also being the
   // simplest non-trivial case!  The issue is that the Jacobian is
   // singular at the root, so Newton iterations converge very slowly,
@@ -124,7 +124,7 @@ int main(int argc, char ** argv)
   // *exactly* singular.
   // -d2 -c0 -v0 -e1 -g0 # 3 QP <-- Solution confirmed
 
-  // d==3, dim==4
+  // d==3, dim==4. Best known PI rule is a conical product rule with 4 QP.
   // -d3 -c1 -v0 -e0 -g1 # 4 QP <-- No solution (-ve wt soln only)
   // -d3 -c0 -v0 -e2 -g0 # 6 QP <-- No solution
   // -d3 -c1 -v1 -e1 -g0 # 7 QP <-- New (?) solution
@@ -140,10 +140,10 @@ int main(int argc, char ** argv)
   // -d4 -c1 -v0 -e2 -g0 # 7 QP <-- No solution
   // -d4 -c0 -v1 -e2 -g0 # 9 QP <-- No solution
 
-  // d==5, dim==7
+  // d==5, dim==7. Best known PI rule has 7 QP.
   // -d5 -c1 -v0 -e0 -g2 # 7 QP <-- Also a D3 rule in libmesh
 
-  // d=6, dim==10
+  // d=6, dim==10. Best known PI rule has 12 QP.
   // -d6 -c1 -v0 -e0 -g3 # 10 QP <-- No solution
   // -d6 -c0 -v1 -e0 -g3 # 12 QP <-- No solution
   // -d6 -c0 -v0 -e2 -g2 # 12 QP <-- New (?) solution
@@ -152,7 +152,7 @@ int main(int argc, char ** argv)
   // -d6 -c0 -v0 -e5 -g0 # 15 QP <-- No solution
   // -d6 -c1 -v1 -e4 -g0 # 16 QP <-- No solution
 
-  // d==7, dim=12
+  // d==7, dim=12. Best known PI rule is Gatermann's rule.
   // -d7 -c0 -v0 -e0 -g4 # 12 QP <-- Gatermann solution
   // -d7 -c1 -v0 -e1 -g3 # 13 QP <-- New (?) solution
   // -d7 -c0 -v1 -e1 -g3 # 15 QP <-- No solution
@@ -176,7 +176,7 @@ int main(int argc, char ** argv)
   // -d8 -c0 -v1 -e7 -g0 # 24 QP <-- No solution
 
   // d==9, dim=19, best PI degree 9 rule in libmesh has 19 QPs
-  // -d9 -c1 -v0 -e0 -g6 # 19 QP <-- No solution
+  // -d9 -c1 -v0 -e0 -g6 # 19 QP <-- One solution found, same as D3!
   // -d9 -c0 -v1 -e0 -g6 # 21 QP <-- New (?) solution
   // -d9 -c0 -v0 -e2 -g5 # 21 QP <-- No solution
   // -d9 -c1 -v1 -e1 -g5 # 22 QP <-- New (?) solution
@@ -194,12 +194,12 @@ int main(int argc, char ** argv)
   // d==10, dim=22, best PI degree 10 rule in libmesh has 25 QPs
   // -d10 -c1 -v0 -e0 -g7 # 22 QP <-- No solution
   // -d10 -c0 -v1 -e0 -g7 # 24 QP <-- No solution
-  // -d10 -c0 -v0 -e2 -g6 # 24 QP <-- TWO New (?) solutions
+  // -d10 -c0 -v0 -e2 -g6 # 24 QP <-- SIX New (?) solutions
   // -d10 -c1 -v1 -e1 -g6 # 25 QP <-- New (?) solution
-  // -d10 -c1 -v0 -e3 -g5 # 25 QP <-- New (?) solution
+  // -d10 -c1 -v0 -e3 -g5 # 25 QP <-- TWO New (?) solutions
   // -d10 -c0 -v1 -e3 -g5 # 27 QP <-- New (?) solution
   // -d10 -c0 -v0 -e5 -g4 # 27 QP <-- No solution
-  // -d10 -c1 -v1 -e4 -g4 # 28 QP <-- 4.9e-17
+  // -d10 -c1 -v1 -e4 -g4 # 28 QP <-- No solutions found
   // -d10 -c1 -v0 -e6 -g3 # 28 QP
   // -d10 -c1 -v0 -e7 -g2 # 28 QP
   // -d10 -c0 -v1 -e7 -g2 # 30 QP
@@ -209,16 +209,16 @@ int main(int argc, char ** argv)
   // -d10 -c1 -v1 -e10 -g0 # 34 QP
 
   // d==11, dim=26, best PI degree 11 rule in libmesh has 30 QPs
-  // -d11 -c0 -v0 -e1 -g8 # 27 QP <-- 1.36e-21, instance-3
-  // -d11 -c1 -v1 -e0 -g8 # 28 QP <-- 7.47e-23, instance-4
-  // -d11 -c1 -v0 -e2 -g7 # 28 QP <-- 1.66e-20, instance-5
-  // -d11 -c0 -v1 -e2 -g7 # 30 QP <-- 3.05e-21, instance-6
-  // -d11 -c0 -v0 -e4 -g6 # 30 QP <-- 3.05e-19, instance-7
-  // -d11 -c1 -v1 -e3 -g6 # 31 QP <-- 4.23e-21, instance-8
-  // -d11 -c1 -v0 -e5 -g5 # 31 QP <-- 4.21e-20, instance-1
-  // -d11 -c0 -v1 -e5 -g5 # 33 QP <-- 3.97e-19
-  // -d11 -c0 -v0 -e7 -g4 # 33 QP <-- 9.54e-16
-  // -d11 -c1 -v1 -e6 -g4 # 34 QP <-- 3.23e-16
+  // -d11 -c0 -v0 -e1 -g8 # 27 QP <-- Two New solutions
+  // -d11 -c1 -v1 -e0 -g8 # 28 QP <-- No solutions found
+  // -d11 -c1 -v0 -e2 -g7 # 28 QP <-- One New solution
+  // -d11 -c0 -v1 -e2 -g7 # 30 QP <-- One New solution
+  // -d11 -c0 -v0 -e4 -g6 # 30 QP <-- One New solution
+  // -d11 -c1 -v1 -e3 -g6 # 31 QP <-- Two New solutions
+  // -d11 -c1 -v0 -e5 -g5 # 31 QP <-- No solutions found
+  // -d11 -c0 -v1 -e5 -g5 # 33 QP <-- No solutions found
+  // -d11 -c0 -v0 -e7 -g4 # 33 QP <-- No solutions found
+  // -d11 -c1 -v1 -e6 -g4 # 34 QP <-- No solutions found
   // -d11 -c1 -v0 -e8 -g3 # 34 QP
   // -d11 -c0 -v1 -e8 -g3 # 36 QP
   // -d11 -c0 -v0 -e10 -g2 # 36 QP
@@ -229,18 +229,19 @@ int main(int argc, char ** argv)
   // -d11 -c1 -v1 -e12 -g0 # 40 QP
 
   // d==12, dim=31, best PI degree 12 rule in libmesh has 33 QPs
-  // -d12 -c1 -v0 -e0 -g10 # 31 QP <-- instance-2
-  // -d12 -c0 -v1 -e0 -g10 # 33 QP
-  // -d12 -c0 -v0 -e2 -g9 # 33 QP
-  // -d12 -c1 -v1 -e1 -g9 # 34 QP
-  // -d12 -c1 -v0 -e3 -g8 # 34 QP
-  // -d12 -c0 -v1 -e3 -g8 # 36 QP
-  // -d12 -c0 -v0 -e5 -g7 # 36 QP
+  // -d12 -c1 -v0 -e0 -g10 # 31 QP <-- No solutions found, instance-1, instance-4, instance-7
+  // -d12 -c0 -v1 -e0 -g10 # 33 QP <-- No solutions found, instance-2, instance-5, instance-8
+  // -d12 -c0 -v0 -e2 -g9 # 33 QP <-- No solutions found, instance-3, instance-6
+  // -d12 -c1 -v1 -e1 -g9 # 34 QP <-- No solutions found
+  // -d12 -c1 -v0 -e3 -g8 # 34 QP <-- No solutions found
+  // -d12 -c0 -v1 -e3 -g8 # 36 QP <-- No solutions found
+  // -d12 -c0 -v0 -e5 -g7 # 36 QP <-- No solutions found
+  // -d12 -c1 -v1 -e4 -g7 # 37 QP <-- No solutions found
   // ...
 
   // d==13, dim=35, best PI degree 13 rule in libmesh has 37 QPs
-  // -d13 -c0 -v0 -e1 -g11 # 36 QP
-  // -d13 -c1 -v1 -e0 -g11 # 37 QP
+  // -d13 -c0 -v0 -e1 -g11 # 36 QP <-- No solutions found
+  // -d13 -c1 -v1 -e0 -g11 # 37 QP <-- No solutions found
   // -d13 -c1 -v0 -e2 -g10 # 37 QP
   // -d13 -c0 -v1 -e2 -g10 # 39 QP
   // -d13 -c0 -v0 -e4 -g9 # 39 QP
@@ -249,15 +250,31 @@ int main(int argc, char ** argv)
   // -d13 -c0 -v1 -e5 -g8 # 42 QP
   // ...
 
-  // d==14, dim=40, best PI degree 14 rule in libmesh has 42 QPs
-  // -d14 -c1 -v0 -e0 -g13 # 40 QP
-  // -d14 -c0 -v0 -e2 -g12 # 42 QP
-  // -d14 -c1 -v1 -e1 -g12 # 43 QP
-  // -d14 -c1 -v0 -e3 -g11 # 43 QP
-  // -d14 -c0 -v1 -e3 -g11 # 45 QP
-  // -d14 -c0 -v0 -e5 -g10 # 45 QP
-  // -d14 -c1 -v1 -e4 -g10 # 46 QP
+  // d==14, dim=40, best PI degree 14 rule in libmesh has 42 QPs.
+  // When plotted, Dunavant's 42 QP rule *appears* to have points on the
+  // boundary, but they are in fact only very *close* to the boundary
+  // and not on it, for example one QP is located at position
+  // (1.196e-1, 1.0984e-3) in the equilateral reference triangle.
+  // -d14 -c1 -v0 -e0 -g13 # 40 QP, <-- No solutions found
+  // -d14 -c0 -v0 -e2 -g12 # 42 QP, <-- No solutions found
+  // -d14 -c1 -v1 -e1 -g12 # 43 QP, <-- No solutions found
+  // -d14 -c1 -v0 -e3 -g11 # 43 QP, <-- One new solution found
+  // -d14 -c0 -v1 -e3 -g11 # 45 QP, <-- One new solution found
+  // -d14 -c0 -v0 -e5 -g10 # 45 QP, <-- No solutions found
+  // -d14 -c1 -v1 -e4 -g10 # 46 QP, <-- No solutions found
   // ...
+
+  // d==15, dim=46, best PI rule in libmesh has 49 QPs
+  // -d15 -c1 -v0 -e0 -g15 # 46 QP, <-- No solutions found
+  // -d15 -c0 -v1 -e0 -g15 # 48 QP, <-- No solutions found
+  // -d15 -c1 -v1 -e1 -g14 # 49 QP, <-- No solutions found
+  // -d15 -c1 -v0 -e3 -g13 # 49 QP, <-- No solutions found
+  // -d15 -c0 -v1 -e3 -g13 # 51 QP, <-- No solutions found
+  // -d15 -c0 -v0 -e5 -g12 # 51 QP
+  // -d15 -c1 -v1 -e4 -g12 # 52 QP
+  // -d15 -c1 -v0 -e6 -g11 # 52 QP
+  // -d15 -c0 -v1 -e6 -g11 # 54 QP
+  // -d15 -c1 -v1 -e7 -g10 # 55 QP
 
   // d==18, dim=64, there is no PI degree 18 rule in libmesh, next highest has 73 pts.
   // -d18 -c1 -v0 -e0 -g21 # 64 QP
@@ -338,7 +355,7 @@ int main(int argc, char ** argv)
   //  5000  &  19.86 & 47.02 & 19.28 & 41.47 & 18.37
   //  2500  &  9.60  & 10.32 & 9.58  & 9.46  & 21.34
   //  1000  &  3.85  & 9.23  & 9.49  & 9.37  & 6.01
-  double ftol_rel = 1.e-16;
+  double ftol_rel = 1.e-30;
   double xtol_rel = 1.e-8;
   int maxeval = 10000;
 
@@ -346,14 +363,25 @@ int main(int argc, char ** argv)
   // nlopt_algorithm alg = NLOPT_GN_DIRECT_L;
 
   // "LD" = local gradient based optimization
-  // nlopt_algorithm alg = NLOPT_LD_MMA; // method of moving asymptotes
-  // nlopt_algorithm alg = NLOPT_LD_SLSQP; // sequential quadratic programming
-  // nlopt_algorithm alg = NLOPT_LD_TNEWTON_PRECOND_RESTART; // Preconditioned truncated Newton
-  // nlopt_algorithm alg = NLOPT_LD_LBFGS; // Low storage BFGS
+
+  // .) MMA = method of moving asymptotes
+  // o gradient-based
+  // o globally-convergent
+  // o includes nonlinear constraints but not equality constraints
+  // nlopt_algorithm alg = NLOPT_LD_MMA;
+
+  // .) sequential quadratic programming
+  // nlopt_algorithm alg = NLOPT_LD_SLSQP;
+
+  // Preconditioned truncated Newton
+  // nlopt_algorithm alg = NLOPT_LD_TNEWTON_PRECOND_RESTART;
+
+  // Low storage BFGS
+  // nlopt_algorithm alg = NLOPT_LD_LBFGS;
 
   // You must use a local/subsidiary optimization algorithm with AUGLAG,
   // this is set by calling nlopt_set_local_optimizer().
-  nlopt_algorithm alg = NLOPT_AUGLAG;
+  // nlopt_algorithm alg = NLOPT_AUGLAG;
 
   // MLSL also requires a local optimizer. MLSL is a multistart
   // algorithm that performs a sequence of local optimizations, and
@@ -363,6 +391,12 @@ int main(int argc, char ** argv)
   // problem which has a known solution, so I'm not really sure what
   // it's doing or if it's even working?
   // nlopt_algorithm alg = NLOPT_G_MLSL;
+  // nlopt_algorithm alg = NLOPT_G_MLSL_LDS;
+
+  // Improved Stochastic Ranking Evolution Strategy.
+  // "This method supports arbitrary nonlinear inequality and equality
+  // constraints in addition to the bound constraints"
+  nlopt_algorithm alg = NLOPT_GN_ISRES;
 
   // The problem dimension depends only on "d".
   unsigned int dim = r.dim();
@@ -373,11 +407,149 @@ int main(int argc, char ** argv)
   if (alg == NLOPT_AUGLAG ||
       alg == NLOPT_G_MLSL)
     {
+
+      ////////////////////////////////////////////////////////////////////////////////
+      // Global optimization
+      ////////////////////////////////////////////////////////////////////////////////
+
+      // The locally biased variant seemed to work well for d==7 case
+      // given a large maxeval.  You have to be careful when using
+      // these, at least the first two *ignore* your initial guess, so
+      // if you run multiple times with the same maxeval, you will
+      // just get the same result every time... Another issue that
+      // makes these unsuitable for our use is they will often choose
+      // the same values for more than (w,x,y) triple, which generally
+      // leads to a singular Jacobian (although for some reason it can
+      // produce a small residual).
+      //
+      // All of the algorithms perform a "deterministic search based
+      // on systematic division of the search domain into smaller and
+      // smaller hyperrectangles". The "L" versions of the algorithms
+      // are specifically stated to "do well for small problems with a
+      // single global minimizer and only a few local minimizers"
+      // which I don't think describes our problem particularly
+      // well. A possible use of the algorithms is to "generate
+      // initial iterates for other sampling methods", which is
+      // something that seems relevant.
+      // nlopt_algorithm local_alg = NLOPT_GN_DIRECT;
+      // nlopt_algorithm local_alg = NLOPT_GN_DIRECT_L; // "locally biased" variant
+      // nlopt_algorithm local_alg = NLOPT_GN_DIRECT_L_RAND; // randomized variant of DIRECT-L
+      // nlopt_algorithm local_alg = NLOPT_GN_DIRECT_NOSCAL; // Unscaled variant
+      // nlopt_algorithm local_alg = NLOPT_GN_DIRECT_L_NOSCAL; // Unscaled variant
+      // nlopt_algorithm local_alg = NLOPT_GN_DIRECT_L_RAND_NOSCAL; // Unscaled variant
+      // nlopt_algorithm local_alg = NLOPT_GN_ORIG_DIRECT; // implementation based on original Fortran
+      // nlopt_algorithm local_alg = NLOPT_GN_ORIG_DIRECT_L; // implementation based on original Fortran
+
+      // Controlled random search. This one can also use the
+      // nl_set_population() flag. In my experience this one seemed to
+      // frequently produce "solutions" that contained many 0s or 1s,
+      // i.e. that were pegged at the lower or upper constraint, for
+      // some reason.  Possibly it is not designed to be used as an
+      // inner unconstrained optimization algorithm wrapped by AUGLAG,
+      // or perhaps there is some bug in the implementation. In
+      // contrast, the evolutionary algorithm seemed not to do this
+      // for whatever reason.
+      // nlopt_algorithm local_alg = NLOPT_GN_CRS2_LM;
+
+      ////////////////////////////////////////////////////////////////////////////////
+      // Evolutionary algorithms
+      ////////////////////////////////////////////////////////////////////////////////
+
+      // The population size for ISRES defaults to 20*(n+1) in n dimensions,
+      // this can be changed by calling nlopt_set_population(). Both of these seem to provide
+      // somewhat reasonable looking initial guesses (i.e. not full of
+      // 0s and 1s like CRS2) and therefore have been my go-to for
+      // initial guess selection selection up to this point.
+      // For a -d15 problem, ISRES takes about 11.5 seconds while ESCH takes about 14, although
+      // some of that time was spent in newton_min.
+      // nlopt_algorithm local_alg = NLOPT_GN_ISRES;
+      nlopt_algorithm local_alg = NLOPT_GN_ESCH;
+
+      // Global optimization algorithms that use derivative
+      // information.  Requires a bound constrained problem. Original
+      // source code No longer seems to be available. Requires linking
+      // against the NLOPT C++ library, when I try to run it, it just
+      // returns error codes, and that could be why...
+      // nlopt_algorithm local_alg = NLOPT_GD_STOGO;
+      // nlopt_algorithm local_alg = NLOPT_GD_STOGO_RAND;
+
+      ////////////////////////////////////////////////////////////////////////////////
+      // Derivative-free algorithms
+      // I doubt that any derivative-free optimization algorithm will
+      // ever be as good as the derivative-based ones, at least for a
+      // given maxeval. But I figured I might as well try them all
+      // anyway. Most ran surprisingly (to me) slow compared to the
+      // derivative based algorithms.
+      ////////////////////////////////////////////////////////////////////////////////
+
+      // nlopt_algorithm local_alg = NLOPT_LN_COBYLA; // 12/33 converged, slow
+      // nlopt_algorithm local_alg = NLOPT_LN_BOBYQA; // 1/22 converged, slow
+      // nlopt_algorithm local_alg = NLOPT_LN_NEWUOA; // solutions violate constraints?
+      // nlopt_algorithm local_alg = NLOPT_LN_NEWUOA_BOUND; // did not work?
+      // nlopt_algorithm local_alg = NLOPT_LN_PRAXIS; // 2/40 converged
+      // nlopt_algorithm local_alg = NLOPT_LN_NELDERMEAD; // none converged
+      // nlopt_algorithm local_alg = NLOPT_LN_SBPLX; // 3/28 converged
+
+      ////////////////////////////////////////////////////////////////////////////////
+      // Derivative-based algorithms
+      ////////////////////////////////////////////////////////////////////////////////
+
+      // Must set a maxeval for this otherwise it will run forever.
+      // Generally does not work as well as SLSQP even for the
+      // relatively simple degree=7 problem.
+      // nlopt_algorithm local_alg = NLOPT_LD_MMA;
+
+      // Instead of constructing local MMA approximations, constructs
+      // simple quadratic approximations. *Must* set a maxeval for this
+      // or else it will run forever. This is the only optimization algorithm
+      // in nlopt which supports a user-defined Hessian approximation/preconditioner.
+      // See: nlopt_set_precond_min_objective(). The function prototype for the
+      // preconditioner is
+      // void pre(unsigned n, const double *x, const double *v,
+      //          double *vpre, void *f_data);
+      // and you are meant to compute and return the action of H, vpre = H * v.
+      // nlopt_algorithm local_alg = NLOPT_LD_CCSAQ;
+
+      // Low storage BFGS. Runs really fast. Does not seem to respect
+      // the ftol we set, as it returns NLOPT_FTOL_REACHED even with
+      // the minimum is much larger than the tolerance? Does actually
+      // find some roots, but that may be because it runs so fast that
+      // I got more data for it... Also when it did converge, it
+      // seemed to be my Newton solver that was actually obtaining the
+      // root, and not really the optimization program.
+      // nlopt_algorithm local_alg = NLOPT_LD_LBFGS; // 10/89 converged
+
+      // Preconditioned truncated Newton. For some reason it seems to
+      // find many solutions which are pegged at multiple constraints?
+      // I'm not sure what would cause something like this... The
+      // versions with no preconditioning and no restart or
+      // preconditioning found a few converged solutions in the d=7
+      // case.  Seems to run reasonably fast.
+      // nlopt_algorithm local_alg = NLOPT_LD_TNEWTON_PRECOND_RESTART;
+      // nlopt_algorithm local_alg = NLOPT_LD_TNEWTON_PRECOND; // no restarting
+      // nlopt_algorithm local_alg = NLOPT_LD_TNEWTON_RESTART; // no preconditioning
+      // nlopt_algorithm local_alg = NLOPT_LD_TNEWTON; // no restart or preconditioning
+
+      // Shifted limited-memory variable metric, rank-2 and rank-1 versions.
+      // Seems to run quite fast and does find a few converged solutions (30/263
+      // and 29/253, respectively).
+      // nlopt_algorithm local_alg = NLOPT_LD_VAR2;
+      // nlopt_algorithm local_alg = NLOPT_LD_VAR1;
+
+      // So far this is the best local minimizer I've found to use in
+      // conjunction with AUGLAG... For the degree=7 problem, it
+      // converged for an impressive 79/115 initial guesses, but
+      // perhaps it does not scale as well as some of the other
+      // methods for larger problems?
+      // nlopt_algorithm local_alg = NLOPT_LD_SLSQP;
+
       // The objective function, bounds, and nonlinear-constraint
       // parameters of local_opt are ignored. A copy is made when
       // calling set_local_optimizer, so it is safe to let the local
       // copy be destroyed.
-      nlopt_opt local_opt = nlopt_create(NLOPT_LD_SLSQP, dim);
+      nlopt_opt local_opt = nlopt_create(local_alg, dim);
+      // if (local_alg == NLOPT_GN_ISRES || local_alg == NLOPT_GN_CRS2_LM)
+      //   nlopt_set_population(local_opt, 40*(r.dim() + 1));
       nlopt_set_xtol_rel(local_opt, xtol_rel);
       nlopt_set_ftol_rel(local_opt, ftol_rel);
       nlopt_set_maxeval(local_opt, maxeval);
@@ -651,6 +823,33 @@ int main(int argc, char ** argv)
       //       8.1799808561019703180235467829817e-2
       //     };
 
+      // A degree=9 1-0-0-6 rule with 19 QPs, this ties the current minimum!
+      // Actually this is the same as the previously-known D3-invariant rule
+      // with 19 QPs.
+      // if (r.d==9 && r.nc==1 && r.nv==0 && r.ne==0 && r.ng==6)
+      // x =
+      //   {
+      //     4.8567898141399416909620991253644e-2,
+      //     3.9823869463605126516445887132023e-2,
+      //     1.8820353561903273024096128046734e-1,
+      //     1.8820353561903273024096128046734e-1,
+      //     1.5667350113569535268427415643605e-2,
+      //     4.8968251919873762778370692483619e-1,
+      //     2.0634961602524744432586150327614e-2,
+      //     2.1641769688644688644688644688645e-2,
+      //     7.4119859878449802069007987352342e-1,
+      //     2.2196298916076569567510252769319e-1,
+      //     1.2788837829349015630839399279500e-2,
+      //     4.4729513394452709865106589966276e-2,
+      //     4.4729513394452709865106589966276e-2,
+      //     2.1641769688644688644688644688645e-2,
+      //     7.4119859878449802069007987352342e-1,
+      //     3.6838412054736283634817598783385e-2,
+      //     3.8913770502387139658369678149702e-2,
+      //     4.3708959149293663726993036443535e-1,
+      //     1.2582081701412672546013927112929e-1
+      //   };
+
       // A degree=9 rule with 21 QPs
       // if (r.d==9 && r.nc==0 && r.nv==1 && r.ne==0 && r.ng==6)
       // x =
@@ -783,6 +982,122 @@ int main(int argc, char ** argv)
       //       4.8509072998273930259505659173245e-1
       //     };
 
+      // A *third* degree=10 rule with 24 QPs and 0026 configuration.
+      // I wasn't even looking for this... it just popped up while I
+      // was experimenting with different optimization algorithms! It
+      // also almost didn't converge... it required exactly 50 Newton
+      // iterations!
+      // if (r.d==10 && r.nc==0 && r.nv==0 && r.ne==2 && r.ng==6)
+      //   x =
+      //     {
+      //       5.4182602431180742419012975840987e-3,
+      //       1.8436361439082912239287076199852e-1,
+      //       5.9852576657074839510432326113733e-3,
+      //       6.1050316703542844868812608863530e-1,
+      //       8.0691227940699078197481579119651e-3,
+      //       9.2893410705677578721193588750841e-1,
+      //       3.5753059859079028015587068659359e-2,
+      //       2.7929259575676991206594548597666e-2,
+      //       1.0070799873421512282498660467458e-1,
+      //       7.3715384361281192006447189345953e-1,
+      //       1.3329322854499305969742173140315e-2,
+      //       1.7425713782396221670836596810662e-1,
+      //       7.9674412091269421568078805095696e-1,
+      //       3.5352219432776408242842120396444e-2,
+      //       3.2019851929290632085891892083740e-1,
+      //       5.7670773292297347321026202955429e-1,
+      //       2.4337851756964119586513300176318e-2,
+      //       4.3963494980239674841811610522069e-2,
+      //       5.7511639509054177348822161582207e-1,
+      //       4.6245372343854375648281836248486e-2,
+      //       3.1146210305934346282199719556151e-1,
+      //       2.1624307751824776491821571751996e-1
+      //     };
+
+      // Wow, a *fourth* degree=10 rule with 24 QPs
+      // if (r.d==10 && r.nc==0 && r.nv==0 && r.ne==2 && r.ng==6)
+      //   x =
+      //     {
+      //       6.1935726910001758541078241539263e-3,
+      //       3.3937615435249893352746365930789e-1,
+      //       5.2925293385584474156952124159760e-3,
+      //       8.1604706571429431480245669966563e-1,
+      //       2.7830353344135349778500405243835e-2,
+      //       9.4133792711222378238760106555204e-2,
+      //       1.7631879015417056904139925982017e-1,
+      //       4.6873870579045364081863575403270e-2,
+      //       4.6859333350512851674998237955624e-1,
+      //       2.1171166682586492544087434741492e-1,
+      //       2.3970523489400444168780206716243e-2,
+      //       3.9192270748963862949012192065698e-2,
+      //       4.0281896555207495154945708709387e-1,
+      //       1.3626423836434353260840172788744e-2,
+      //       1.4757623947530962134060686657472e-1,
+      //       3.5613227466971039550554430193004e-2,
+      //       3.5870519028083430398177360897913e-2,
+      //       1.0439471886636364342444603201521e-1,
+      //       5.8802274042993997988484650010385e-1,
+      //       7.0088743600091017087019090467601e-3,
+      //       3.5987336367983871336129310176438e-2,
+      //       9.3343603776198938768545803095892e-1
+      //     };
+
+      // Ridiculous, a *fifth* degree=10 rule with 24 QPs
+      // if (r.d==10 && r.nc==0 && r.nv==0 && r.ne==2 && r.ng==6)
+      //   x =
+      //     {
+      //       7.1633170697004196998871675324386e-3,
+      //       7.5955588633458936806336676273387e-1,
+      //       5.1049969920165429199237231873571e-3,
+      //       1.5193663248046395463352611125183e-1,
+      //       7.8568994386027624616574131921037e-3,
+      //       4.2237680049868393035216758301495e-2,
+      //       9.2862155781321497106698489852560e-1,
+      //       2.4055550786638763160189013574995e-2,
+      //       6.7373748617165142309703171777769e-1,
+      //       2.6370177258295204404766466671693e-1,
+      //       2.4598961140793922509347817346151e-2,
+      //       1.3421000044845207799557776284413e-1,
+      //       7.6764505900725274771488592099709e-1,
+      //       1.5072036191824669938696300381058e-2,
+      //       2.2585748215909707408243899147017e-2,
+      //       5.1250467241310646796363694038491e-1,
+      //       3.4678422346643332938784934500371e-2,
+      //       5.6779938220150505301675570462183e-1,
+      //       9.9751753925878964685649398982363e-2,
+      //       4.8136482700446253038180296952192e-2,
+      //       3.0785415280170697910264379441776e-1,
+      //       2.1458187835052252754456597776010e-1
+      //     };
+
+      // A *sixth* degree=10 rule with 24 QPs. It just keeps going...
+      // if (r.d==10 && r.nc==0 && r.nv==0 && r.ne==2 && r.ng==6)
+      //   x =
+      //     {
+      //       5.3834706252454055829176909195913e-3,
+      //       3.0855885949458465505208876769013e-1,
+      //       2.2585614023837660045101392700689e-3,
+      //       9.7067360043836614156360874897275e-1,
+      //       2.3617073911209024419373702587775e-2,
+      //       5.5596379430986266793841350014444e-1,
+      //       3.6346785109772127345585658484591e-2,
+      //       4.4759864182831451230220789451556e-2,
+      //       4.0577405760968800735440681116372e-1,
+      //       1.9765132573961310778448643201566e-1,
+      //       1.4952769339638923689958680821648e-2,
+      //       2.9419545386540148820586514239455e-2,
+      //       1.7528426317643462839331536695820e-1,
+      //       2.6220682345205438475350628365720e-2,
+      //       2.9793346146766825012738112385943e-1,
+      //       7.4101005002342904421619518548260e-2,
+      //       1.5811554292507884609065109648664e-2,
+      //       8.6050319153478836901733989334052e-1,
+      //       1.0014651384993564882983705026052e-1,
+      //       3.3662690567644772655269925601644e-2,
+      //       6.4214981788197325641907116304210e-1,
+      //       1.5645681947791997908258482531983e-1
+      //     };
+
       // A degree=10 rule with 25 QPs
       // if (r.d==10 && r.nc==1 && r.nv==1 && r.ne==1 && r.ng==6)
       //   x =
@@ -811,7 +1126,7 @@ int main(int argc, char ** argv)
       //       1.2777722809830669309582013618709e-1
       //     };
 
-      // A second degree=10 rule with 25 QPs
+      // A degree=10 1-0-3-5 rule with 25 QPs
       // if (r.d==10 && r.nc==1 && r.nv==0 && r.ne==3 && r.ng==5)
       //   x =
       //     {
@@ -837,6 +1152,34 @@ int main(int argc, char ** argv)
       //       2.3188161972795448597914015255621e-2,
       //       6.8579014955455508229105658625928e-1,
       //       4.5690890104473341999976206420424e-2
+      //     };
+
+      // A *second* degree=10 1-0-3-5 rule with 25 QPs
+      // if (r.d==10 && r.nc==1 && r.nv==0 && r.ne==3 && r.ng==5)
+      //   x =
+      //     {
+      //       5.1345668536024914411167997684058e-2,
+      //       3.4581948178630205438576188361475e-3,
+      //       5.9390050736371604294803794039014e-2,
+      //       7.0888025444097578448485241065769e-3,
+      //       4.1492064251981583325843804152774e-1,
+      //       2.1064303554996973040694501159955e-3,
+      //       9.4092794891315452906467386615319e-1,
+      //       3.9017241786683034241205005116621e-2,
+      //       1.0284393318430089371584671935755e-1,
+      //       4.8530147947070841080705363096520e-1,
+      //       1.8985766577595162514393470423551e-2,
+      //       3.0673465604941172960039426783390e-2,
+      //       3.0799818976234575755778917061732e-1,
+      //       2.2101552554910438933768447236166e-2,
+      //       4.8385919093417191677167303459693e-2,
+      //       7.5251385329642788292413917481847e-1,
+      //       1.6405929030770321222066991770666e-2,
+      //       5.2236414355455385930427554647279e-2,
+      //       1.1351835493802583579205862674649e-1,
+      //       4.0387526153593595925401159832924e-2,
+      //       5.9280494105185473668624375618082e-1,
+      //       1.8256468126521531326784284288188e-1
       //     };
 
       // A degree=10 rule with 27 QPs
@@ -865,6 +1208,322 @@ int main(int argc, char ** argv)
       //       1.3960746583857763185533320493072e-2,
       //       8.6097589069840721814036297772080e-2,
       //       3.8205053391734468157969505461413e-2
+      //     };
+
+      // A degree=11 rule with 27 QPs. This is a new minimum!
+      // if (r.d==11 && r.nc==0 && r.nv==0 && r.ne==1 && r.ng==8)
+      //   x =
+      //     {
+      //       5.2501900628803483265691402520251e-3,
+      //       2.7263237565209247203086721087576e-1,
+      //       9.6078311676320423628745787031043e-3,
+      //       1.2566813660658779461518373277871e-2,
+      //       3.6422495909528624483300674843998e-1,
+      //       2.8397128511550294298445438150029e-3,
+      //       9.4380452905028433573549593440564e-3,
+      //       3.3307532214123278261894624459744e-2,
+      //       9.1226212614723748339671998630591e-3,
+      //       8.8159235080580116486130047655196e-1,
+      //       9.0597208132597846103287274377368e-2,
+      //       4.1325979108748536413659626103765e-2,
+      //       2.1435335265095806153369337057104e-1,
+      //       4.5275183764840794396905381350312e-1,
+      //       1.5584140407676158910413646153654e-2,
+      //       3.6673070947612617954340116533663e-2,
+      //       1.5740290188190833241335042691653e-1,
+      //       3.3066696149169029769073153196462e-2,
+      //       5.8600348844560926069470015142148e-1,
+      //       1.2352912853885500748429654291735e-1,
+      //       2.3284027204112150759145400913219e-2,
+      //       4.1377415154448198901737239785191e-1,
+      //       5.1624512474990088671128327739257e-2,
+      //       2.6585468453820995861119377666375e-2,
+      //       9.8616918269915361670885340191111e-2,
+      //       7.0688498243425849919240661534406e-1
+      //     };
+
+      // A second degree=11 rule with 27 QPs. This is a new minimum!
+      // if (r.d==11 && r.nc==0 && r.nv==0 && r.ne==1 && r.ng==8)
+      //   x =
+      //     {
+      //       4.1612804317314842767555766406199e-3,
+      //       6.8002906083945000961186411060696e-1,
+      //       3.1338137025347552815928236201535e-2,
+      //       5.6433855195090291230615957448581e-1,
+      //       3.1435732845762994573128512907851e-1,
+      //       2.4652523258928223931542332898165e-2,
+      //       1.2322869010646763885831827091858e-1,
+      //       1.6927635734210890199455789431847e-1,
+      //       1.0184449346229461815371958266942e-2,
+      //       2.6486113476716200406483433449668e-2,
+      //       1.4387747522813605056916070495475e-1,
+      //       1.5012583397281533333668358360737e-2,
+      //       1.6801782841091323672916814789423e-1,
+      //       3.2980816870835011314453213507343e-2,
+      //       3.9258394807048784825903710855647e-2,
+      //       2.2209434646096813071330105288043e-1,
+      //       3.2146756719314824820725269959936e-1,
+      //       6.2502000020799461189244380099301e-3,
+      //       3.3754120263242869089885850618322e-2,
+      //       2.8770220336106529610117019606918e-2,
+      //       2.3964763845196892791134629522367e-2,
+      //       5.6757782226097864625226237614412e-1,
+      //       6.1105709652421022972202840731351e-2,
+      //       1.1844334552822786757437425910724e-2,
+      //       3.8705519294784296506910844535742e-1,
+      //       1.7297366791290889546544445963562e-2
+      //     };
+
+      // A second degree=11 1-0-2-7 rule with 28 QPs.
+      // if (r.d==11 && r.nc==1 && r.nv==0 && r.ne==2 && r.ng==7)
+      //   x =
+      //     {
+      //       4.2122982350847949694727649296954e-2,
+      //       3.9464280009823691929272033278939e-3,
+      //       4.3851364648565862779521140096313e-1,
+      //       3.8898791225765856909372783156346e-3,
+      //       1.3995698827372101943554341473740e-1,
+      //       3.5262305538711489842410819392275e-2,
+      //       5.8566468487181347917878803731368e-1,
+      //       1.7036392744105047524076839706264e-1,
+      //       3.3361116413273105358961963180009e-2,
+      //       4.8306262254575673934200276414849e-1,
+      //       3.7827174154058150282594080624972e-1,
+      //       1.9560808916875607711291904779182e-2,
+      //       1.3137337444561324011566482502052e-1,
+      //       8.9880877534325906643646059438573e-2,
+      //       1.7473024328675662660544053438309e-2,
+      //       6.6027376485714331282233861970713e-1,
+      //       2.9644506798669171221562610931799e-1,
+      //       1.9560067376719361931546552789315e-2,
+      //       3.8903304298748738240372330102006e-2,
+      //       3.7960586267452617988153688836539e-1,
+      //       6.4204924585268918107940059108414e-3,
+      //       3.7008141341327453433650952017530e-2,
+      //       9.3611834286247349005855727560366e-1,
+      //       1.3151550393376275902343669100888e-2,
+      //       1.8410877771043024982846962887486e-1,
+      //       7.8854437699959397338611667104577e-1
+      //     };
+
+      // A degree=11 rule with 30 QPs.
+      // if (r.d==11 && r.nc==0 && r.nv==1 && r.ne==2 && r.ng==7)
+      //   x =
+      //     {
+      //       7.5412493611041301804962310010194e-4,
+      //       6.3161815270687152350168791503399e-3,
+      //       5.6385014612129497529881148904435e-1,
+      //       3.7494474079695397188491120716770e-3,
+      //       8.3488305870667139228616877262442e-1,
+      //       2.4433178455646771114724388698792e-2,
+      //       2.5325397027450240080362940174495e-1,
+      //       6.8174631574538163787988886551214e-1,
+      //       4.2288098861187531062746735284753e-2,
+      //       4.8177392799531548713787151950669e-1,
+      //       2.5889350380839276410035974192840e-1,
+      //       2.5394796909503515368692355944612e-2,
+      //       1.8223607005333125199210988159907e-1,
+      //       1.1333303081543736946090107077428e-1,
+      //       1.4815826371661608754249307042139e-2,
+      //       2.9093074037820991137978739688485e-2,
+      //       6.5399402380789810595116446692129e-1,
+      //       5.1517923138868893670696918220655e-3,
+      //       1.3720341444785722286806905133316e-1,
+      //       6.5733729231839964979308737167756e-3,
+      //       3.1942784309260200650148324153126e-2,
+      //       4.5314310583192857405867396170595e-1,
+      //       4.4830066793135978961050156779897e-1,
+      //       1.1820435574371482377120249399060e-2,
+      //       8.8628106858323135974444732732874e-1,
+      //       5.0240542970396197597182374396274e-2
+      //     };
+
+      // A degree=11 0-0-4-6 rule with 30 QPs.
+      // if (r.d==11 && r.nc==0 && r.nv==0 && r.ne==4 && r.ng==6)
+      //   x =
+      //     {
+      //       3.4042935191212521125417637423319e-3,
+      //       1.0533831485611468951827070887515e-1,
+      //       1.4136460443059679379104136378358e-3,
+      //       9.8080568711710162525846816632421e-1,
+      //       3.8685011609546712039597447831703e-3,
+      //       8.2904397392277897613273802134403e-1,
+      //       6.5265066749499600082919813841364e-3,
+      //       4.9913242609386226378123612282765e-1,
+      //       1.4631682182610466538653073674428e-2,
+      //       6.3629896186521054170467908823881e-2,
+      //       7.5696723176356166876951114964586e-2,
+      //       3.8127981634651491545796781560602e-2,
+      //       2.5158471141276727123152166420305e-1,
+      //       2.7737293953432875042582608471750e-1,
+      //       1.8283036918212341492710216612943e-2,
+      //       2.6038385172770044846218234873667e-1,
+      //       3.7096444360507273292978510853588e-2,
+      //       2.2403768844131921054416252342201e-2,
+      //       2.8694297686892572885172482330583e-1,
+      //       6.6107239076911926661580007115788e-1,
+      //       2.4990073832444596183619315819850e-2,
+      //       6.7417466711525312625004511594622e-1,
+      //       1.6946898544628711377722057702335e-1,
+      //       3.3017175855283998588767123109168e-2,
+      //       1.0112420559093728857058675508909e-1,
+      //       4.7395330890231320202868021211856e-1
+      //     };
+
+      // A degree=11 1-1-3-6 rule with 31 QPs.
+      // if (r.d==11 && r.nc==1 && r.nv==1 && r.ne==3 && r.ng==6)
+      //   x =
+      //     {
+      //       2.8451667886196583694006718095887e-2,
+      //       7.3055714467327739638952453597763e-4,
+      //       3.6811918916502771321294475236903e-3,
+      //       8.5887028128263670403917393805835e-1,
+      //       6.5351044593471576161934645215936e-3,
+      //       5.0000000000000000000000000000000e-1,
+      //       3.6811918916502771321294475236903e-3,
+      //       1.4112971871736329596082606194165e-1,
+      //       3.5315570503778766188602955268914e-2,
+      //       2.3833330710732888004699981720368e-1,
+      //       2.3833330710732888004699981720368e-1,
+      //       2.0528157714644283320826157453647e-2,
+      //       6.7793765488259040154212614118875e-1,
+      //       4.4841677589130443309052391468801e-2,
+      //       3.3610672307980639973419663983883e-2,
+      //       4.4733898105487205823982810218710e-1,
+      //       1.0532203789025588352034379562580e-1,
+      //       2.1108427194052090712444172658803e-2,
+      //       7.2463396466285646833648738316732e-1,
+      //       1.3768301766857176583175630841634e-1,
+      //       1.1463746548846752642370103044192e-2,
+      //       5.6406468667843899761177546691495e-2,
+      //       5.6406468667843899761177546691495e-2,
+      //       2.0528157714644283320826157453647e-2,
+      //       4.4841677589130443309052391468801e-2,
+      //       6.7793765488259040154212614118875e-1
+      //     };
+
+      // A _second_ degree=11 1-1-3-6 rule with 31 QPs.
+      // if (r.d==11 && r.nc==1 && r.nv==1 && r.ne==3 && r.ng==6)
+      //   x =
+      //     {
+      //       3.7542955251948995401672680293581e-2,
+      //       3.6533451963881083443684362034211e-4,
+      //       3.5762967678650843788591230666722e-3,
+      //       9.1015474311166688608512214305766e-1,
+      //       2.6073745012037032789340447798328e-3,
+      //       6.2385191332680303902529447964571e-2,
+      //       4.5551605943322813979348587630311e-3,
+      //       6.9954864306968144192703052658983e-1,
+      //       3.3338612898292408774050540627908e-2,
+      //       1.5645214415692873582456121817917e-1,
+      //       3.7135696041962229240381346558013e-1,
+      //       3.6051275129777332126733353401397e-2,
+      //       5.9709474708140337993704348861480e-1,
+      //       2.4881761956721132779037905742563e-1,
+      //       2.2879360289804412969026940836061e-2,
+      //       6.8342015633946618852882997579606e-2,
+      //       2.3706083495843791490270902111653e-1,
+      //       1.4275934919031088293713358286828e-2,
+      //       2.4122406608702034263703592419432e-1,
+      //       2.6461088264622624769359649119523e-2,
+      //       1.6271506250344408816976566105223e-2,
+      //       8.4217751123168425530061679836483e-2,
+      //       7.6290214863539934178354308794439e-2,
+      //       2.0231492379060803995443477081512e-2,
+      //       5.0229888907582665997864575023573e-1,
+      //       4.6319966110752449250886263049113e-1
+      //     };
+
+      // A degree=14 rule with 43 QPs
+      // if (r.d==14 && r.nc==1 && r.nv==0 && r.ne==3 && r.ng==11)
+      //   x =
+      //     {
+      //       8.7602731941396900630735811947358e-3,
+      //       2.9370048439533343099581854148131e-3,
+      //       6.2569253700367656437599058972695e-1,
+      //       1.6722513059433337416138535964424e-3,
+      //       8.8680974748427433769925101370325e-2,
+      //       5.7390658454334448532157896567854e-4,
+      //       1.2799961839418472894118805041784e-2,
+      //       9.5083874542120944322747876929124e-3,
+      //       1.1710792836049738347970910075001e-1,
+      //       4.8441813220397451000822101304212e-2,
+      //       1.8325481630759103084118515572825e-2,
+      //       4.4083626500893020361210042699666e-1,
+      //       1.0532653095577596382329864081012e-1,
+      //       2.4395501721248301734401840100893e-2,
+      //       1.8192544578916314911386413213589e-1,
+      //       2.6274708469190746410044887848486e-1,
+      //       5.4733878981357532110672298946041e-3,
+      //       2.3614034101103065689516149293159e-2,
+      //       5.5365008543376860411186591718459e-2,
+      //       7.1580877387819418984424546237794e-3,
+      //       1.7805982025480138666710873201622e-2,
+      //       1.7988024351778182678727751998295e-1,
+      //       1.5382037527279956789320393864015e-2,
+      //       7.4413372874920121574666100186901e-1,
+      //       1.0096598858785286765560093338538e-1,
+      //       2.0770322555420189374486180714216e-2,
+      //       2.5755784039249370167366496740320e-1,
+      //       1.0490301583281400901946442066470e-1,
+      //       7.8294830776101924134496693934753e-3,
+      //       7.3350913065469368221226676165934e-1,
+      //       2.4892308231352947537903472219670e-1,
+      //       1.1093259959636639241345639892050e-2,
+      //       4.2927867298388176661985950025306e-1,
+      //       2.3217124123051175846242571349823e-2,
+      //       1.5272066925997130278476353288891e-2,
+      //       5.2264287574525983396476919517189e-2,
+      //       3.2561032239980910848464202797350e-1,
+      //       2.3355396378432121651365456587160e-2,
+      //       3.4651207179134267642714477679978e-1,
+      //       2.2593051901338893848890937988649e-1
+      //     };
+
+      // A degree=14 rule with 45 QPs
+      // if (r.d==14 && r.nc==0 && r.nv==1 && r.ne==3 && r.ng==11)
+      //   x =
+      //     {
+      //       3.3341899592961390239330691261075e-4,
+      //       3.0804695636428859775836998484786e-3,
+      //       6.3949508844000101530322090060017e-1,
+      //       1.3467792723446368940584261873350e-3,
+      //       8.9865581126975221365647380324030e-1,
+      //       1.5808612604308310282152033095180e-3,
+      //       8.2584471866031358855731003566467e-2,
+      //       1.5517179962432558030079423848826e-2,
+      //       3.2737328694989254537979410999909e-1,
+      //       6.1224845612522570738777194715772e-1,
+      //       5.8662491339398932703718253350689e-3,
+      //       3.4850864435982021385019048236532e-2,
+      //       4.5197798839280629001552417799081e-2,
+      //       1.3100196828241954768175386975552e-2,
+      //       1.0211868224797030928841192894071e-1,
+      //       1.1807074456720143580973186137872e-1,
+      //       5.7384174774244469979829896128327e-3,
+      //       1.2103222706495347272600039299542e-2,
+      //       6.9871209216410311139155281266307e-1,
+      //       8.8257700451123060137611409110076e-3,
+      //       2.6608472404768591546336780338015e-2,
+      //       1.9182589356278665756923992509375e-1,
+      //       2.0328946435433698309360010474528e-2,
+      //       2.7548450177012763711574099989473e-1,
+      //       9.8017236746459420569439397915450e-2,
+      //       1.2337108101872235990810963734127e-2,
+      //       4.5072480205695292700062605730619e-1,
+      //       2.7784943748007040744651153745007e-2,
+      //       8.7367504162729152038456560338039e-3,
+      //       1.5863306115852773909310196554799e-1,
+      //       3.3841769725060766849846547666604e-2,
+      //       2.6166451247689517218959272227204e-2,
+      //       4.4733762244797522632545143088875e-1,
+      //       2.8250580286951273987516423182381e-1,
+      //       2.0031633502453665041956251163153e-2,
+      //       1.6277387226616365612347189484367e-1,
+      //       2.2247245619331818629709299504105e-1,
+      //       2.3676434423445508019113110092622e-2,
+      //       4.3244235515783959316476754659812e-1,
+      //       1.3816549030011917242370306253053e-1
       //     };
 
       // std::cout << "x=" << std::endl;
