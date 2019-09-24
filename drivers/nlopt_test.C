@@ -235,11 +235,11 @@ int main(int argc, char ** argv)
   // -d11 -c1 -v1 -e12 -m0 -g0 # 40 QP
 
   // d==12, dim=31, best PI degree 12 rule in libmesh has 33 QPs
-  // -d12 -c1 -v0 -e0 -m0 -g10 # 31 QP <-- No solutions found, instance-1, instance-4, instance-7
-  // -d12 -c0 -v1 -e0 -m0 -g10 # 33 QP <-- No solutions found, instance-2, instance-5, instance-8
-  // -d12 -c0 -v0 -e2 -m0 -g9 # 33 QP <-- No solutions found, instance-3, instance-6
-  // -d12 -c0 -v0 -e1 -m1 -g9 # 33 QP
-  // -d12 -c0 -v0 -e0 -m2 -g9 # 33 QP
+  // -d12 -c1 -v0 -e0 -m0 -g10 # 31 QP <-- No solutions found
+  // -d12 -c0 -v1 -e0 -m0 -g10 # 33 QP <-- No solutions found
+  // -d12 -c0 -v0 -e2 -m0 -g9 # 33 QP <-- No solutions found
+  // -d12 -c0 -v0 -e1 -m1 -g9 # 33 QP <-- instance-1
+  // -d12 -c0 -v0 -e0 -m2 -g9 # 33 QP <-- instance-2
   // -d12 -c1 -v1 -e1 -m0 -g9 # 34 QP <-- No solutions found
   // -d12 -c1 -v0 -e3 -m0 -g8 # 34 QP <-- No solutions found
   // -d12 -c0 -v1 -e3 -m0 -g8 # 36 QP <-- No solutions found
@@ -250,7 +250,9 @@ int main(int argc, char ** argv)
   // d==13, dim=35, best PI degree 13 rule in libmesh has 37 QPs
   // -d13 -c0 -v0 -e1 -m0 -g11 # 36 QP <-- No solutions found
   // -d13 -c1 -v1 -e0 -m0 -g11 # 37 QP <-- No solutions found
-  // -d13 -c1 -v0 -e2 -m0 -g10 # 37 QP
+  // -d13 -c1 -v0 -e2 -m0 -g10 # 37 QP <-- instance-3
+  // -d13 -c1 -v0 -e1 -m1 -g10 # 37 QP <-- instance-4
+  // -d13 -c1 -v0 -e0 -m2 -g10 # 37 QP <-- instance-5
   // -d13 -c0 -v1 -e2 -m0 -g10 # 39 QP
   // -d13 -c0 -v0 -e4 -m0 -g9 # 39 QP
   // -d13 -c1 -v1 -e3 -m0 -g9 # 40 QP
@@ -265,6 +267,8 @@ int main(int argc, char ** argv)
   // (1.196e-1, 1.0984e-3) in the equilateral reference triangle.
   // -d14 -c1 -v0 -e0 -m0 -g13 # 40 QP, <-- No solutions found
   // -d14 -c0 -v0 -e2 -m0 -g12 # 42 QP, <-- No solutions found
+  // -d14 -c0 -v0 -e1 -m1 -g12 # 42 QP, <-- instance-6
+  // -d14 -c0 -v0 -e0 -m2 -g12 # 42 QP, <-- instance-7
   // -d14 -c1 -v1 -e1 -m0 -g12 # 43 QP, <-- No solutions found
   // -d14 -c1 -v0 -e3 -m0 -g11 # 43 QP, <-- One new solution found
   // -d14 -c0 -v1 -e3 -m0 -g11 # 45 QP, <-- One new solution found
@@ -276,6 +280,7 @@ int main(int argc, char ** argv)
   // -d15 -c1 -v0 -e0 -m0 -g15 # 46 QP, <-- No solutions found
   // -d15 -c0 -v1 -e0 -m0 -g15 # 48 QP, <-- No solutions found
   // -d15 -c1 -v1 -e1 -m0 -g14 # 49 QP, <-- No solutions found
+  // -d15 -c1 -v1 -e0 -m1 -g14 # 49 QP, <-- instance-8
   // -d15 -c1 -v0 -e3 -m0 -g13 # 49 QP, <-- No solutions found
   // -d15 -c0 -v1 -e3 -m0 -g13 # 51 QP, <-- No solutions found
   // -d15 -c0 -v0 -e5 -m0 -g12 # 51 QP
