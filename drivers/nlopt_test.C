@@ -169,91 +169,91 @@ int main(int argc, char ** argv)
   // -d7 -c1 -v1 -e5 -m0 -g0 # 18 QP <-- No solution
 
   // d==8, dim=15, best PI degree 8 rule in libmesh has 16 QPs
-  // -d8 -c0 -v0 -e0 -g5 # 15 QP <-- No solution
-  // -d8 -c1 -v0 -e1 -g4 # 16 QP <-- New (?) solution
-  // -d8 -c0 -v1 -e1 -g4 # 18 QP <-- New (?) solution
-  // -d8 -c0 -v0 -e3 -g3 # 18 QP <-- No solution
-  // -d8 -c1 -v1 -e2 -g3 # 19 QP <-- New (?) solution
-  // -d8 -c1 -v0 -e4 -g2 # 19 QP <-- No solution
-  // -d8 -c0 -v1 -e4 -g2 # 21 QP <-- No solution
-  // -d8 -c0 -v0 -e6 -g1 # 21 QP <-- No solution
-  // -d8 -c1 -v1 -e5 -g1 # 22 QP <-- No solution
-  // -d8 -c1 -v0 -e7 -g0 # 22 QP <-- No solution
-  // -d8 -c0 -v1 -e7 -g0 # 24 QP <-- No solution
+  // -d8 -c0 -v0 -e0 -m0 -g5 # 15 QP <-- No solution
+  // -d8 -c1 -v0 -e1 -m0 -g4 # 16 QP <-- New (?) solution
+  // -d8 -c0 -v1 -e1 -m0 -g4 # 18 QP <-- New (?) solution
+  // -d8 -c0 -v0 -e3 -m0 -g3 # 18 QP <-- No solution
+  // -d8 -c1 -v1 -e2 -m0 -g3 # 19 QP <-- New (?) solution
+  // -d8 -c1 -v0 -e4 -m0 -g2 # 19 QP <-- No solution
+  // -d8 -c0 -v1 -e4 -m0 -g2 # 21 QP <-- No solution
+  // -d8 -c0 -v0 -e6 -m0 -g1 # 21 QP <-- No solution
+  // -d8 -c1 -v1 -e5 -m0 -g1 # 22 QP <-- No solution
+  // -d8 -c1 -v0 -e7 -m0 -g0 # 22 QP <-- No solution
+  // -d8 -c0 -v1 -e7 -m0 -g0 # 24 QP <-- No solution
 
   // d==9, dim=19, best PI degree 9 rule in libmesh has 19 QPs
-  // -d9 -c1 -v0 -e0 -g6 # 19 QP <-- One solution found, same as D3!
-  // -d9 -c0 -v1 -e0 -g6 # 21 QP <-- New (?) solution
-  // -d9 -c0 -v0 -e2 -g5 # 21 QP <-- No solution
-  // -d9 -c1 -v1 -e1 -g5 # 22 QP <-- New (?) solution
-  // -d9 -c1 -v0 -e3 -g4 # 22 QP <-- No solution
-  // -d9 -c0 -v1 -e3 -g4 # 24 QP <-- New (?) solution
-  // -d9 -c0 -v0 -e5 -g3 # 24 QP <-- No solution
-  // -d9 -c1 -v1 -e4 -g3 # 25 QP <-- No solution
-  // -d9 -c1 -v0 -e6 -g2 # 25 QP <-- No solution
-  // -d9 -c0 -v1 -e6 -g2 # 27 QP <-- No solution
-  // -d9 -c0 -v0 -e8 -g1 # 27 QP <-- No solution
-  // -d9 -c1 -v1 -e7 -g1 # 28 QP <-- No solution
-  // -d9 -c1 -v0 -e9 -g0 # 28 QP <-- No solution
-  // -d9 -c0 -v1 -e9 -g0 # 30 QP <-- No solution
+  // -d9 -c1 -v0 -e0 -m0 -g6 # 19 QP <-- One solution found, same as D3!
+  // -d9 -c0 -v1 -e0 -m0 -g6 # 21 QP <-- New (?) solution
+  // -d9 -c0 -v0 -e2 -m0 -g5 # 21 QP <-- No solution
+  // -d9 -c1 -v1 -e1 -m0 -g5 # 22 QP <-- New (?) solution
+  // -d9 -c1 -v0 -e3 -m0 -g4 # 22 QP <-- No solution
+  // -d9 -c0 -v1 -e3 -m0 -g4 # 24 QP <-- New (?) solution
+  // -d9 -c0 -v0 -e5 -m0 -g3 # 24 QP <-- No solution
+  // -d9 -c1 -v1 -e4 -m0 -g3 # 25 QP <-- No solution
+  // -d9 -c1 -v0 -e6 -m0 -g2 # 25 QP <-- No solution
+  // -d9 -c0 -v1 -e6 -m0 -g2 # 27 QP <-- No solution
+  // -d9 -c0 -v0 -e8 -m0 -g1 # 27 QP <-- No solution
+  // -d9 -c1 -v1 -e7 -m0 -g1 # 28 QP <-- No solution
+  // -d9 -c1 -v0 -e9 -m0 -g0 # 28 QP <-- No solution
+  // -d9 -c0 -v1 -e9 -m0 -g0 # 30 QP <-- No solution
 
   // d==10, dim=22, best PI degree 10 rule in libmesh has 25 QPs
-  // -d10 -c1 -v0 -e0 -g7 # 22 QP <-- No solution
-  // -d10 -c0 -v1 -e0 -g7 # 24 QP <-- No solution
-  // -d10 -c0 -v0 -e2 -g6 # 24 QP <-- SIX New (?) solutions
-  // -d10 -c1 -v1 -e1 -g6 # 25 QP <-- New (?) solution
-  // -d10 -c1 -v0 -e3 -g5 # 25 QP <-- TWO New (?) solutions
-  // -d10 -c0 -v1 -e3 -g5 # 27 QP <-- New (?) solution
-  // -d10 -c0 -v0 -e5 -g4 # 27 QP <-- No solution
-  // -d10 -c1 -v1 -e4 -g4 # 28 QP <-- No solutions found
-  // -d10 -c1 -v0 -e6 -g3 # 28 QP
-  // -d10 -c1 -v0 -e7 -g2 # 28 QP
-  // -d10 -c0 -v1 -e7 -g2 # 30 QP
-  // -d10 -c0 -v0 -e8 -g2 # 30 QP
-  // -d10 -c1 -v0 -e9 -g1 # 31 QP
-  // -d10 -c0 -v1 -e9 -g1 # 33 QP
-  // -d10 -c1 -v1 -e10 -g0 # 34 QP
+  // -d10 -c1 -v0 -e0 -m0 -g7 # 22 QP <-- No solution
+  // -d10 -c0 -v1 -e0 -m0 -g7 # 24 QP <-- No solution
+  // -d10 -c0 -v0 -e2 -m0 -g6 # 24 QP <-- SIX New (?) solutions
+  // -d10 -c1 -v1 -e1 -m0 -g6 # 25 QP <-- New (?) solution
+  // -d10 -c1 -v0 -e3 -m0 -g5 # 25 QP <-- TWO New (?) solutions
+  // -d10 -c0 -v1 -e3 -m0 -g5 # 27 QP <-- New (?) solution
+  // -d10 -c0 -v0 -e5 -m0 -g4 # 27 QP <-- No solution
+  // -d10 -c1 -v1 -e4 -m0 -g4 # 28 QP <-- No solutions found
+  // -d10 -c1 -v0 -e6 -m0 -g3 # 28 QP
+  // -d10 -c1 -v0 -e7 -m0 -g2 # 28 QP
+  // -d10 -c0 -v1 -e7 -m0 -g2 # 30 QP
+  // -d10 -c0 -v0 -e8 -m0 -g2 # 30 QP
+  // -d10 -c1 -v0 -e9 -m0 -g1 # 31 QP
+  // -d10 -c0 -v1 -e9 -m0 -g1 # 33 QP
+  // -d10 -c1 -v1 -e10 -m0 -g0 # 34 QP
 
   // d==11, dim=26, best PI degree 11 rule in libmesh has 30 QPs
-  // -d11 -c0 -v0 -e1 -g8 # 27 QP <-- Two New solutions
-  // -d11 -c1 -v1 -e0 -g8 # 28 QP <-- No solutions found
-  // -d11 -c1 -v0 -e2 -g7 # 28 QP <-- One New solution
-  // -d11 -c0 -v1 -e2 -g7 # 30 QP <-- One New solution
-  // -d11 -c0 -v0 -e4 -g6 # 30 QP <-- One New solution
-  // -d11 -c1 -v1 -e3 -g6 # 31 QP <-- Two New solutions
-  // -d11 -c1 -v0 -e5 -g5 # 31 QP <-- No solutions found
-  // -d11 -c0 -v1 -e5 -g5 # 33 QP <-- No solutions found
-  // -d11 -c0 -v0 -e7 -g4 # 33 QP <-- No solutions found
-  // -d11 -c1 -v1 -e6 -g4 # 34 QP <-- No solutions found
-  // -d11 -c1 -v0 -e8 -g3 # 34 QP
-  // -d11 -c0 -v1 -e8 -g3 # 36 QP
-  // -d11 -c0 -v0 -e10 -g2 # 36 QP
-  // -d11 -c1 -v1 -e9  -g2 # 37 QP
-  // -d11 -c1 -v0 -e11 -g1 # 37 QP
-  // -d11 -c0 -v1 -e11 -g1 # 39 QP
-  // -d11 -c0 -v0 -e13 -g0 # 39 QP
-  // -d11 -c1 -v1 -e12 -g0 # 40 QP
+  // -d11 -c0 -v0 -e1 -m0 -g8 # 27 QP <-- Two New solutions
+  // -d11 -c1 -v1 -e0 -m0 -g8 # 28 QP <-- No solutions found
+  // -d11 -c1 -v0 -e2 -m0 -g7 # 28 QP <-- One New solution
+  // -d11 -c0 -v1 -e2 -m0 -g7 # 30 QP <-- One New solution
+  // -d11 -c0 -v0 -e4 -m0 -g6 # 30 QP <-- One New solution
+  // -d11 -c1 -v1 -e3 -m0 -g6 # 31 QP <-- Two New solutions
+  // -d11 -c1 -v0 -e5 -m0 -g5 # 31 QP <-- No solutions found
+  // -d11 -c0 -v1 -e5 -m0 -g5 # 33 QP <-- No solutions found
+  // -d11 -c0 -v0 -e7 -m0 -g4 # 33 QP <-- No solutions found
+  // -d11 -c1 -v1 -e6 -m0 -g4 # 34 QP <-- No solutions found
+  // -d11 -c1 -v0 -e8 -m0 -g3 # 34 QP
+  // -d11 -c0 -v1 -e8 -m0 -g3 # 36 QP
+  // -d11 -c0 -v0 -e10 -m0 -g2 # 36 QP
+  // -d11 -c1 -v1 -e9  -m0 -g2 # 37 QP
+  // -d11 -c1 -v0 -e11 -m0 -g1 # 37 QP
+  // -d11 -c0 -v1 -e11 -m0 -g1 # 39 QP
+  // -d11 -c0 -v0 -e13 -m0 -g0 # 39 QP
+  // -d11 -c1 -v1 -e12 -m0 -g0 # 40 QP
 
   // d==12, dim=31, best PI degree 12 rule in libmesh has 33 QPs
-  // -d12 -c1 -v0 -e0 -g10 # 31 QP <-- No solutions found, instance-1, instance-4, instance-7
-  // -d12 -c0 -v1 -e0 -g10 # 33 QP <-- No solutions found, instance-2, instance-5, instance-8
-  // -d12 -c0 -v0 -e2 -g9 # 33 QP <-- No solutions found, instance-3, instance-6
-  // -d12 -c1 -v1 -e1 -g9 # 34 QP <-- No solutions found
-  // -d12 -c1 -v0 -e3 -g8 # 34 QP <-- No solutions found
-  // -d12 -c0 -v1 -e3 -g8 # 36 QP <-- No solutions found
-  // -d12 -c0 -v0 -e5 -g7 # 36 QP <-- No solutions found
-  // -d12 -c1 -v1 -e4 -g7 # 37 QP <-- No solutions found
+  // -d12 -c1 -v0 -e0 -m0 -g10 # 31 QP <-- No solutions found, instance-1, instance-4, instance-7
+  // -d12 -c0 -v1 -e0 -m0 -g10 # 33 QP <-- No solutions found, instance-2, instance-5, instance-8
+  // -d12 -c0 -v0 -e2 -m0 -g9 # 33 QP <-- No solutions found, instance-3, instance-6
+  // -d12 -c1 -v1 -e1 -m0 -g9 # 34 QP <-- No solutions found
+  // -d12 -c1 -v0 -e3 -m0 -g8 # 34 QP <-- No solutions found
+  // -d12 -c0 -v1 -e3 -m0 -g8 # 36 QP <-- No solutions found
+  // -d12 -c0 -v0 -e5 -m0 -g7 # 36 QP <-- No solutions found
+  // -d12 -c1 -v1 -e4 -m0 -g7 # 37 QP <-- No solutions found
   // ...
 
   // d==13, dim=35, best PI degree 13 rule in libmesh has 37 QPs
-  // -d13 -c0 -v0 -e1 -g11 # 36 QP <-- No solutions found
-  // -d13 -c1 -v1 -e0 -g11 # 37 QP <-- No solutions found
-  // -d13 -c1 -v0 -e2 -g10 # 37 QP
-  // -d13 -c0 -v1 -e2 -g10 # 39 QP
-  // -d13 -c0 -v0 -e4 -g9 # 39 QP
-  // -d13 -c1 -v1 -e3 -g9 # 40 QP
-  // -d13 -c1 -v0 -e5 -g8 # 40 QP
-  // -d13 -c0 -v1 -e5 -g8 # 42 QP
+  // -d13 -c0 -v0 -e1 -m0 -g11 # 36 QP <-- No solutions found
+  // -d13 -c1 -v1 -e0 -m0 -g11 # 37 QP <-- No solutions found
+  // -d13 -c1 -v0 -e2 -m0 -g10 # 37 QP
+  // -d13 -c0 -v1 -e2 -m0 -g10 # 39 QP
+  // -d13 -c0 -v0 -e4 -m0 -g9 # 39 QP
+  // -d13 -c1 -v1 -e3 -m0 -g9 # 40 QP
+  // -d13 -c1 -v0 -e5 -m0 -g8 # 40 QP
+  // -d13 -c0 -v1 -e5 -m0 -g8 # 42 QP
   // ...
 
   // d==14, dim=40, best PI degree 14 rule in libmesh has 42 QPs.
@@ -261,42 +261,42 @@ int main(int argc, char ** argv)
   // boundary, but they are in fact only very *close* to the boundary
   // and not on it, for example one QP is located at position
   // (1.196e-1, 1.0984e-3) in the equilateral reference triangle.
-  // -d14 -c1 -v0 -e0 -g13 # 40 QP, <-- No solutions found
-  // -d14 -c0 -v0 -e2 -g12 # 42 QP, <-- No solutions found
-  // -d14 -c1 -v1 -e1 -g12 # 43 QP, <-- No solutions found
-  // -d14 -c1 -v0 -e3 -g11 # 43 QP, <-- One new solution found
-  // -d14 -c0 -v1 -e3 -g11 # 45 QP, <-- One new solution found
-  // -d14 -c0 -v0 -e5 -g10 # 45 QP, <-- No solutions found
-  // -d14 -c1 -v1 -e4 -g10 # 46 QP, <-- No solutions found
+  // -d14 -c1 -v0 -e0 -m0 -g13 # 40 QP, <-- No solutions found
+  // -d14 -c0 -v0 -e2 -m0 -g12 # 42 QP, <-- No solutions found
+  // -d14 -c1 -v1 -e1 -m0 -g12 # 43 QP, <-- No solutions found
+  // -d14 -c1 -v0 -e3 -m0 -g11 # 43 QP, <-- One new solution found
+  // -d14 -c0 -v1 -e3 -m0 -g11 # 45 QP, <-- One new solution found
+  // -d14 -c0 -v0 -e5 -m0 -g10 # 45 QP, <-- No solutions found
+  // -d14 -c1 -v1 -e4 -m0 -g10 # 46 QP, <-- No solutions found
   // ...
 
   // d==15, dim=46, best PI rule in libmesh has 49 QPs
-  // -d15 -c1 -v0 -e0 -g15 # 46 QP, <-- No solutions found
-  // -d15 -c0 -v1 -e0 -g15 # 48 QP, <-- No solutions found
-  // -d15 -c1 -v1 -e1 -g14 # 49 QP, <-- No solutions found
-  // -d15 -c1 -v0 -e3 -g13 # 49 QP, <-- No solutions found
-  // -d15 -c0 -v1 -e3 -g13 # 51 QP, <-- No solutions found
-  // -d15 -c0 -v0 -e5 -g12 # 51 QP
-  // -d15 -c1 -v1 -e4 -g12 # 52 QP
-  // -d15 -c1 -v0 -e6 -g11 # 52 QP
-  // -d15 -c0 -v1 -e6 -g11 # 54 QP
-  // -d15 -c1 -v1 -e7 -g10 # 55 QP
+  // -d15 -c1 -v0 -e0 -m0 -g15 # 46 QP, <-- No solutions found
+  // -d15 -c0 -v1 -e0 -m0 -g15 # 48 QP, <-- No solutions found
+  // -d15 -c1 -v1 -e1 -m0 -g14 # 49 QP, <-- No solutions found
+  // -d15 -c1 -v0 -e3 -m0 -g13 # 49 QP, <-- No solutions found
+  // -d15 -c0 -v1 -e3 -m0 -g13 # 51 QP, <-- No solutions found
+  // -d15 -c0 -v0 -e5 -m0 -g12 # 51 QP
+  // -d15 -c1 -v1 -e4 -m0 -g12 # 52 QP
+  // -d15 -c1 -v0 -e6 -m0 -g11 # 52 QP
+  // -d15 -c0 -v1 -e6 -m0 -g11 # 54 QP
+  // -d15 -c1 -v1 -e7 -m0 -g10 # 55 QP
 
   // d==18, dim=64, there is no PI degree 18 rule in libmesh, next highest has 73 pts.
-  // -d18 -c1 -v0 -e0 -g21 # 64 QP
-  // -d18 -c0 -v1 -e0 -g21 # 66 QP
-  // -d18 -c0 -v0 -e2 -g20 # 66 QP
-  // -d18 -c1 -v1 -e1 -g20 # 67 QP
-  // -d18 -c1 -v0 -e3 -g19 # 67 QP
-  // -d18 -c0 -v1 -e3 -g19 # 69 QP
-  // -d18 -c0 -v0 -e5 -g18 # 69 QP
-  // -d18 -c1 -v1 -e4 -g18 # 70 QP
-  // -d18 -c1 -v0 -e6 -g17 # 70 QP
-  // -d18 -c0 -v1 -e6 -g17 # 72 QP
-  // -d18 -c0 -v0 -e8 -g16 # 72 QP
-  // -d18 -c1 -v1 -e7 -g16 # 73 QP
-  // -d18 -c1 -v0 -e9 -g15 # 73 QP
-  // -d18 -c0 -v1 -e9 -g15 # 75 QP
+  // -d18 -c1 -v0 -e0 -m0 -g21 # 64 QP
+  // -d18 -c0 -v1 -e0 -m0 -g21 # 66 QP
+  // -d18 -c0 -v0 -e2 -m0 -g20 # 66 QP
+  // -d18 -c1 -v1 -e1 -m0 -g20 # 67 QP
+  // -d18 -c1 -v0 -e3 -m0 -g19 # 67 QP
+  // -d18 -c0 -v1 -e3 -m0 -g19 # 69 QP
+  // -d18 -c0 -v0 -e5 -m0 -g18 # 69 QP
+  // -d18 -c1 -v1 -e4 -m0 -g18 # 70 QP
+  // -d18 -c1 -v0 -e6 -m0 -g17 # 70 QP
+  // -d18 -c0 -v1 -e6 -m0 -g17 # 72 QP
+  // -d18 -c0 -v0 -e8 -m0 -g16 # 72 QP
+  // -d18 -c1 -v1 -e7 -m0 -g16 # 73 QP
+  // -d18 -c1 -v0 -e9 -m0 -g15 # 73 QP
+  // -d18 -c0 -v1 -e9 -m0 -g15 # 75 QP
   // ...
 
   // Print information.
