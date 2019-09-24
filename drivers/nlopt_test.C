@@ -146,16 +146,17 @@ int main(int argc, char ** argv)
   // -d4 -c0 -v1 -e2 -m0 -g0 # 9 QP <-- No solution
 
   // d==5, dim==7. Best known PI rule has 7 QP.
-  // -d5 -c1 -v0 -e0 -g2 # 7 QP <-- Also a D3 rule in libmesh
+  // -d5 -c1 -v0 -e0 -m0 -g2 # 7 QP <-- Also a D3 rule in libmesh
+  // -d5 -c1 -v0 -e0 -m3 -g0 # 10 QP <-- A D3 rule
 
   // d=6, dim==10. Best known PI rule has 12 QP.
-  // -d6 -c1 -v0 -e0 -g3 # 10 QP <-- No solution
-  // -d6 -c0 -v1 -e0 -g3 # 12 QP <-- No solution
-  // -d6 -c0 -v0 -e2 -g2 # 12 QP <-- New (?) solution
-  // -d6 -c1 -v1 -e1 -g2 # 13 QP <-- No solution
-  // -d6 -c1 -v0 -e3 -g1 # 13 QP <-- No solution
-  // -d6 -c0 -v0 -e5 -g0 # 15 QP <-- No solution
-  // -d6 -c1 -v1 -e4 -g0 # 16 QP <-- No solution
+  // -d6 -c1 -v0 -e0 -m0 -g3 # 10 QP <-- No solution
+  // -d6 -c0 -v1 -e0 -m0 -g3 # 12 QP <-- No solution
+  // -d6 -c0 -v0 -e2 -m0 -g2 # 12 QP <-- New (?) solution
+  // -d6 -c1 -v1 -e1 -m0 -g2 # 13 QP <-- No solution
+  // -d6 -c1 -v0 -e3 -m0 -g1 # 13 QP <-- No solution
+  // -d6 -c0 -v0 -e5 -m0 -g0 # 15 QP <-- No solution
+  // -d6 -c1 -v1 -e4 -m0 -g0 # 16 QP <-- No solution
 
   // d==7, dim=12. Best known PI rule is Gatermann's rule.
   // -d7 -c0 -v0 -e0 -m0 -g4 # 12 QP <-- Gatermann solution
@@ -767,6 +768,19 @@ int main(int argc, char ** argv)
       //       6.2969590272413576297841972750091e-2,
       //       1.0128650732345633880098736191512e-1,
       //       7.9742698535308732239802527616975e-1
+      //     };
+
+      // degree=5 rule with 10 QPs
+      // if (r.has_orbits(1,0,0,3,0))
+      //   x =
+      //     {
+      //       1.2186423932585219984549820562014e-1,
+      //       1.1700433911324622627645941889857e-2,
+      //       3.8273347483138637226611226870869e-2,
+      //       4.2316140269087041665556366610484e-2,
+      //       4.9096810155229997362992320344920e-1,
+      //       7.2028679377637602424964956292946e-2,
+      //       1.4482809461230114506784241834028e-1
       //     };
 
       // degree=6 with 12 points, which matches the degree=6 rule
