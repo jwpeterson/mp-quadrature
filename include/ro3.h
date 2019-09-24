@@ -20,7 +20,7 @@ struct Ro3
 {
   // Constructor. Checks that the parameters are consistent with the dimension.
   Ro3(unsigned int d_in, unsigned int nc_in, unsigned int nv_in,
-      unsigned int ne_in, unsigned int ng_in);
+      unsigned int ne_in, unsigned int nm_in, unsigned int ng_in);
 
   // The 5 "special" functions can be explicitly defaulted for this class.
   Ro3 (const Ro3 &) = default;
@@ -29,15 +29,13 @@ struct Ro3
   Ro3 & operator= (Ro3 &&) = default;
   ~Ro3() = default;
 
-  // Default ctor: initializes the struct for a d==1 rule with 1 point.
-  // Ro3() : d(1), nc(1), nv(0), ne(0), ng(0) {}
-
   // Enumerate the different types of Orbits.
   enum Orbit : int
     {
       CENTROID,
       VERTEX,
       EDGE,
+      MEDIAN,
       GENERAL
     };
 
@@ -75,11 +73,11 @@ struct Ro3
 
   // The number of quadrature points implied by the current (nc, nv,
   // ne, ng) values.
-  unsigned int n_qp() { return nc + 3*(nv + ne + ng); }
+  unsigned int n_qp() { return nc + 3*(nv + ne + nm + ng); }
 
-  // Check that the current (nc, nv, ne, ng) values are consistent with
+  // Check that the current (nc, nv, ne, nm, ng) values are consistent with
   // the current value of d.
-  bool check() { return dim() == nc + nv + 2*ne + 3*ng; }
+  bool check() { return dim() == nc + nv + 2*(ne + nm) + 3*ng; }
 
   // Polynomial degree to be integrated exactly
   unsigned int d;
@@ -92,6 +90,9 @@ struct Ro3
 
   // Number of edge orbits (max N/2)
   unsigned int ne;
+
+  // Number of median orbits
+  unsigned int nm;
 
   // Number of "general" orbits (max N/3)
   unsigned int ng;
