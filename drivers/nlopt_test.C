@@ -613,7 +613,8 @@ int main(int argc, char ** argv)
       // for (const auto & val : x)
       //   std::cout << val << std::endl;
 
-      // One can also solve for this rule "by hand" since if you
+      // A degree=3 rule with 7 QPs.
+      // One can solve for this rule "by hand" since if you
       // assume the edge orbit is at 1/2 it becomes a linear system of
       // equations that has a solution. This rule is not optimal since
       // it has both points on the boundary and it has 7 QPs while the
@@ -621,7 +622,7 @@ int main(int argc, char ** argv)
       // are all positive and it was a useful test case for making
       // sure that the VERTEX residual and Jacobian contributions were
       // correct.
-      // if (r.d==3 && r.nc==1 && r.ne==1 && r.nv==1 && r.ng==0)
+      // if (r.has_orbits(1,1,1,0,0))
       //   x =
       //     {
       //       2.2500000000000000000000000000000e-1,
@@ -631,6 +632,8 @@ int main(int argc, char ** argv)
       //     };
 
       // A new (?) degree=3 rule with 6 QPs composed of two median orbits.
+      // I'm not totally sure what is happening here... maybe there are
+      // infinitely many solutions and we can show this algebraically?
       if (r.has_orbits(0,0,0,2,0))
         {
           // 1.) This initial guess seems to converge to solution 2?
@@ -700,28 +703,40 @@ int main(int argc, char ** argv)
           // well... but are these all real?
 
           // 8.) OK.
-          x =
-            {
-              1.3334904300348009594958922865917e-1,
-              4.4942168229551341576148893659850e-1,
-              3.3317623663186570717077438007497e-2,
-              4.1757295288082069090936633776143e-2
-            };
+          // x =
+          //   {
+          //     1.3334904300348009594958922865917e-1,
+          //     4.4942168229551341576148893659850e-1,
+          //     3.3317623663186570717077438007497e-2,
+          //     4.1757295288082069090936633776143e-2
+          //   };
 
-          // 1.4858691529812219685514262629516e-1
-          // 1.6613607984476272598242131053447e-1
-          // 1.8079751368544469811524040371505e-2
-          // 4.9557369943661873640529541830763e-1
-          //
-          // 1.3847723620228327636121094567490e-1
-          // 4.5092654879836415947261378305977e-1
-          // 2.8189430464383390305455720991763e-2
-          // 2.3005119030233037076544813251675e-2
-          //
-          // 8.7968789711389793435006162846315e-2
-          // 4.4590889747817179822420514240849e-1
-          // 7.8697876955276873231660503820351e-2
-          // 1.2200025851717823099515109050002e-1
+          // 9.) OK.
+          // x =
+          //   {
+          //     1.4858691529812219685514262629516e-1,
+          //     1.6613607984476272598242131053447e-1,
+          //     1.8079751368544469811524040371505e-2,
+          //     4.9557369943661873640529541830763e-1
+          //   };
+
+          // 10.) OK.
+          // x =
+          //   {
+          //     1.3847723620228327636121094567490e-1,
+          //     4.5092654879836415947261378305977e-1,
+          //     2.8189430464383390305455720991763e-2,
+          //     2.3005119030233037076544813251675e-2
+          //   };
+
+          // 11.) OK.
+          // x =
+          //   {
+          //     8.7968789711389793435006162846315e-2,
+          //     4.4590889747817179822420514240849e-1,
+          //     7.8697876955276873231660503820351e-2,
+          //     1.2200025851717823099515109050002e-1
+          //   };
         }
 
       // This rule is different from the D3-invariant rule with 6 QP
