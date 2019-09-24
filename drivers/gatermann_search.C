@@ -49,7 +49,7 @@ int main()
 
   // d==7, dim=12
   unsigned int d=7;
-  Ro3 r(d, /*nc*/0, /*nv*/0, /*ne*/0, /*ng*/4); // 12 QP
+  Ro3 r(d, /*nc*/0, /*nv*/0, /*ne*/0, /*nm*/0, /*ng*/4); // 12 QP
 
   // Testing
   // std::cout << mpfr_class(exact_tri(0,0)) << std::endl; // =0.5

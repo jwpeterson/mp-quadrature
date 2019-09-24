@@ -114,7 +114,7 @@ int main(int argc, char ** argv)
   srandom(seed);
 
   // Build ro3 rule object
-  Ro3 r(d, nc, nv, ne, ng);
+  Ro3 r(d, nc, nv, ne, nm, ng);
 
   // d==2, dim==2. Betst known PI rule has 3 QP.
   // Note: This case is somewhat tricky despite also being the
@@ -1634,6 +1634,7 @@ void usage()
   std::cout << "-c = number of centroid orbits" << std::endl;
   std::cout << "-v = number of vertex orbits" << std::endl;
   std::cout << "-e = number of edge orbits" << std::endl;
+  std::cout << "-m = number of median orbits" << std::endl;
   std::cout << "-g = number of general orbits" << std::endl;
 }
 
