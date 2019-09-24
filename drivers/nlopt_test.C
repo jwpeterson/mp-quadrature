@@ -138,10 +138,11 @@ int main(int argc, char ** argv)
   // o For the case with nc=1, ne=2 there does not seem to be a solution, but
   //   the same (global) minimum objective function value of ~2.57337-08
   // is found by the algorithm regardless of starting point.
-  // -d4 -c0 -v0 -e1 -g1 # 6 QP <-- New (?) soln found!
-  // -d4 -c1 -v1 -e0 -g1 # 7 QP <-- No solution
-  // -d4 -c1 -v0 -e2 -g0 # 7 QP <-- No solution
-  // -d4 -c0 -v1 -e2 -g0 # 9 QP <-- No solution
+  // -d4 -c0 -v0 -e0 -m1 -g1 # 6 QP <-- The D3-invariant rule currently in libmesh
+  // -d4 -c0 -v0 -e1 -m0 -g1 # 6 QP <-- New (?) soln found!
+  // -d4 -c1 -v1 -e0 -m0 -g1 # 7 QP <-- No solution
+  // -d4 -c1 -v0 -e2 -m0 -g0 # 7 QP <-- No solution
+  // -d4 -c0 -v1 -e2 -m0 -g0 # 9 QP <-- No solution
 
   // d==5, dim==7. Best known PI rule has 7 QP.
   // -d5 -c1 -v0 -e0 -g2 # 7 QP <-- Also a D3 rule in libmesh
