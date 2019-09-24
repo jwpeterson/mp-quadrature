@@ -59,6 +59,14 @@ Ro3::Ro3(unsigned int d_in, unsigned int nc_in, unsigned int nv_in,
 
 
 
+bool Ro3::has_orbits(unsigned int nc_in, unsigned int nv_in, unsigned int ne_in,
+                     unsigned int nm_in, unsigned int ng_in)
+{
+  return
+    (nc == nc_in) && (nv == nv_in) && (ne == ne_in) &&
+    (nm == nm_in) && (ng == ng_in);
+}
+
 unsigned int Ro3::begin(Orbit orb)
 {
   switch (orb)
