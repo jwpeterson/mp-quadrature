@@ -61,6 +61,7 @@ int main(int argc, char ** argv)
       {"n-centroid",  required_argument, NULL, 'c'},
       {"n-vertex",    required_argument, NULL, 'v'},
       {"n-edge",      required_argument, NULL, 'e'},
+      {"n-median",    required_argument, NULL, 'm'},
       {"n-general",   required_argument, NULL, 'g'},
       {"help",        no_argument,       NULL, 'h'},
       { NULL,         0,                 NULL,  0 }
@@ -69,17 +70,18 @@ int main(int argc, char ** argv)
   // To be set from the command line
   unsigned int d = 0;
 
-  // Number of centroid, vertex, edge, and general orbits.
+  // Number of centroid, vertex, edge, median, and general orbits.
   unsigned int nc = 0;
   unsigned int nv = 0;
   unsigned int ne = 0;
+  unsigned int nm = 0;
   unsigned int ng = 0;
 
   // A colon following an option means it has an argument.
   // If there's an unrecognized argument, getopt_long()
   // prints a message, so we don't handle it in the cases below.
   int ch = -1;
-  while ((ch = getopt_long(argc, argv, "hd:c:v:e:g:", longopts, NULL)) != -1)
+  while ((ch = getopt_long(argc, argv, "hd:c:v:e:m:g:", longopts, NULL)) != -1)
     {
       switch (ch)
         {
@@ -87,6 +89,7 @@ int main(int argc, char ** argv)
         case 'c': { nc = atoi(optarg); break; }
         case 'v': { nv = atoi(optarg); break; }
         case 'e': { ne = atoi(optarg); break; }
+        case 'm': { nm = atoi(optarg); break; }
         case 'g': { ng = atoi(optarg); break; }
         case 'h': { usage(); return 0; }
         }
