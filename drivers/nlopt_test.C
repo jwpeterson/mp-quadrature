@@ -116,7 +116,7 @@ int main(int argc, char ** argv)
   // Build ro3 rule object
   Ro3 r(d, nc, nv, ne, nm, ng);
 
-  // d==2, dim==2. Betst known PI rule has 3 QP.
+  // d==2, dim==2. Best known PI rule has 3 QP.
   // Note: This case is somewhat tricky despite also being the
   // simplest non-trivial case!  The issue is that the Jacobian is
   // singular at the root, so Newton iterations converge very slowly,
@@ -128,9 +128,10 @@ int main(int argc, char ** argv)
   // -d2 -c0 -v0 -e1 -g0 # 3 QP <-- Solution confirmed
 
   // d==3, dim==4. Best known PI rule is a conical product rule with 4 QP.
-  // -d3 -c1 -v0 -e0 -g1 # 4 QP <-- No solution (-ve wt soln only)
-  // -d3 -c0 -v0 -e2 -g0 # 6 QP <-- No solution
-  // -d3 -c1 -v1 -e1 -g0 # 7 QP <-- New (?) solution
+  // -d3 -c1 -v0 -e0 -m0 -g1 # 4 QP <-- No solution (-ve wt soln only)
+  // -d3 -c0 -v0 -e2 -m0 -g0 # 6 QP <-- No solution
+  // -d3 -c0 -v0 -e0 -m2 -g0 # 6 QP <-- _Many_ solutions found?!
+  // -d3 -c1 -v1 -e1 -m0 -g0 # 7 QP <-- New (?) solution
 
   // d==4, dim==5
   // o The best known deg=4 PI rule is a D3-invariant rule with 6 QP.
@@ -157,14 +158,14 @@ int main(int argc, char ** argv)
   // -d6 -c1 -v1 -e4 -g0 # 16 QP <-- No solution
 
   // d==7, dim=12. Best known PI rule is Gatermann's rule.
-  // -d7 -c0 -v0 -e0 -g4 # 12 QP <-- Gatermann solution
-  // -d7 -c1 -v0 -e1 -g3 # 13 QP <-- New (?) solution
-  // -d7 -c0 -v1 -e1 -g3 # 15 QP <-- No solution
-  // -d7 -c0 -v0 -e3 -g2 # 15 QP <-- New (?) solution
-  // -d7 -c1 -v1 -e2 -g2 # 16 QP <-- New (?) solution
-  // -d7 -c1 -v0 -e4 -g1 # 16 QP <-- No solution
-  // -d7 -c0 -v1 -e4 -g1 # 18 QP <-- No solution
-  // -d7 -c1 -v1 -e5 -g0 # 18 QP <-- No solution
+  // -d7 -c0 -v0 -e0 -m0 -g4 # 12 QP <-- Gatermann solution
+  // -d7 -c1 -v0 -e1 -m0 -g3 # 13 QP <-- New (?) solution
+  // -d7 -c0 -v1 -e1 -m0 -g3 # 15 QP <-- No solution
+  // -d7 -c0 -v0 -e3 -m0 -g2 # 15 QP <-- New (?) solution
+  // -d7 -c1 -v1 -e2 -m0 -g2 # 16 QP <-- New (?) solution
+  // -d7 -c1 -v0 -e4 -m0 -g1 # 16 QP <-- No solution
+  // -d7 -c0 -v1 -e4 -m0 -g1 # 18 QP <-- No solution
+  // -d7 -c1 -v1 -e5 -m0 -g0 # 18 QP <-- No solution
 
   // d==8, dim=15, best PI degree 8 rule in libmesh has 16 QPs
   // -d8 -c0 -v0 -e0 -g5 # 15 QP <-- No solution
@@ -628,6 +629,96 @@ int main(int argc, char ** argv)
       //       6.6666666666666666666666666666667e-2,
       //       5.0000000000000000000000000000000e-1
       //     };
+
+      // A new (?) degree=3 rule with 6 QPs composed of two median orbits.
+      if (r.d==3 && r.nc==0 && r.nv==0 && r.ne==0 && r.nm==2 && r.ng==0)
+        {
+          // 1.) This initial guess seems to converge to solution 2?
+          //x =
+          //  {
+          //    3.53802775299147664878063324067625e-02,
+          //    4.51663955678838699436816739307687e-02,
+          //    1.31447083213654447586549167681369e-01,
+          //    4.46274687711787798605200805468485e-01
+          //  };
+
+          // 2.) This initial guess converges to itself.
+          // x =
+          //   {
+          //     5.5430438592710409604505936979277e-2,
+          //     9.2321219251293589274056663622764e-2,
+          //     1.1123622807395625706216072968739e-1,
+          //     4.4591389966593863706329438603431e-1
+          //   };
+
+          // 3.) This initial guess converges to itself.
+          // x =
+          //   {
+          //     5.7117599987543327605737790321850e-2,
+          //     4.5233569099773816153684027274282e-1,
+          //     1.0954906667912333906092887634482e-1,
+          //     1.4657918044063831712367103699393e-1
+          //   };
+
+          // 4.) This initial guess converges to itself.
+          // x =
+          //   {
+          //     7.7933915797683249045490620091667e-2,
+          //     1.2122610860169603123104488174293e-1,
+          //     8.8732750868983417621176046575000e-2,
+          //     4.4585335732240594543339113007394e-1
+          //   };
+
+          // 5.) This initial guess converges to itself.
+          // x =
+          //   {
+          //     1.2042638521306163406026028639752e-1,
+          //     4.4689053525703978781310848387351e-1,
+          //     4.6240281453605032606406380269146e-2,
+          //     7.5385114628160386149276261080831e-2
+          //   };
+
+          // 6.) This initial guess converges to itself.
+          // x =
+          //   {
+          //     1.2456211754151360939920276208711e-1,
+          //     1.5524594648127144736622386767957e-1,
+          //     4.2104549125153057267463904579558e-2,
+          //     4.6033550085462189214369999346036e-1
+          //   };
+
+          // 7.) This initial guess converges to itself.
+          // x =
+          //   {
+          //     7.5262266646636315051842197343996e-2,
+          //     1.1843422663525580770659162696761e-1,
+          //     9.1404400020030351614824469322670e-2,
+          //     4.4569023131904496067434049813144e-1
+          //   };
+
+          // There seem to be many, many other solutions as
+          // well... but are these all real?
+
+          // 1.3334904300348009594958922865917e-1
+          // 4.4942168229551341576148893659850e-1
+          // 3.3317623663186570717077438007497e-2
+          // 4.1757295288082069090936633776143e-2
+          //
+          // 1.4858691529812219685514262629516e-1
+          // 1.6613607984476272598242131053447e-1
+          // 1.8079751368544469811524040371505e-2
+          // 4.9557369943661873640529541830763e-1
+          //
+          // 1.3847723620228327636121094567490e-1
+          // 4.5092654879836415947261378305977e-1
+          // 2.8189430464383390305455720991763e-2
+          // 2.3005119030233037076544813251675e-2
+          //
+          // 8.7968789711389793435006162846315e-2
+          // 4.4590889747817179822420514240849e-1
+          // 7.8697876955276873231660503820351e-2
+          // 1.2200025851717823099515109050002e-1
+        }
 
       // This rule is different from the D3-invariant rule with 6 QP
       // in libmesh which is from Lyness and Jesperson and has all
