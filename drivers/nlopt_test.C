@@ -238,6 +238,8 @@ int main(int argc, char ** argv)
   // -d12 -c1 -v0 -e0 -m0 -g10 # 31 QP <-- No solutions found, instance-1, instance-4, instance-7
   // -d12 -c0 -v1 -e0 -m0 -g10 # 33 QP <-- No solutions found, instance-2, instance-5, instance-8
   // -d12 -c0 -v0 -e2 -m0 -g9 # 33 QP <-- No solutions found, instance-3, instance-6
+  // -d12 -c0 -v0 -e1 -m1 -g9 # 33 QP
+  // -d12 -c0 -v0 -e0 -m2 -g9 # 33 QP
   // -d12 -c1 -v1 -e1 -m0 -g9 # 34 QP <-- No solutions found
   // -d12 -c1 -v0 -e3 -m0 -g8 # 34 QP <-- No solutions found
   // -d12 -c0 -v1 -e3 -m0 -g8 # 36 QP <-- No solutions found
