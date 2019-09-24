@@ -139,7 +139,7 @@ int main(int argc, char ** argv)
   // o For the case with nc=1, ne=2 there does not seem to be a solution, but
   //   the same (global) minimum objective function value of ~2.57337-08
   // is found by the algorithm regardless of starting point.
-  // -d4 -c0 -v0 -e0 -m1 -g1 # 6 QP <-- The D3-invariant rule currently in libmesh
+  // -d4 -c0 -v0 -e0 -m1 -g1 # 6 QP <-- No solution (Should be D3-invariant in libmesh)
   // -d4 -c0 -v0 -e1 -m0 -g1 # 6 QP <-- New (?) soln found!
   // -d4 -c1 -v1 -e0 -m0 -g1 # 7 QP <-- No solution
   // -d4 -c1 -v0 -e2 -m0 -g0 # 7 QP <-- No solution
@@ -739,13 +739,14 @@ int main(int argc, char ** argv)
           //   };
         }
 
+      // degree=4 with 6 QPs
       // This rule is different from the D3-invariant rule with 6 QP
       // in libmesh which is from Lyness and Jesperson and has all
       // points inside the reference element.  The rule also has 6
       // points (ne=1, ng=1) but it contains 3 points on the element
       // boundary, so the D3 rule should probably be considered superior,
       // but this one seems .
-      // if (r.d==4 && r.ne==1 && r.ng==1)
+      // if (r.has_orbits(0,0,1,0,1))
       //   x =
       //     {
       //       3.4009490250701580549995389768470e-2,
@@ -755,7 +756,8 @@ int main(int argc, char ** argv)
       //       3.1774517297791196146365253427748e-1
       //     };
 
-      // if (r.d==5 && r.nc==1 && r.ng==2)
+      // degree=5 with 7 QPs
+      // if (r.has_orbits(1,0,0,0,2))
       //   x =
       //     {
       //       1.1250000000000000000000000000000e-1,
@@ -767,11 +769,11 @@ int main(int argc, char ** argv)
       //       7.9742698535308732239802527616975e-1
       //     };
 
-      // This rule has 12 points, which matches the degree=6 rule
+      // degree=6 with 12 points, which matches the degree=6 rule
       // which is currently in libmesh. There are some points on the
       // boundary of the domain, so for that reason, the rule
       // currently in libmesh may be preferred.
-      // if (r.d==6 && r.ne==2 && r.ng==2)
+      // if (r.has_orbits(0,0,2,0,2))
       //   x =
       //     {
       //       1.7521923484831786607547758325659e-2,
@@ -786,42 +788,26 @@ int main(int argc, char ** argv)
       //       3.3904897391721909524901496402551e-1
       //     };
 
-      // The d=7 solution with many digits of accuracy is:
-      // 2.6517028157436251428754180460739e-2
-      // 6.2382265094402118173683000996350e-2
-      // 6.7517867073916085442557131050869e-2
-      // 4.3881408714446055036769903139288e-2
-      // 5.5225456656926611737479190275645e-2
-      // 3.2150249385198182266630784919920e-1
-      // 2.8775042784981585738445496900219e-2
-      // 3.4324302945097146469630642483938e-2
-      // 6.6094919618673565761198031019780e-1
-      // 6.7493187009802774462697086166421e-2
-      // 5.1584233435359177925746338682643e-1
-      // 2.7771616697639178256958187139372e-1
-
-      // if (r.d==7)
+      // Gatermann's degree=7 rule with 12 points.
+      // if (r.has_orbits(0,0,0,0,4))
       //   x =
       //     {
-      //       2.65e-02, // w1
-      //       6.23e-02, // x1
-      //       6.75e-02, // y1
-      //
-      //       4.38e-02, // w2
-      //       5.52e-02, // x2
-      //       3.21e-01, // y2
-      //
-      //       2.87e-02, // w3
-      //       3.43e-02, // x3
-      //       6.60e-01, // y3
-      //
-      //       6.74e-02, // w4
-      //       5.15e-01, // x4
-      //       2.77e-01, // y4
+      //       2.6517028157436251428754180460739e-2,
+      //       6.2382265094402118173683000996350e-2,
+      //       6.7517867073916085442557131050869e-2,
+      //       4.3881408714446055036769903139288e-2,
+      //       5.5225456656926611737479190275645e-2,
+      //       3.2150249385198182266630784919920e-1,
+      //       2.8775042784981585738445496900219e-2,
+      //       3.4324302945097146469630642483938e-2,
+      //       6.6094919618673565761198031019780e-1,
+      //       6.7493187009802774462697086166421e-2,
+      //       5.1584233435359177925746338682643e-1,
+      //       2.7771616697639178256958187139372e-1
       //     };
 
       // A degree=7 rule with 13 QPs and some points on the boundary.
-      // if (r.d==7 && r.nc==1 && r.ne==1 && r.ng==3)
+      // if (r.has_orbits(1,0,1,0,3))
       //   x =
       //     {
       //       5.5952307797500451168270351180298e-2,
@@ -839,7 +825,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=7 rule with 15 QPs and some points on the boundary.
-      // if (r.d==7 && r.ne==3 && r.ng==2)
+      // if (r.has_orbits(0,0,3,0,2))
       //   x =
       //     {
       //       5.3055935561341320656442591841393e-3,
@@ -857,7 +843,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=7 rule with 16 QPs and points on boundary/at vertices.
-      // if (r.d==7 && r.nc==1 && r.nv==1 && r.ne==2 && r.ng==2)
+      // if (r.has_orbits(1,1,2,0,2))
       //   x =
       //     {
       //       8.8156307800262736848734269834507e-2,
