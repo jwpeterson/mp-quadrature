@@ -29,6 +29,11 @@ struct Ro3
   Ro3 & operator= (Ro3 &&) = default;
   ~Ro3() = default;
 
+  // Two Ro3 objects shall be considered equivalent if they have the
+  // same number of each type of Orbit.
+  bool has_orbits(unsigned int nc_in, unsigned int nv_in, unsigned int ne_in,
+                  unsigned int nm_in, unsigned int ng_in);
+
   // Enumerate the different types of Orbits.
   enum Orbit : int
     {

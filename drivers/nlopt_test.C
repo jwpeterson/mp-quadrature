@@ -63,6 +63,7 @@ int main(int argc, char ** argv)
       {"n-edge",      required_argument, NULL, 'e'},
       {"n-median",    required_argument, NULL, 'm'},
       {"n-general",   required_argument, NULL, 'g'},
+      {"rule-string", required_argument, NULL, 'r'},
       {"help",        no_argument,       NULL, 'h'},
       { NULL,         0,                 NULL,  0 }
     };
@@ -77,11 +78,16 @@ int main(int argc, char ** argv)
   unsigned int nm = 0;
   unsigned int ng = 0;
 
+  // A string in the format "nc,nv,ne,nm,ng" specifying the number
+  // of each kind of orbit. There must be exactly 5 comma-separated
+  // values or else an error is thrown.
+  std::string rule_string = "";
+
   // A colon following an option means it has an argument.
   // If there's an unrecognized argument, getopt_long()
   // prints a message, so we don't handle it in the cases below.
   int ch = -1;
-  while ((ch = getopt_long(argc, argv, "hd:c:v:e:m:g:", longopts, NULL)) != -1)
+  while ((ch = getopt_long(argc, argv, "hd:c:v:e:m:g:r:", longopts, NULL)) != -1)
     {
       switch (ch)
         {
@@ -91,6 +97,7 @@ int main(int argc, char ** argv)
         case 'e': { ne = atoi(optarg); break; }
         case 'm': { nm = atoi(optarg); break; }
         case 'g': { ng = atoi(optarg); break; }
+        case 'r': { if (optarg) rule_string = std::string(optarg); break; }
         case 'h': { usage(); return 0; }
         }
     } // end while
@@ -100,6 +107,47 @@ int main(int argc, char ** argv)
       std::cout << "Error, invalid command line arguments provided!" << std::endl;
       usage();
       return 1;
+    }
+
+  // Parse the rule string if present
+  if (!rule_string.empty())
+    {
+      // Debugging
+      // std::cout << "rule_string = " << rule_string << std::endl;
+
+      std::stringstream rule_ss(rule_string);
+      std::string val;
+      std::vector<unsigned int> vals;
+      while (std::getline(rule_ss, val, ','))
+        {
+          char * endptr;
+          unsigned int tmp =
+            std::strtol(val.c_str(), &endptr, /*base=*/10);
+
+          if (val.c_str() != endptr)
+            vals.push_back(tmp);
+        }
+
+      // Debugging
+      // std::cout << "rule numerals = " << std::endl;
+      // for (unsigned int i=0; i<vals.size(); ++i)
+      //   std::cout << vals[i] << std::endl;
+
+      // Make sure exactly the right number of values were parsed.
+      if (vals.size() != 5)
+        {
+          std::cout << "Error, invalid command line arguments provided!" << std::endl;
+          usage();
+          return 1;
+        }
+
+      // Assign values, overwriting anything that may have already
+      // been there.
+      nc = vals[0];
+      nv = vals[1];
+      ne = vals[2];
+      nm = vals[3];
+      ng = vals[4];
     }
 
   // # of binary digits
@@ -114,9 +162,9 @@ int main(int argc, char ** argv)
   srandom(seed);
 
   // Build ro3 rule object
-  Ro3 r(d, nc, nv, ne, ng);
+  Ro3 r(d, nc, nv, ne, nm, ng);
 
-  // d==2, dim==2. Betst known PI rule has 3 QP.
+  // d==2, dim==2. Best known PI rule has 3 QP.
   // Note: This case is somewhat tricky despite also being the
   // simplest non-trivial case!  The issue is that the Jacobian is
   // singular at the root, so Newton iterations converge very slowly,
@@ -128,9 +176,10 @@ int main(int argc, char ** argv)
   // -d2 -c0 -v0 -e1 -g0 # 3 QP <-- Solution confirmed
 
   // d==3, dim==4. Best known PI rule is a conical product rule with 4 QP.
-  // -d3 -c1 -v0 -e0 -g1 # 4 QP <-- No solution (-ve wt soln only)
-  // -d3 -c0 -v0 -e2 -g0 # 6 QP <-- No solution
-  // -d3 -c1 -v1 -e1 -g0 # 7 QP <-- New (?) solution
+  // -d3 -c1 -v0 -e0 -m0 -g1 # 4 QP <-- No solution (-ve wt soln only)
+  // -d3 -c0 -v0 -e2 -m0 -g0 # 6 QP <-- No solution
+  // -d3 -c0 -v0 -e0 -m2 -g0 # 6 QP <-- _Many_ solutions found?!
+  // -d3 -c1 -v1 -e1 -m0 -g0 # 7 QP <-- New (?) solution
 
   // d==4, dim==5
   // o The best known deg=4 PI rule is a D3-invariant rule with 6 QP.
@@ -138,120 +187,125 @@ int main(int argc, char ** argv)
   // o For the case with nc=1, ne=2 there does not seem to be a solution, but
   //   the same (global) minimum objective function value of ~2.57337-08
   // is found by the algorithm regardless of starting point.
-  // -d4 -c0 -v0 -e0 -m1 -g1 # 6 QP <-- The D3-invariant rule currently in libmesh
+  // -d4 -c0 -v0 -e0 -m1 -g1 # 6 QP <-- No solution (Should be D3-invariant in libmesh)
   // -d4 -c0 -v0 -e1 -m0 -g1 # 6 QP <-- New (?) soln found!
   // -d4 -c1 -v1 -e0 -m0 -g1 # 7 QP <-- No solution
   // -d4 -c1 -v0 -e2 -m0 -g0 # 7 QP <-- No solution
   // -d4 -c0 -v1 -e2 -m0 -g0 # 9 QP <-- No solution
 
   // d==5, dim==7. Best known PI rule has 7 QP.
-  // -d5 -c1 -v0 -e0 -g2 # 7 QP <-- Also a D3 rule in libmesh
+  // -d5 -c1 -v0 -e0 -m0 -g2 # 7 QP <-- Also a D3 rule in libmesh
+  // -d5 -c1 -v0 -e0 -m3 -g0 # 10 QP <-- A D3 rule
 
   // d=6, dim==10. Best known PI rule has 12 QP.
-  // -d6 -c1 -v0 -e0 -g3 # 10 QP <-- No solution
-  // -d6 -c0 -v1 -e0 -g3 # 12 QP <-- No solution
-  // -d6 -c0 -v0 -e2 -g2 # 12 QP <-- New (?) solution
-  // -d6 -c1 -v1 -e1 -g2 # 13 QP <-- No solution
-  // -d6 -c1 -v0 -e3 -g1 # 13 QP <-- No solution
-  // -d6 -c0 -v0 -e5 -g0 # 15 QP <-- No solution
-  // -d6 -c1 -v1 -e4 -g0 # 16 QP <-- No solution
+  // -d6 -c1 -v0 -e0 -m0 -g3 # 10 QP <-- No solution
+  // -d6 -c0 -v1 -e0 -m0 -g3 # 12 QP <-- No solution
+  // -d6 -c0 -v0 -e2 -m0 -g2 # 12 QP <-- New (?) solution
+  // -d6 -c1 -v1 -e1 -m0 -g2 # 13 QP <-- No solution
+  // -d6 -c1 -v0 -e3 -m0 -g1 # 13 QP <-- No solution
+  // -d6 -c0 -v0 -e5 -m0 -g0 # 15 QP <-- No solution
+  // -d6 -c1 -v1 -e4 -m0 -g0 # 16 QP <-- No solution
 
   // d==7, dim=12. Best known PI rule is Gatermann's rule.
-  // -d7 -c0 -v0 -e0 -g4 # 12 QP <-- Gatermann solution
-  // -d7 -c1 -v0 -e1 -g3 # 13 QP <-- New (?) solution
-  // -d7 -c0 -v1 -e1 -g3 # 15 QP <-- No solution
-  // -d7 -c0 -v0 -e3 -g2 # 15 QP <-- New (?) solution
-  // -d7 -c1 -v1 -e2 -g2 # 16 QP <-- New (?) solution
-  // -d7 -c1 -v0 -e4 -g1 # 16 QP <-- No solution
-  // -d7 -c0 -v1 -e4 -g1 # 18 QP <-- No solution
-  // -d7 -c1 -v1 -e5 -g0 # 18 QP <-- No solution
+  // -d7 -c0 -v0 -e0 -m0 -g4 # 12 QP <-- Gatermann solution
+  // -d7 -c1 -v0 -e1 -m0 -g3 # 13 QP <-- New (?) solution
+  // -d7 -c0 -v1 -e1 -m0 -g3 # 15 QP <-- No solution
+  // -d7 -c0 -v0 -e3 -m0 -g2 # 15 QP <-- New (?) solution
+  // -d7 -c1 -v1 -e2 -m0 -g2 # 16 QP <-- New (?) solution
+  // -d7 -c1 -v0 -e4 -m0 -g1 # 16 QP <-- No solution
+  // -d7 -c0 -v1 -e4 -m0 -g1 # 18 QP <-- No solution
+  // -d7 -c1 -v1 -e5 -m0 -g0 # 18 QP <-- No solution
 
   // d==8, dim=15, best PI degree 8 rule in libmesh has 16 QPs
-  // -d8 -c0 -v0 -e0 -g5 # 15 QP <-- No solution
-  // -d8 -c1 -v0 -e1 -g4 # 16 QP <-- New (?) solution
-  // -d8 -c0 -v1 -e1 -g4 # 18 QP <-- New (?) solution
-  // -d8 -c0 -v0 -e3 -g3 # 18 QP <-- No solution
-  // -d8 -c1 -v1 -e2 -g3 # 19 QP <-- New (?) solution
-  // -d8 -c1 -v0 -e4 -g2 # 19 QP <-- No solution
-  // -d8 -c0 -v1 -e4 -g2 # 21 QP <-- No solution
-  // -d8 -c0 -v0 -e6 -g1 # 21 QP <-- No solution
-  // -d8 -c1 -v1 -e5 -g1 # 22 QP <-- No solution
-  // -d8 -c1 -v0 -e7 -g0 # 22 QP <-- No solution
-  // -d8 -c0 -v1 -e7 -g0 # 24 QP <-- No solution
+  // -d8 -c0 -v0 -e0 -m0 -g5 # 15 QP <-- No solution
+  // -d8 -c1 -v0 -e1 -m0 -g4 # 16 QP <-- New (?) solution
+  // -d8 -c0 -v1 -e1 -m0 -g4 # 18 QP <-- New (?) solution
+  // -d8 -c0 -v0 -e3 -m0 -g3 # 18 QP <-- No solution
+  // -d8 -c1 -v1 -e2 -m0 -g3 # 19 QP <-- New (?) solution
+  // -d8 -c1 -v0 -e4 -m0 -g2 # 19 QP <-- No solution
+  // -d8 -c0 -v1 -e4 -m0 -g2 # 21 QP <-- No solution
+  // -d8 -c0 -v0 -e6 -m0 -g1 # 21 QP <-- No solution
+  // -d8 -c1 -v1 -e5 -m0 -g1 # 22 QP <-- No solution
+  // -d8 -c1 -v0 -e7 -m0 -g0 # 22 QP <-- No solution
+  // -d8 -c0 -v1 -e7 -m0 -g0 # 24 QP <-- No solution
 
   // d==9, dim=19, best PI degree 9 rule in libmesh has 19 QPs
-  // -d9 -c1 -v0 -e0 -g6 # 19 QP <-- One solution found, same as D3!
-  // -d9 -c0 -v1 -e0 -g6 # 21 QP <-- New (?) solution
-  // -d9 -c0 -v0 -e2 -g5 # 21 QP <-- No solution
-  // -d9 -c1 -v1 -e1 -g5 # 22 QP <-- New (?) solution
-  // -d9 -c1 -v0 -e3 -g4 # 22 QP <-- No solution
-  // -d9 -c0 -v1 -e3 -g4 # 24 QP <-- New (?) solution
-  // -d9 -c0 -v0 -e5 -g3 # 24 QP <-- No solution
-  // -d9 -c1 -v1 -e4 -g3 # 25 QP <-- No solution
-  // -d9 -c1 -v0 -e6 -g2 # 25 QP <-- No solution
-  // -d9 -c0 -v1 -e6 -g2 # 27 QP <-- No solution
-  // -d9 -c0 -v0 -e8 -g1 # 27 QP <-- No solution
-  // -d9 -c1 -v1 -e7 -g1 # 28 QP <-- No solution
-  // -d9 -c1 -v0 -e9 -g0 # 28 QP <-- No solution
-  // -d9 -c0 -v1 -e9 -g0 # 30 QP <-- No solution
+  // -d9 -c1 -v0 -e0 -m0 -g6 # 19 QP <-- One solution found, same as D3!
+  // -d9 -c0 -v1 -e0 -m0 -g6 # 21 QP <-- New (?) solution
+  // -d9 -c0 -v0 -e2 -m0 -g5 # 21 QP <-- No solution
+  // -d9 -c1 -v1 -e1 -m0 -g5 # 22 QP <-- New (?) solution
+  // -d9 -c1 -v0 -e3 -m0 -g4 # 22 QP <-- No solution
+  // -d9 -c0 -v1 -e3 -m0 -g4 # 24 QP <-- New (?) solution
+  // -d9 -c0 -v0 -e5 -m0 -g3 # 24 QP <-- No solution
+  // -d9 -c1 -v1 -e4 -m0 -g3 # 25 QP <-- No solution
+  // -d9 -c1 -v0 -e6 -m0 -g2 # 25 QP <-- No solution
+  // -d9 -c0 -v1 -e6 -m0 -g2 # 27 QP <-- No solution
+  // -d9 -c0 -v0 -e8 -m0 -g1 # 27 QP <-- No solution
+  // -d9 -c1 -v1 -e7 -m0 -g1 # 28 QP <-- No solution
+  // -d9 -c1 -v0 -e9 -m0 -g0 # 28 QP <-- No solution
+  // -d9 -c0 -v1 -e9 -m0 -g0 # 30 QP <-- No solution
 
   // d==10, dim=22, best PI degree 10 rule in libmesh has 25 QPs
-  // -d10 -c1 -v0 -e0 -g7 # 22 QP <-- No solution
-  // -d10 -c0 -v1 -e0 -g7 # 24 QP <-- No solution
-  // -d10 -c0 -v0 -e2 -g6 # 24 QP <-- SIX New (?) solutions
-  // -d10 -c1 -v1 -e1 -g6 # 25 QP <-- New (?) solution
-  // -d10 -c1 -v0 -e3 -g5 # 25 QP <-- TWO New (?) solutions
-  // -d10 -c0 -v1 -e3 -g5 # 27 QP <-- New (?) solution
-  // -d10 -c0 -v0 -e5 -g4 # 27 QP <-- No solution
-  // -d10 -c1 -v1 -e4 -g4 # 28 QP <-- No solutions found
-  // -d10 -c1 -v0 -e6 -g3 # 28 QP
-  // -d10 -c1 -v0 -e7 -g2 # 28 QP
-  // -d10 -c0 -v1 -e7 -g2 # 30 QP
-  // -d10 -c0 -v0 -e8 -g2 # 30 QP
-  // -d10 -c1 -v0 -e9 -g1 # 31 QP
-  // -d10 -c0 -v1 -e9 -g1 # 33 QP
-  // -d10 -c1 -v1 -e10 -g0 # 34 QP
+  // -d10 -c1 -v0 -e0 -m0 -g7 # 22 QP <-- No solution
+  // -d10 -c0 -v1 -e0 -m0 -g7 # 24 QP <-- No solution
+  // -d10 -c0 -v0 -e2 -m0 -g6 # 24 QP <-- SIX New (?) solutions
+  // -d10 -c1 -v1 -e1 -m0 -g6 # 25 QP <-- New (?) solution
+  // -d10 -c1 -v0 -e3 -m0 -g5 # 25 QP <-- TWO New (?) solutions
+  // -d10 -c0 -v1 -e3 -m0 -g5 # 27 QP <-- New (?) solution
+  // -d10 -c0 -v0 -e5 -m0 -g4 # 27 QP <-- No solution
+  // -d10 -c1 -v1 -e4 -m0 -g4 # 28 QP <-- No solutions found
+  // -d10 -c1 -v0 -e6 -m0 -g3 # 28 QP
+  // -d10 -c1 -v0 -e7 -m0 -g2 # 28 QP
+  // -d10 -c0 -v1 -e7 -m0 -g2 # 30 QP
+  // -d10 -c0 -v0 -e8 -m0 -g2 # 30 QP
+  // -d10 -c1 -v0 -e9 -m0 -g1 # 31 QP
+  // -d10 -c0 -v1 -e9 -m0 -g1 # 33 QP
+  // -d10 -c1 -v1 -e10 -m0 -g0 # 34 QP
 
   // d==11, dim=26, best PI degree 11 rule in libmesh has 30 QPs
-  // -d11 -c0 -v0 -e1 -g8 # 27 QP <-- Two New solutions
-  // -d11 -c1 -v1 -e0 -g8 # 28 QP <-- No solutions found
-  // -d11 -c1 -v0 -e2 -g7 # 28 QP <-- One New solution
-  // -d11 -c0 -v1 -e2 -g7 # 30 QP <-- One New solution
-  // -d11 -c0 -v0 -e4 -g6 # 30 QP <-- One New solution
-  // -d11 -c1 -v1 -e3 -g6 # 31 QP <-- Two New solutions
-  // -d11 -c1 -v0 -e5 -g5 # 31 QP <-- No solutions found
-  // -d11 -c0 -v1 -e5 -g5 # 33 QP <-- No solutions found
-  // -d11 -c0 -v0 -e7 -g4 # 33 QP <-- No solutions found
-  // -d11 -c1 -v1 -e6 -g4 # 34 QP <-- No solutions found
-  // -d11 -c1 -v0 -e8 -g3 # 34 QP
-  // -d11 -c0 -v1 -e8 -g3 # 36 QP
-  // -d11 -c0 -v0 -e10 -g2 # 36 QP
-  // -d11 -c1 -v1 -e9  -g2 # 37 QP
-  // -d11 -c1 -v0 -e11 -g1 # 37 QP
-  // -d11 -c0 -v1 -e11 -g1 # 39 QP
-  // -d11 -c0 -v0 -e13 -g0 # 39 QP
-  // -d11 -c1 -v1 -e12 -g0 # 40 QP
+  // -d11 -c0 -v0 -e1 -m0 -g8 # 27 QP <-- Two New solutions
+  // -d11 -c1 -v1 -e0 -m0 -g8 # 28 QP <-- No solutions found
+  // -d11 -c1 -v0 -e2 -m0 -g7 # 28 QP <-- One New solution
+  // -d11 -c0 -v1 -e2 -m0 -g7 # 30 QP <-- One New solution
+  // -d11 -c0 -v0 -e4 -m0 -g6 # 30 QP <-- One New solution
+  // -d11 -c1 -v1 -e3 -m0 -g6 # 31 QP <-- Two New solutions
+  // -d11 -c1 -v0 -e5 -m0 -g5 # 31 QP <-- No solutions found
+  // -d11 -c0 -v1 -e5 -m0 -g5 # 33 QP <-- No solutions found
+  // -d11 -c0 -v0 -e7 -m0 -g4 # 33 QP <-- No solutions found
+  // -d11 -c1 -v1 -e6 -m0 -g4 # 34 QP <-- No solutions found
+  // -d11 -c1 -v0 -e8 -m0 -g3 # 34 QP
+  // -d11 -c0 -v1 -e8 -m0 -g3 # 36 QP
+  // -d11 -c0 -v0 -e10 -m0 -g2 # 36 QP
+  // -d11 -c1 -v1 -e9  -m0 -g2 # 37 QP
+  // -d11 -c1 -v0 -e11 -m0 -g1 # 37 QP
+  // -d11 -c0 -v1 -e11 -m0 -g1 # 39 QP
+  // -d11 -c0 -v0 -e13 -m0 -g0 # 39 QP
+  // -d11 -c1 -v1 -e12 -m0 -g0 # 40 QP
 
   // d==12, dim=31, best PI degree 12 rule in libmesh has 33 QPs
-  // -d12 -c1 -v0 -e0 -g10 # 31 QP <-- No solutions found, instance-1, instance-4, instance-7
-  // -d12 -c0 -v1 -e0 -g10 # 33 QP <-- No solutions found, instance-2, instance-5, instance-8
-  // -d12 -c0 -v0 -e2 -g9 # 33 QP <-- No solutions found, instance-3, instance-6
-  // -d12 -c1 -v1 -e1 -g9 # 34 QP <-- No solutions found
-  // -d12 -c1 -v0 -e3 -g8 # 34 QP <-- No solutions found
-  // -d12 -c0 -v1 -e3 -g8 # 36 QP <-- No solutions found
-  // -d12 -c0 -v0 -e5 -g7 # 36 QP <-- No solutions found
-  // -d12 -c1 -v1 -e4 -g7 # 37 QP <-- No solutions found
+  // -d12 -c1 -v0 -e0 -m0 -g10 # 31 QP <-- No solutions found
+  // -d12 -c0 -v1 -e0 -m0 -g10 # 33 QP <-- No solutions found
+  // -d12 -c0 -v0 -e2 -m0 -g9 # 33 QP <-- No solutions found
+  // -d12 -c0 -v0 -e1 -m1 -g9 # 33 QP <-- No solutions found
+  // -d12 -c0 -v0 -e0 -m2 -g9 # 33 QP <-- No solutions found
+  // -d12 -c1 -v1 -e1 -m0 -g9 # 34 QP <-- No solutions found
+  // -d12 -c1 -v0 -e3 -m0 -g8 # 34 QP <-- No solutions found
+  // -d12 -c0 -v1 -e3 -m0 -g8 # 36 QP <-- No solutions found
+  // -d12 -c0 -v0 -e5 -m0 -g7 # 36 QP <-- No solutions found
+  // -d12 -c1 -v1 -e4 -m0 -g7 # 37 QP <-- No solutions found
   // ...
 
   // d==13, dim=35, best PI degree 13 rule in libmesh has 37 QPs
-  // -d13 -c0 -v0 -e1 -g11 # 36 QP <-- No solutions found
-  // -d13 -c1 -v1 -e0 -g11 # 37 QP <-- No solutions found
-  // -d13 -c1 -v0 -e2 -g10 # 37 QP
-  // -d13 -c0 -v1 -e2 -g10 # 39 QP
-  // -d13 -c0 -v0 -e4 -g9 # 39 QP
-  // -d13 -c1 -v1 -e3 -g9 # 40 QP
-  // -d13 -c1 -v0 -e5 -g8 # 40 QP
-  // -d13 -c0 -v1 -e5 -g8 # 42 QP
+  // -d13 -c0 -v0 -e1 -m0 -g11 # 36 QP <-- No solutions found
+  // -d13 -c1 -v1 -e0 -m0 -g11 # 37 QP <-- No solutions found
+  // -d13 -c1 -v0 -e2 -m0 -g10 # 37 QP <-- No solutions found
+  // -d13 -c1 -v0 -e1 -m1 -g10 # 37 QP <-- No solutions found
+  // -d13 -c1 -v0 -e0 -m2 -g10 # 37 QP <-- No solutions found
+  // -d13 -c0 -v1 -e2 -m0 -g10 # 39 QP
+  // -d13 -c0 -v0 -e4 -m0 -g9 # 39 QP
+  // -d13 -c1 -v1 -e3 -m0 -g9 # 40 QP
+  // -d13 -c1 -v0 -e5 -m0 -g8 # 40 QP
+  // -d13 -c0 -v1 -e5 -m0 -g8 # 42 QP
   // ...
 
   // d==14, dim=40, best PI degree 14 rule in libmesh has 42 QPs.
@@ -259,42 +313,122 @@ int main(int argc, char ** argv)
   // boundary, but they are in fact only very *close* to the boundary
   // and not on it, for example one QP is located at position
   // (1.196e-1, 1.0984e-3) in the equilateral reference triangle.
-  // -d14 -c1 -v0 -e0 -g13 # 40 QP, <-- No solutions found
-  // -d14 -c0 -v0 -e2 -g12 # 42 QP, <-- No solutions found
-  // -d14 -c1 -v1 -e1 -g12 # 43 QP, <-- No solutions found
-  // -d14 -c1 -v0 -e3 -g11 # 43 QP, <-- One new solution found
-  // -d14 -c0 -v1 -e3 -g11 # 45 QP, <-- One new solution found
-  // -d14 -c0 -v0 -e5 -g10 # 45 QP, <-- No solutions found
-  // -d14 -c1 -v1 -e4 -g10 # 46 QP, <-- No solutions found
+  // -d14 -c1 -v0 -e0 -m0 -g13 # 40 QP, <-- No solutions found
+  // -d14 -c0 -v0 -e2 -m0 -g12 # 42 QP, <-- No solutions found
+  // -d14 -c0 -v0 -e1 -m1 -g12 # 42 QP, <-- No solutions found
+  // -d14 -c0 -v0 -e0 -m2 -g12 # 42 QP, <-- No solutions found
+  // -d14 -c1 -v1 -e1 -m0 -g12 # 43 QP, <-- No solutions found
+  // -d14 -c1 -v0 -e3 -m0 -g11 # 43 QP, <-- One new solution found
+  // -d14 -c0 -v1 -e3 -m0 -g11 # 45 QP, <-- One new solution found
+  // -d14 -c0 -v0 -e5 -m0 -g10 # 45 QP, <-- No solutions found
+  // -d14 -c1 -v1 -e4 -m0 -g10 # 46 QP, <-- No solutions found
   // ...
 
   // d==15, dim=46, best PI rule in libmesh has 49 QPs
-  // -d15 -c1 -v0 -e0 -g15 # 46 QP, <-- No solutions found
-  // -d15 -c0 -v1 -e0 -g15 # 48 QP, <-- No solutions found
-  // -d15 -c1 -v1 -e1 -g14 # 49 QP, <-- No solutions found
-  // -d15 -c1 -v0 -e3 -g13 # 49 QP, <-- No solutions found
-  // -d15 -c0 -v1 -e3 -g13 # 51 QP, <-- No solutions found
-  // -d15 -c0 -v0 -e5 -g12 # 51 QP
-  // -d15 -c1 -v1 -e4 -g12 # 52 QP
-  // -d15 -c1 -v0 -e6 -g11 # 52 QP
-  // -d15 -c0 -v1 -e6 -g11 # 54 QP
-  // -d15 -c1 -v1 -e7 -g10 # 55 QP
+  // -d15 -c1 -v0 -e0 -m0 -g15 # 46 QP, <-- No solutions found
+  // -d15 -c0 -v1 -e0 -m0 -g15 # 48 QP, <-- No solutions found
+  // -d15 -c1 -v1 -e1 -m0 -g14 # 49 QP, <-- No solutions found
+  // -d15 -c1 -v1 -e0 -m1 -g14 # 49 QP, <-- No solutions found
+  // -d15 -c1 -v0 -e3 -m0 -g13 # 49 QP, <-- No solutions found
+  // -d15 -c0 -v1 -e3 -m0 -g13 # 51 QP, <-- No solutions found
+  // -d15 -c0 -v0 -e5 -m0 -g12 # 51 QP
+  // -d15 -c1 -v1 -e4 -m0 -g12 # 52 QP
+  // -d15 -c1 -v0 -e6 -m0 -g11 # 52 QP
+  // -d15 -c0 -v1 -e6 -m0 -g11 # 54 QP
+  // -d15 -c1 -v1 -e7 -m0 -g10 # 55 QP
+
+  // d==16, dim=51, best PI rule in libmesh has 55 QPs
+  // -d16 -r 0,0,0,0,17 # 51 QP, <-- instance-1
+  // -d16 -r 1,0,1,0,16 # 52 QP, <-- instance-2
+  // -d16 -r 1,0,0,1,16 # 52 QP, <-- instance-3
+  // -d16 -r 0,1,1,0,16 # 54 QP, <-- instance-4
+  // -d16 -r 0,1,0,1,16 # 54 QP, <-- instance-5
+  // -d16 -r 0,0,0,3,15 # 54 QP, <-- instance-6
+  // -d16 -r 0,0,1,2,15 # 54 QP, <-- instance-7
+  // -d16 -r 0,0,2,1,15 # 54 QP, <-- instance-8
+  // -d16 -r 0,0,3,0,15 # 54 QP
+  // -d16 -r 1,1,0,2,15 # 55 QP
+  // -d16 -r 1,1,1,1,15 # 55 QP
+  // -d16 -r 1,1,2,0,15 # 55 QP
+  // -d16 -r 1,0,4,0,14 # 55 QP
+  // -d16 -r 1,0,3,1,14 # 55 QP
+  // -d16 -r 1,0,2,2,14 # 55 QP
+  // -d16 -r 1,0,1,3,14 # 55 QP
+  // -d16 -r 1,0,0,4,14 # 55 QP
+
+  // d==17, dim=57, best PI rule in libmesh has 63 QPs
+  // -d17 -r 0,0,0,0,19 # 57 QP
+  // -d17 -r 1,0,1,0,18 # 58 QP
+  // -d17 -r 1,0,0,1,18 # 58 QP
+  // -d17 -r 0,1,1,0,18 # 60 QP
+  // -d17 -r 0,1,0,1,18 # 60 QP
 
   // d==18, dim=64, there is no PI degree 18 rule in libmesh, next highest has 73 pts.
-  // -d18 -c1 -v0 -e0 -g21 # 64 QP
-  // -d18 -c0 -v1 -e0 -g21 # 66 QP
-  // -d18 -c0 -v0 -e2 -g20 # 66 QP
-  // -d18 -c1 -v1 -e1 -g20 # 67 QP
-  // -d18 -c1 -v0 -e3 -g19 # 67 QP
-  // -d18 -c0 -v1 -e3 -g19 # 69 QP
-  // -d18 -c0 -v0 -e5 -g18 # 69 QP
-  // -d18 -c1 -v1 -e4 -g18 # 70 QP
-  // -d18 -c1 -v0 -e6 -g17 # 70 QP
-  // -d18 -c0 -v1 -e6 -g17 # 72 QP
-  // -d18 -c0 -v0 -e8 -g16 # 72 QP
-  // -d18 -c1 -v1 -e7 -g16 # 73 QP
-  // -d18 -c1 -v0 -e9 -g15 # 73 QP
-  // -d18 -c0 -v1 -e9 -g15 # 75 QP
+  // -d18 -r 1,0,0,0,21 # 64 QP
+  // -d18 -r 0,1,0,0,21 # 66 QP
+  //
+  // -d18 -r 0,0,2,0,20 # 66 QP
+  // -d18 -r 0,0,1,1,20 # 66 QP
+  // -d18 -r 0,0,0,2,20 # 66 QP
+  // -d18 -r 1,1,1,0,20 # 67 QP
+  // -d18 -r 1,1,0,1,20 # 67 QP
+  //
+  // -d18 -r 1,0,3,0,19 # 67 QP
+  // -d18 -r 1,0,2,1,19 # 67 QP
+  // -d18 -r 1,0,1,2,19 # 67 QP
+  // -d18 -r 1,0,0,3,19 # 67 QP
+  // -d18 -r 0,1,3,0,19 # 69 QP
+  // -d18 -r 0,1,2,1,19 # 69 QP
+  // -d18 -r 0,1,1,2,19 # 69 QP
+  // -d18 -r 0,1,0,3,19 # 69 QP
+  //
+  // -d18 -r 0,0,5,0,18 # 69 QP
+  // -d18 -r 0,0,4,1,18 # 69 QP
+  // -d18 -r 0,0,3,2,18 # 69 QP
+  // -d18 -r 0,0,2,3,18 # 69 QP
+  // -d18 -r 0,0,1,4,18 # 69 QP
+  // -d18 -r 0,0,0,5,18 # 69 QP
+  // -d18 -r 1,1,4,0,18 # 70 QP
+  // -d18 -r 1,1,3,1,18 # 70 QP
+  // -d18 -r 1,1,2,2,18 # 70 QP
+  // -d18 -r 1,1,1,3,18 # 70 QP
+  // -d18 -r 1,1,0,4,18 # 70 QP
+  //
+  // -d18 -r 1,0,6,0,17 # 70 QP
+  // -d18 -r 1,0,5,1,17 # 70 QP
+  // -d18 -r 1,0,4,2,17 # 70 QP
+  // -d18 -r 1,0,3,3,17 # 70 QP
+  // -d18 -r 1,0,2,4,17 # 70 QP
+  // -d18 -r 1,0,1,5,17 # 70 QP
+  // -d18 -r 1,0,0,6,17 # 70 QP
+  // -d18 -r 0,1,6,0,17 # 72 QP
+  // -d18 -r 0,1,5,1,17 # 72 QP
+  // -d18 -r 0,1,4,2,17 # 72 QP
+  // -d18 -r 0,1,3,3,17 # 72 QP
+  // -d18 -r 0,1,2,4,17 # 72 QP
+  // -d18 -r 0,1,1,5,17 # 72 QP
+  // -d18 -r 0,1,0,6,17 # 72 QP
+  //
+  // -d18 -r 0,0,8,0,16 # 72 QP
+  // -d18 -r 0,0,7,1,16 # 72 QP
+  // -d18 -r 0,0,6,2,16 # 72 QP
+  // -d18 -r 0,0,5,3,16 # 72 QP
+  // -d18 -r 0,0,4,4,16 # 72 QP
+  // -d18 -r 0,0,3,5,16 # 72 QP
+  // -d18 -r 0,0,2,6,16 # 72 QP
+  // -d18 -r 0,0,1,7,16 # 72 QP
+  // -d18 -r 0,0,0,8,16 # 72 QP
+  // -d18 -r 1,1,7,0,16 # 73 QP
+  // -d18 -r 1,1,6,1,16 # 73 QP
+  // -d18 -r 1,1,5,2,16 # 73 QP
+  // -d18 -r 1,1,4,3,16 # 73 QP
+  // -d18 -r 1,1,3,4,16 # 73 QP
+  // -d18 -r 1,1,2,5,16 # 73 QP
+  // -d18 -r 1,1,1,6,16 # 73 QP
+  // -d18 -r 1,1,0,7,16 # 73 QP
+  //
+  // -d18 -r 1,0,9,0,15 # 73 QP
+  // -d18 -r 0,1,9,0,15 # 75 QP
   // ...
 
   // Print information.
@@ -361,7 +495,7 @@ int main(int argc, char ** argv)
   //  1000  &  3.85  & 9.23  & 9.49  & 9.37  & 6.01
   double ftol_rel = 1.e-30;
   double xtol_rel = 1.e-8;
-  int maxeval = 10000;
+  int maxeval = 20000;
 
   // "GN" = global derivative-free optimization
   // nlopt_algorithm alg = NLOPT_GN_DIRECT_L;
@@ -385,7 +519,7 @@ int main(int argc, char ** argv)
 
   // You must use a local/subsidiary optimization algorithm with AUGLAG,
   // this is set by calling nlopt_set_local_optimizer().
-  // nlopt_algorithm alg = NLOPT_AUGLAG;
+  nlopt_algorithm alg = NLOPT_AUGLAG;
 
   // MLSL also requires a local optimizer. MLSL is a multistart
   // algorithm that performs a sequence of local optimizations, and
@@ -400,7 +534,7 @@ int main(int argc, char ** argv)
   // Improved Stochastic Ranking Evolution Strategy.
   // "This method supports arbitrary nonlinear inequality and equality
   // constraints in addition to the bound constraints"
-  nlopt_algorithm alg = NLOPT_GN_ISRES;
+  // nlopt_algorithm alg = NLOPT_GN_ISRES;
 
   // The problem dimension depends only on "d".
   unsigned int dim = r.dim();
@@ -466,8 +600,8 @@ int main(int argc, char ** argv)
       // initial guess selection selection up to this point.
       // For a -d15 problem, ISRES takes about 11.5 seconds while ESCH takes about 14, although
       // some of that time was spent in newton_min.
-      // nlopt_algorithm local_alg = NLOPT_GN_ISRES;
-      nlopt_algorithm local_alg = NLOPT_GN_ESCH;
+      nlopt_algorithm local_alg = NLOPT_GN_ISRES;
+      // nlopt_algorithm local_alg = NLOPT_GN_ESCH;
 
       // Global optimization algorithms that use derivative
       // information.  Requires a bound constrained problem. Original
@@ -612,7 +746,8 @@ int main(int argc, char ** argv)
       // for (const auto & val : x)
       //   std::cout << val << std::endl;
 
-      // One can also solve for this rule "by hand" since if you
+      // A degree=3 rule with 7 QPs.
+      // One can solve for this rule "by hand" since if you
       // assume the edge orbit is at 1/2 it becomes a linear system of
       // equations that has a solution. This rule is not optimal since
       // it has both points on the boundary and it has 7 QPs while the
@@ -620,7 +755,7 @@ int main(int argc, char ** argv)
       // are all positive and it was a useful test case for making
       // sure that the VERTEX residual and Jacobian contributions were
       // correct.
-      // if (r.d==3 && r.nc==1 && r.ne==1 && r.nv==1 && r.ng==0)
+      // if (r.has_orbits(1,1,1,0,0))
       //   x =
       //     {
       //       2.2500000000000000000000000000000e-1,
@@ -629,13 +764,122 @@ int main(int argc, char ** argv)
       //       5.0000000000000000000000000000000e-1
       //     };
 
+      // A new (?) degree=3 rule with 6 QPs composed of two median orbits.
+      // I'm not totally sure what is happening here... maybe there are
+      // infinitely many solutions and we can show this algebraically?
+      if (r.has_orbits(0,0,0,2,0))
+        {
+          // 1.) This initial guess seems to converge to solution 2?
+          //x =
+          //  {
+          //    3.53802775299147664878063324067625e-02,
+          //    4.51663955678838699436816739307687e-02,
+          //    1.31447083213654447586549167681369e-01,
+          //    4.46274687711787798605200805468485e-01
+          //  };
+
+          // 2.) This initial guess converges to itself.
+          // x =
+          //   {
+          //     5.5430438592710409604505936979277e-2,
+          //     9.2321219251293589274056663622764e-2,
+          //     1.1123622807395625706216072968739e-1,
+          //     4.4591389966593863706329438603431e-1
+          //   };
+
+          // 3.) This initial guess converges to itself.
+          // x =
+          //   {
+          //     5.7117599987543327605737790321850e-2,
+          //     4.5233569099773816153684027274282e-1,
+          //     1.0954906667912333906092887634482e-1,
+          //     1.4657918044063831712367103699393e-1
+          //   };
+
+          // 4.) This initial guess converges to itself.
+          // x =
+          //   {
+          //     7.7933915797683249045490620091667e-2,
+          //     1.2122610860169603123104488174293e-1,
+          //     8.8732750868983417621176046575000e-2,
+          //     4.4585335732240594543339113007394e-1
+          //   };
+
+          // 5.) This initial guess converges to itself.
+          // x =
+          //   {
+          //     1.2042638521306163406026028639752e-1,
+          //     4.4689053525703978781310848387351e-1,
+          //     4.6240281453605032606406380269146e-2,
+          //     7.5385114628160386149276261080831e-2
+          //   };
+
+          // 6.) This initial guess converges to itself.
+          // x =
+          //   {
+          //     1.2456211754151360939920276208711e-1,
+          //     1.5524594648127144736622386767957e-1,
+          //     4.2104549125153057267463904579558e-2,
+          //     4.6033550085462189214369999346036e-1
+          //   };
+
+          // 7.) This initial guess converges to itself.
+          // x =
+          //   {
+          //     7.5262266646636315051842197343996e-2,
+          //     1.1843422663525580770659162696761e-1,
+          //     9.1404400020030351614824469322670e-2,
+          //     4.4569023131904496067434049813144e-1
+          //   };
+
+          // There seem to be many, many other solutions as
+          // well... but are these all real?
+
+          // 8.) OK.
+          // x =
+          //   {
+          //     1.3334904300348009594958922865917e-1,
+          //     4.4942168229551341576148893659850e-1,
+          //     3.3317623663186570717077438007497e-2,
+          //     4.1757295288082069090936633776143e-2
+          //   };
+
+          // 9.) OK.
+          // x =
+          //   {
+          //     1.4858691529812219685514262629516e-1,
+          //     1.6613607984476272598242131053447e-1,
+          //     1.8079751368544469811524040371505e-2,
+          //     4.9557369943661873640529541830763e-1
+          //   };
+
+          // 10.) OK.
+          // x =
+          //   {
+          //     1.3847723620228327636121094567490e-1,
+          //     4.5092654879836415947261378305977e-1,
+          //     2.8189430464383390305455720991763e-2,
+          //     2.3005119030233037076544813251675e-2
+          //   };
+
+          // 11.) OK.
+          // x =
+          //   {
+          //     8.7968789711389793435006162846315e-2,
+          //     4.4590889747817179822420514240849e-1,
+          //     7.8697876955276873231660503820351e-2,
+          //     1.2200025851717823099515109050002e-1
+          //   };
+        }
+
+      // degree=4 with 6 QPs
       // This rule is different from the D3-invariant rule with 6 QP
       // in libmesh which is from Lyness and Jesperson and has all
       // points inside the reference element.  The rule also has 6
       // points (ne=1, ng=1) but it contains 3 points on the element
       // boundary, so the D3 rule should probably be considered superior,
       // but this one seems .
-      // if (r.d==4 && r.ne==1 && r.ng==1)
+      // if (r.has_orbits(0,0,1,0,1))
       //   x =
       //     {
       //       3.4009490250701580549995389768470e-2,
@@ -645,7 +889,8 @@ int main(int argc, char ** argv)
       //       3.1774517297791196146365253427748e-1
       //     };
 
-      // if (r.d==5 && r.nc==1 && r.ng==2)
+      // degree=5 with 7 QPs
+      // if (r.has_orbits(1,0,0,0,2))
       //   x =
       //     {
       //       1.1250000000000000000000000000000e-1,
@@ -657,11 +902,24 @@ int main(int argc, char ** argv)
       //       7.9742698535308732239802527616975e-1
       //     };
 
-      // This rule has 12 points, which matches the degree=6 rule
+      // degree=5 rule with 10 QPs
+      // if (r.has_orbits(1,0,0,3,0))
+      //   x =
+      //     {
+      //       1.2186423932585219984549820562014e-1,
+      //       1.1700433911324622627645941889857e-2,
+      //       3.8273347483138637226611226870869e-2,
+      //       4.2316140269087041665556366610484e-2,
+      //       4.9096810155229997362992320344920e-1,
+      //       7.2028679377637602424964956292946e-2,
+      //       1.4482809461230114506784241834028e-1
+      //     };
+
+      // degree=6 with 12 points, which matches the degree=6 rule
       // which is currently in libmesh. There are some points on the
       // boundary of the domain, so for that reason, the rule
       // currently in libmesh may be preferred.
-      // if (r.d==6 && r.ne==2 && r.ng==2)
+      // if (r.has_orbits(0,0,2,0,2))
       //   x =
       //     {
       //       1.7521923484831786607547758325659e-2,
@@ -676,42 +934,26 @@ int main(int argc, char ** argv)
       //       3.3904897391721909524901496402551e-1
       //     };
 
-      // The d=7 solution with many digits of accuracy is:
-      // 2.6517028157436251428754180460739e-2
-      // 6.2382265094402118173683000996350e-2
-      // 6.7517867073916085442557131050869e-2
-      // 4.3881408714446055036769903139288e-2
-      // 5.5225456656926611737479190275645e-2
-      // 3.2150249385198182266630784919920e-1
-      // 2.8775042784981585738445496900219e-2
-      // 3.4324302945097146469630642483938e-2
-      // 6.6094919618673565761198031019780e-1
-      // 6.7493187009802774462697086166421e-2
-      // 5.1584233435359177925746338682643e-1
-      // 2.7771616697639178256958187139372e-1
-
-      // if (r.d==7)
+      // Gatermann's degree=7 rule with 12 points.
+      // if (r.has_orbits(0,0,0,0,4))
       //   x =
       //     {
-      //       2.65e-02, // w1
-      //       6.23e-02, // x1
-      //       6.75e-02, // y1
-      //
-      //       4.38e-02, // w2
-      //       5.52e-02, // x2
-      //       3.21e-01, // y2
-      //
-      //       2.87e-02, // w3
-      //       3.43e-02, // x3
-      //       6.60e-01, // y3
-      //
-      //       6.74e-02, // w4
-      //       5.15e-01, // x4
-      //       2.77e-01, // y4
+      //       2.6517028157436251428754180460739e-2,
+      //       6.2382265094402118173683000996350e-2,
+      //       6.7517867073916085442557131050869e-2,
+      //       4.3881408714446055036769903139288e-2,
+      //       5.5225456656926611737479190275645e-2,
+      //       3.2150249385198182266630784919920e-1,
+      //       2.8775042784981585738445496900219e-2,
+      //       3.4324302945097146469630642483938e-2,
+      //       6.6094919618673565761198031019780e-1,
+      //       6.7493187009802774462697086166421e-2,
+      //       5.1584233435359177925746338682643e-1,
+      //       2.7771616697639178256958187139372e-1
       //     };
 
       // A degree=7 rule with 13 QPs and some points on the boundary.
-      // if (r.d==7 && r.nc==1 && r.ne==1 && r.ng==3)
+      // if (r.has_orbits(1,0,1,0,3))
       //   x =
       //     {
       //       5.5952307797500451168270351180298e-2,
@@ -729,7 +971,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=7 rule with 15 QPs and some points on the boundary.
-      // if (r.d==7 && r.ne==3 && r.ng==2)
+      // if (r.has_orbits(0,0,3,0,2))
       //   x =
       //     {
       //       5.3055935561341320656442591841393e-3,
@@ -747,7 +989,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=7 rule with 16 QPs and points on boundary/at vertices.
-      // if (r.d==7 && r.nc==1 && r.nv==1 && r.ne==2 && r.ng==2)
+      // if (r.has_orbits(1,1,2,0,2))
       //   x =
       //     {
       //       8.8156307800262736848734269834507e-2,
@@ -765,7 +1007,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=8 rule with 16 QPs
-      // if (r.d==8 && r.nc==1 && r.nv==0 && r.ne==1 && r.ng==4)
+      // if (r.has_orbits(1,0,1,0,4))
       //   x =
       //     {
       //       7.2521345610590588615251673993725e-2,
@@ -786,7 +1028,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=8 rule with 18 QPs
-      // if (r.d==8 && r.nc==0 && r.nv==1 && r.ne==1 && r.ng==4)
+      // if (r.has_orbits(0,1,1,0,4))
       //   x =
       //     {
       //       1.6365619450731091079309677113646e-3,
@@ -807,7 +1049,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=8 rule with 19 QPs
-      // if (r.d==8 && r.nc==1 && r.nv==1 && r.ne==2 && r.ng==3)
+      // if (r.has_orbits(1,1,2,0,3))
       //   x =
       //     {
       //       5.3249913011017943647121653650309e-2,
@@ -830,7 +1072,7 @@ int main(int argc, char ** argv)
       // A degree=9 1-0-0-6 rule with 19 QPs, this ties the current minimum!
       // Actually this is the same as the previously-known D3-invariant rule
       // with 19 QPs.
-      // if (r.d==9 && r.nc==1 && r.nv==0 && r.ne==0 && r.ng==6)
+      // if (r.has_orbits(1,0,0,0,6))
       // x =
       //   {
       //     4.8567898141399416909620991253644e-2,
@@ -855,7 +1097,7 @@ int main(int argc, char ** argv)
       //   };
 
       // A degree=9 rule with 21 QPs
-      // if (r.d==9 && r.nc==0 && r.nv==1 && r.ne==0 && r.ng==6)
+      // if (r.has_orbits(0,1,0,0,6))
       // x =
       //   {
       //     4.6208136672890810190208010916353e-4,
@@ -880,7 +1122,7 @@ int main(int argc, char ** argv)
       //   };
 
       // A degree=9 rule with 22 QPs
-      // if (r.d==9 && r.nc==1 && r.nv==1 && r.ne==1 && r.ng==5)
+      // if (r.has_orbits(1,1,1,0,5))
       //   x =
       //     {
       //       5.6681242229959782378455068998313e-2,
@@ -905,7 +1147,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=9 rule with 24 QPs
-      // if (r.d==9 && r.nc==0 && r.nv==1 && r.ne==3 && r.ng==4)
+      // if (r.has_orbits(0,1,3,0,4))
       //   x =
       //     {
       //       9.9920681638586186356375443283050e-4,
@@ -930,7 +1172,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=10 rule with 24 QPs. New minimum!
-      // if (r.d==10 && r.nc==0 && r.nv==0 && r.ne==2 && r.ng==6)
+      // if (r.has_orbits(0,0,2,0,6))
       //   x =
       //     {
       //       5.3681429742859643492357377689009e-3,
@@ -959,7 +1201,7 @@ int main(int argc, char ** argv)
 
       // A *second* degree=10 rule with 24 QPs and 0026 configuration.
       // Also a new minimum!
-      // if (r.d==10 && r.nc==0 && r.nv==0 && r.ne==2 && r.ng==6)
+      // if (r.has_orbits(0,0,2,0,6))
       //   x =
       //     {
       //       6.8034549450389437911542695284968e-3,
@@ -991,7 +1233,7 @@ int main(int argc, char ** argv)
       // was experimenting with different optimization algorithms! It
       // also almost didn't converge... it required exactly 50 Newton
       // iterations!
-      // if (r.d==10 && r.nc==0 && r.nv==0 && r.ne==2 && r.ng==6)
+      // if (r.has_orbits(0,0,2,0,6))
       //   x =
       //     {
       //       5.4182602431180742419012975840987e-3,
@@ -1019,7 +1261,7 @@ int main(int argc, char ** argv)
       //     };
 
       // Wow, a *fourth* degree=10 rule with 24 QPs
-      // if (r.d==10 && r.nc==0 && r.nv==0 && r.ne==2 && r.ng==6)
+      // if (r.has_orbits(0,0,2,0,6))
       //   x =
       //     {
       //       6.1935726910001758541078241539263e-3,
@@ -1047,7 +1289,7 @@ int main(int argc, char ** argv)
       //     };
 
       // Ridiculous, a *fifth* degree=10 rule with 24 QPs
-      // if (r.d==10 && r.nc==0 && r.nv==0 && r.ne==2 && r.ng==6)
+      // if (r.has_orbits(0,0,2,0,6))
       //   x =
       //     {
       //       7.1633170697004196998871675324386e-3,
@@ -1075,7 +1317,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A *sixth* degree=10 rule with 24 QPs. It just keeps going...
-      // if (r.d==10 && r.nc==0 && r.nv==0 && r.ne==2 && r.ng==6)
+      // if (r.has_orbits(0,0,2,0,6))
       //   x =
       //     {
       //       5.3834706252454055829176909195913e-3,
@@ -1103,7 +1345,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=10 rule with 25 QPs
-      // if (r.d==10 && r.nc==1 && r.nv==1 && r.ne==1 && r.ng==6)
+      // if (r.has_orbits(1,1,1,0,6))
       //   x =
       //     {
       //       4.7309440928094852885976950813341e-2,
@@ -1130,8 +1372,8 @@ int main(int argc, char ** argv)
       //       1.2777722809830669309582013618709e-1
       //     };
 
-      // A degree=10 1-0-3-5 rule with 25 QPs
-      // if (r.d==10 && r.nc==1 && r.nv==0 && r.ne==3 && r.ng==5)
+      // A degree=10 rule with 25 QPs
+      // if (r.has_orbits(1,0,3,0,5))
       //   x =
       //     {
       //       4.0232634070269439301667832239894e-2,
@@ -1158,8 +1400,8 @@ int main(int argc, char ** argv)
       //       4.5690890104473341999976206420424e-2
       //     };
 
-      // A *second* degree=10 1-0-3-5 rule with 25 QPs
-      // if (r.d==10 && r.nc==1 && r.nv==0 && r.ne==3 && r.ng==5)
+      // A *second* degree=10 rule with 25 QPs
+      // if (r.has_orbits(1,0,3,0,5))
       //   x =
       //     {
       //       5.1345668536024914411167997684058e-2,
@@ -1187,7 +1429,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=10 rule with 27 QPs
-      // if (r.d==10 && r.nc==0 && r.nv==1 && r.ne==3 && r.ng==5)
+      // if (r.has_orbits(0,1,3,0,5))
       //   x =
       //     {
       //       7.0349169304985602109942089161121e-4,
@@ -1215,7 +1457,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=11 rule with 27 QPs. This is a new minimum!
-      // if (r.d==11 && r.nc==0 && r.nv==0 && r.ne==1 && r.ng==8)
+      // if (r.has_orbits(0,0,1,0,8))
       //   x =
       //     {
       //       5.2501900628803483265691402520251e-3,
@@ -1247,7 +1489,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A second degree=11 rule with 27 QPs. This is a new minimum!
-      // if (r.d==11 && r.nc==0 && r.nv==0 && r.ne==1 && r.ng==8)
+      // if (r.has_orbits(0,0,1,0,8))
       //   x =
       //     {
       //       4.1612804317314842767555766406199e-3,
@@ -1278,8 +1520,8 @@ int main(int argc, char ** argv)
       //       1.7297366791290889546544445963562e-2
       //     };
 
-      // A second degree=11 1-0-2-7 rule with 28 QPs.
-      // if (r.d==11 && r.nc==1 && r.nv==0 && r.ne==2 && r.ng==7)
+      // A degree=11 rule with 28 QPs.
+      // if (r.has_orbits(1,0,2,0,7))
       //   x =
       //     {
       //       4.2122982350847949694727649296954e-2,
@@ -1311,7 +1553,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=11 rule with 30 QPs.
-      // if (r.d==11 && r.nc==0 && r.nv==1 && r.ne==2 && r.ng==7)
+      // if (r.has_orbits(0,1,2,0,7))
       //   x =
       //     {
       //       7.5412493611041301804962310010194e-4,
@@ -1342,8 +1584,8 @@ int main(int argc, char ** argv)
       //       5.0240542970396197597182374396274e-2
       //     };
 
-      // A degree=11 0-0-4-6 rule with 30 QPs.
-      // if (r.d==11 && r.nc==0 && r.nv==0 && r.ne==4 && r.ng==6)
+      // A degree=11 rule with 30 QPs.
+      // if (r.has_orbits(0,0,4,0,6))
       //   x =
       //     {
       //       3.4042935191212521125417637423319e-3,
@@ -1374,8 +1616,8 @@ int main(int argc, char ** argv)
       //       4.7395330890231320202868021211856e-1
       //     };
 
-      // A degree=11 1-1-3-6 rule with 31 QPs.
-      // if (r.d==11 && r.nc==1 && r.nv==1 && r.ne==3 && r.ng==6)
+      // A degree=11 rule with 31 QPs.
+      // if (r.has_orbits(1,1,3,0,6))
       //   x =
       //     {
       //       2.8451667886196583694006718095887e-2,
@@ -1406,8 +1648,8 @@ int main(int argc, char ** argv)
       //       6.7793765488259040154212614118875e-1
       //     };
 
-      // A _second_ degree=11 1-1-3-6 rule with 31 QPs.
-      // if (r.d==11 && r.nc==1 && r.nv==1 && r.ne==3 && r.ng==6)
+      // A _second_ degree=11 rule with 31 QPs.
+      // if (r.has_orbits(1,1,3,0,6))
       //   x =
       //     {
       //       3.7542955251948995401672680293581e-2,
@@ -1439,7 +1681,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=14 rule with 43 QPs
-      // if (r.d==14 && r.nc==1 && r.nv==0 && r.ne==3 && r.ng==11)
+      // if (r.has_orbits(1,0,3,0,11))
       //   x =
       //     {
       //       8.7602731941396900630735811947358e-3,
@@ -1485,7 +1727,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=14 rule with 45 QPs
-      // if (r.d==14 && r.nc==0 && r.nv==1 && r.ne==3 && r.ng==11)
+      // if (r.has_orbits(0,1,3,0,11))
       //   x =
       //     {
       //       3.3341899592961390239330691261075e-4,
@@ -1634,7 +1876,10 @@ void usage()
   std::cout << "-c = number of centroid orbits" << std::endl;
   std::cout << "-v = number of vertex orbits" << std::endl;
   std::cout << "-e = number of edge orbits" << std::endl;
+  std::cout << "-m = number of median orbits" << std::endl;
   std::cout << "-g = number of general orbits" << std::endl;
+  std::cout << "-r nc,nv,ne,nm,ng = comma separated list specifying "
+            << "quantity of each orbit" << std::endl;
 }
 
 
