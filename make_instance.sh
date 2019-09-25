@@ -2,8 +2,9 @@
 
 # Useful commands to place in .bashrc on instances:
 # alias latest_log="ls -tr *.log | tail -n 1"
-#
-# Use this alias in logfile processing commands, e.g.
+# export GIT_EDITOR='emacs -nw'
+
+# Example of using the latest_log alias in logfile processing commands:
 # grep "found minimum" `latest_log` | cut -d' ' -f3 | sort -gr
 
 # Commands I ran to install all support software and build mp-quadrature.
