@@ -63,6 +63,7 @@ int main(int argc, char ** argv)
       {"n-edge",      required_argument, NULL, 'e'},
       {"n-median",    required_argument, NULL, 'm'},
       {"n-general",   required_argument, NULL, 'g'},
+      {"rule-string", required_argument, NULL, 'r'},
       {"help",        no_argument,       NULL, 'h'},
       { NULL,         0,                 NULL,  0 }
     };
@@ -77,11 +78,16 @@ int main(int argc, char ** argv)
   unsigned int nm = 0;
   unsigned int ng = 0;
 
+  // A string in the format "nc,nv,ne,nm,ng" specifying the number
+  // of each kind of orbit. There must be exactly 5 comma-separated
+  // values or else an error is thrown.
+  std::string rule_string = "";
+
   // A colon following an option means it has an argument.
   // If there's an unrecognized argument, getopt_long()
   // prints a message, so we don't handle it in the cases below.
   int ch = -1;
-  while ((ch = getopt_long(argc, argv, "hd:c:v:e:m:g:", longopts, NULL)) != -1)
+  while ((ch = getopt_long(argc, argv, "hd:c:v:e:m:g:r:", longopts, NULL)) != -1)
     {
       switch (ch)
         {
@@ -91,6 +97,7 @@ int main(int argc, char ** argv)
         case 'e': { ne = atoi(optarg); break; }
         case 'm': { nm = atoi(optarg); break; }
         case 'g': { ng = atoi(optarg); break; }
+        case 'r': { if (optarg) rule_string = std::string(optarg); break; }
         case 'h': { usage(); return 0; }
         }
     } // end while
@@ -100,6 +107,47 @@ int main(int argc, char ** argv)
       std::cout << "Error, invalid command line arguments provided!" << std::endl;
       usage();
       return 1;
+    }
+
+  // Parse the rule string if present
+  if (!rule_string.empty())
+    {
+      // Debugging
+      // std::cout << "rule_string = " << rule_string << std::endl;
+
+      std::stringstream rule_ss(rule_string);
+      std::string val;
+      std::vector<unsigned int> vals;
+      while (std::getline(rule_ss, val, ','))
+        {
+          char * endptr;
+          unsigned int tmp =
+            std::strtol(val.c_str(), &endptr, /*base=*/10);
+
+          if (val.c_str() != endptr)
+            vals.push_back(tmp);
+        }
+
+      // Debugging
+      // std::cout << "rule numerals = " << std::endl;
+      // for (unsigned int i=0; i<vals.size(); ++i)
+      //   std::cout << vals[i] << std::endl;
+
+      // Make sure exactly the right number of values were parsed.
+      if (vals.size() != 5)
+        {
+          std::cout << "Error, invalid command line arguments provided!" << std::endl;
+          usage();
+          return 1;
+        }
+
+      // Assign values, overwriting anything that may have already
+      // been there.
+      nc = vals[0];
+      nv = vals[1];
+      ne = vals[2];
+      nm = vals[3];
+      ng = vals[4];
     }
 
   // # of binary digits
@@ -1753,6 +1801,8 @@ void usage()
   std::cout << "-e = number of edge orbits" << std::endl;
   std::cout << "-m = number of median orbits" << std::endl;
   std::cout << "-g = number of general orbits" << std::endl;
+  std::cout << "-r nc,nv,ne,nm,ng = comma separated list specifying "
+            << "quantity of each orbit" << std::endl;
 }
 
 
