@@ -286,8 +286,8 @@ int main(int argc, char ** argv)
   // -d12 -c1 -v0 -e0 -m0 -g10 # 31 QP <-- No solutions found
   // -d12 -c0 -v1 -e0 -m0 -g10 # 33 QP <-- No solutions found
   // -d12 -c0 -v0 -e2 -m0 -g9 # 33 QP <-- No solutions found
-  // -d12 -c0 -v0 -e1 -m1 -g9 # 33 QP <-- instance-1
-  // -d12 -c0 -v0 -e0 -m2 -g9 # 33 QP <-- instance-2
+  // -d12 -c0 -v0 -e1 -m1 -g9 # 33 QP <-- No solutions found
+  // -d12 -c0 -v0 -e0 -m2 -g9 # 33 QP <-- No solutions found
   // -d12 -c1 -v1 -e1 -m0 -g9 # 34 QP <-- No solutions found
   // -d12 -c1 -v0 -e3 -m0 -g8 # 34 QP <-- No solutions found
   // -d12 -c0 -v1 -e3 -m0 -g8 # 36 QP <-- No solutions found
@@ -298,9 +298,9 @@ int main(int argc, char ** argv)
   // d==13, dim=35, best PI degree 13 rule in libmesh has 37 QPs
   // -d13 -c0 -v0 -e1 -m0 -g11 # 36 QP <-- No solutions found
   // -d13 -c1 -v1 -e0 -m0 -g11 # 37 QP <-- No solutions found
-  // -d13 -c1 -v0 -e2 -m0 -g10 # 37 QP <-- instance-3
-  // -d13 -c1 -v0 -e1 -m1 -g10 # 37 QP <-- instance-4
-  // -d13 -c1 -v0 -e0 -m2 -g10 # 37 QP <-- instance-5
+  // -d13 -c1 -v0 -e2 -m0 -g10 # 37 QP <-- No solutions found
+  // -d13 -c1 -v0 -e1 -m1 -g10 # 37 QP <-- No solutions found
+  // -d13 -c1 -v0 -e0 -m2 -g10 # 37 QP <-- No solutions found
   // -d13 -c0 -v1 -e2 -m0 -g10 # 39 QP
   // -d13 -c0 -v0 -e4 -m0 -g9 # 39 QP
   // -d13 -c1 -v1 -e3 -m0 -g9 # 40 QP
@@ -315,8 +315,8 @@ int main(int argc, char ** argv)
   // (1.196e-1, 1.0984e-3) in the equilateral reference triangle.
   // -d14 -c1 -v0 -e0 -m0 -g13 # 40 QP, <-- No solutions found
   // -d14 -c0 -v0 -e2 -m0 -g12 # 42 QP, <-- No solutions found
-  // -d14 -c0 -v0 -e1 -m1 -g12 # 42 QP, <-- instance-6
-  // -d14 -c0 -v0 -e0 -m2 -g12 # 42 QP, <-- instance-7
+  // -d14 -c0 -v0 -e1 -m1 -g12 # 42 QP, <-- No solutions found
+  // -d14 -c0 -v0 -e0 -m2 -g12 # 42 QP, <-- No solutions found
   // -d14 -c1 -v1 -e1 -m0 -g12 # 43 QP, <-- No solutions found
   // -d14 -c1 -v0 -e3 -m0 -g11 # 43 QP, <-- One new solution found
   // -d14 -c0 -v1 -e3 -m0 -g11 # 45 QP, <-- One new solution found
@@ -328,7 +328,7 @@ int main(int argc, char ** argv)
   // -d15 -c1 -v0 -e0 -m0 -g15 # 46 QP, <-- No solutions found
   // -d15 -c0 -v1 -e0 -m0 -g15 # 48 QP, <-- No solutions found
   // -d15 -c1 -v1 -e1 -m0 -g14 # 49 QP, <-- No solutions found
-  // -d15 -c1 -v1 -e0 -m1 -g14 # 49 QP, <-- instance-8
+  // -d15 -c1 -v1 -e0 -m1 -g14 # 49 QP, <-- No solutions found
   // -d15 -c1 -v0 -e3 -m0 -g13 # 49 QP, <-- No solutions found
   // -d15 -c0 -v1 -e3 -m0 -g13 # 51 QP, <-- No solutions found
   // -d15 -c0 -v0 -e5 -m0 -g12 # 51 QP
@@ -336,6 +336,20 @@ int main(int argc, char ** argv)
   // -d15 -c1 -v0 -e6 -m0 -g11 # 52 QP
   // -d15 -c0 -v1 -e6 -m0 -g11 # 54 QP
   // -d15 -c1 -v1 -e7 -m0 -g10 # 55 QP
+
+  // d==16, dim=51, best PI rule in libmesh has 55 QPs
+  // -d16 -r 0,0,0,0,17 # 51 QP, <-- instance-1
+  // -d16 -r 1,0,1,0,16 # 52 QP, <-- instance-2
+  // -d16 -r 1,0,0,1,16 # 52 QP, <-- instance-3
+  // -d16 -r 0,1,1,0,16 # 54 QP, <-- instance-4
+  // -d16 -r 0,1,0,1,16 # 54 QP, <-- instance-5
+  // -d16 -r 0,0,0,3,15 # 54 QP, <-- instance-6
+  // -d16 -r 0,0,1,2,15 # 54 QP, <-- instance-7
+  // -d16 -r 0,0,2,1,15 # 54 QP, <-- instance-8
+  // -d16 -r 0,0,3,0,15 # 54 QP
+  // -d16 -r 1,1,0,2,15 # 55 QP
+  // -d16 -r 1,1,1,1,15 # 55 QP
+  // -d16 -r 1,1,2,0,15 # 55 QP
 
   // d==18, dim=64, there is no PI degree 18 rule in libmesh, next highest has 73 pts.
   // -d18 -c1 -v0 -e0 -m0 -g21 # 64 QP
