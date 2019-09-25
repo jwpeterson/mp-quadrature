@@ -495,7 +495,7 @@ int main(int argc, char ** argv)
   //  1000  &  3.85  & 9.23  & 9.49  & 9.37  & 6.01
   double ftol_rel = 1.e-30;
   double xtol_rel = 1.e-8;
-  int maxeval = 10000;
+  int maxeval = 20000;
 
   // "GN" = global derivative-free optimization
   // nlopt_algorithm alg = NLOPT_GN_DIRECT_L;
@@ -519,7 +519,7 @@ int main(int argc, char ** argv)
 
   // You must use a local/subsidiary optimization algorithm with AUGLAG,
   // this is set by calling nlopt_set_local_optimizer().
-  // nlopt_algorithm alg = NLOPT_AUGLAG;
+  nlopt_algorithm alg = NLOPT_AUGLAG;
 
   // MLSL also requires a local optimizer. MLSL is a multistart
   // algorithm that performs a sequence of local optimizations, and
@@ -534,7 +534,7 @@ int main(int argc, char ** argv)
   // Improved Stochastic Ranking Evolution Strategy.
   // "This method supports arbitrary nonlinear inequality and equality
   // constraints in addition to the bound constraints"
-  nlopt_algorithm alg = NLOPT_GN_ISRES;
+  // nlopt_algorithm alg = NLOPT_GN_ISRES;
 
   // The problem dimension depends only on "d".
   unsigned int dim = r.dim();
@@ -600,8 +600,8 @@ int main(int argc, char ** argv)
       // initial guess selection selection up to this point.
       // For a -d15 problem, ISRES takes about 11.5 seconds while ESCH takes about 14, although
       // some of that time was spent in newton_min.
-      // nlopt_algorithm local_alg = NLOPT_GN_ISRES;
-      nlopt_algorithm local_alg = NLOPT_GN_ESCH;
+      nlopt_algorithm local_alg = NLOPT_GN_ISRES;
+      // nlopt_algorithm local_alg = NLOPT_GN_ESCH;
 
       // Global optimization algorithms that use derivative
       // information.  Requires a bound constrained problem. Original
