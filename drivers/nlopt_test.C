@@ -882,7 +882,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=8 rule with 16 QPs
-      // if (r.d==8 && r.nc==1 && r.nv==0 && r.ne==1 && r.ng==4)
+      // if (r.has_orbits(1,0,1,0,4))
       //   x =
       //     {
       //       7.2521345610590588615251673993725e-2,
@@ -903,7 +903,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=8 rule with 18 QPs
-      // if (r.d==8 && r.nc==0 && r.nv==1 && r.ne==1 && r.ng==4)
+      // if (r.has_orbits(0,1,1,0,4))
       //   x =
       //     {
       //       1.6365619450731091079309677113646e-3,
@@ -924,7 +924,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=8 rule with 19 QPs
-      // if (r.d==8 && r.nc==1 && r.nv==1 && r.ne==2 && r.ng==3)
+      // if (r.has_orbits(1,1,2,0,3))
       //   x =
       //     {
       //       5.3249913011017943647121653650309e-2,
@@ -947,7 +947,7 @@ int main(int argc, char ** argv)
       // A degree=9 1-0-0-6 rule with 19 QPs, this ties the current minimum!
       // Actually this is the same as the previously-known D3-invariant rule
       // with 19 QPs.
-      // if (r.d==9 && r.nc==1 && r.nv==0 && r.ne==0 && r.ng==6)
+      // if (r.has_orbits(1,0,0,0,6))
       // x =
       //   {
       //     4.8567898141399416909620991253644e-2,
@@ -972,7 +972,7 @@ int main(int argc, char ** argv)
       //   };
 
       // A degree=9 rule with 21 QPs
-      // if (r.d==9 && r.nc==0 && r.nv==1 && r.ne==0 && r.ng==6)
+      // if (r.has_orbits(0,1,0,0,6))
       // x =
       //   {
       //     4.6208136672890810190208010916353e-4,
@@ -997,7 +997,7 @@ int main(int argc, char ** argv)
       //   };
 
       // A degree=9 rule with 22 QPs
-      // if (r.d==9 && r.nc==1 && r.nv==1 && r.ne==1 && r.ng==5)
+      // if (r.has_orbits(1,1,1,0,5))
       //   x =
       //     {
       //       5.6681242229959782378455068998313e-2,
@@ -1022,7 +1022,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=9 rule with 24 QPs
-      // if (r.d==9 && r.nc==0 && r.nv==1 && r.ne==3 && r.ng==4)
+      // if (r.has_orbits(0,1,3,0,4))
       //   x =
       //     {
       //       9.9920681638586186356375443283050e-4,
@@ -1047,7 +1047,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=10 rule with 24 QPs. New minimum!
-      // if (r.d==10 && r.nc==0 && r.nv==0 && r.ne==2 && r.ng==6)
+      // if (r.has_orbits(0,0,2,0,6))
       //   x =
       //     {
       //       5.3681429742859643492357377689009e-3,
@@ -1076,7 +1076,7 @@ int main(int argc, char ** argv)
 
       // A *second* degree=10 rule with 24 QPs and 0026 configuration.
       // Also a new minimum!
-      // if (r.d==10 && r.nc==0 && r.nv==0 && r.ne==2 && r.ng==6)
+      // if (r.has_orbits(0,0,2,0,6))
       //   x =
       //     {
       //       6.8034549450389437911542695284968e-3,
@@ -1108,7 +1108,7 @@ int main(int argc, char ** argv)
       // was experimenting with different optimization algorithms! It
       // also almost didn't converge... it required exactly 50 Newton
       // iterations!
-      // if (r.d==10 && r.nc==0 && r.nv==0 && r.ne==2 && r.ng==6)
+      // if (r.has_orbits(0,0,2,0,6))
       //   x =
       //     {
       //       5.4182602431180742419012975840987e-3,
@@ -1136,7 +1136,7 @@ int main(int argc, char ** argv)
       //     };
 
       // Wow, a *fourth* degree=10 rule with 24 QPs
-      // if (r.d==10 && r.nc==0 && r.nv==0 && r.ne==2 && r.ng==6)
+      // if (r.has_orbits(0,0,2,0,6))
       //   x =
       //     {
       //       6.1935726910001758541078241539263e-3,
@@ -1164,7 +1164,7 @@ int main(int argc, char ** argv)
       //     };
 
       // Ridiculous, a *fifth* degree=10 rule with 24 QPs
-      // if (r.d==10 && r.nc==0 && r.nv==0 && r.ne==2 && r.ng==6)
+      // if (r.has_orbits(0,0,2,0,6))
       //   x =
       //     {
       //       7.1633170697004196998871675324386e-3,
@@ -1192,7 +1192,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A *sixth* degree=10 rule with 24 QPs. It just keeps going...
-      // if (r.d==10 && r.nc==0 && r.nv==0 && r.ne==2 && r.ng==6)
+      // if (r.has_orbits(0,0,2,0,6))
       //   x =
       //     {
       //       5.3834706252454055829176909195913e-3,
@@ -1220,7 +1220,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=10 rule with 25 QPs
-      // if (r.d==10 && r.nc==1 && r.nv==1 && r.ne==1 && r.ng==6)
+      // if (r.has_orbits(1,1,1,0,6))
       //   x =
       //     {
       //       4.7309440928094852885976950813341e-2,
@@ -1247,8 +1247,8 @@ int main(int argc, char ** argv)
       //       1.2777722809830669309582013618709e-1
       //     };
 
-      // A degree=10 1-0-3-5 rule with 25 QPs
-      // if (r.d==10 && r.nc==1 && r.nv==0 && r.ne==3 && r.ng==5)
+      // A degree=10 rule with 25 QPs
+      // if (r.has_orbits(1,0,3,0,5))
       //   x =
       //     {
       //       4.0232634070269439301667832239894e-2,
@@ -1275,8 +1275,8 @@ int main(int argc, char ** argv)
       //       4.5690890104473341999976206420424e-2
       //     };
 
-      // A *second* degree=10 1-0-3-5 rule with 25 QPs
-      // if (r.d==10 && r.nc==1 && r.nv==0 && r.ne==3 && r.ng==5)
+      // A *second* degree=10 rule with 25 QPs
+      // if (r.has_orbits(1,0,3,0,5))
       //   x =
       //     {
       //       5.1345668536024914411167997684058e-2,
@@ -1304,7 +1304,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=10 rule with 27 QPs
-      // if (r.d==10 && r.nc==0 && r.nv==1 && r.ne==3 && r.ng==5)
+      // if (r.has_orbits(0,1,3,0,5))
       //   x =
       //     {
       //       7.0349169304985602109942089161121e-4,
@@ -1332,7 +1332,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=11 rule with 27 QPs. This is a new minimum!
-      // if (r.d==11 && r.nc==0 && r.nv==0 && r.ne==1 && r.ng==8)
+      // if (r.has_orbits(0,0,1,0,8))
       //   x =
       //     {
       //       5.2501900628803483265691402520251e-3,
@@ -1364,7 +1364,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A second degree=11 rule with 27 QPs. This is a new minimum!
-      // if (r.d==11 && r.nc==0 && r.nv==0 && r.ne==1 && r.ng==8)
+      // if (r.has_orbits(0,0,1,0,8))
       //   x =
       //     {
       //       4.1612804317314842767555766406199e-3,
@@ -1395,8 +1395,8 @@ int main(int argc, char ** argv)
       //       1.7297366791290889546544445963562e-2
       //     };
 
-      // A second degree=11 1-0-2-7 rule with 28 QPs.
-      // if (r.d==11 && r.nc==1 && r.nv==0 && r.ne==2 && r.ng==7)
+      // A degree=11 rule with 28 QPs.
+      // if (r.has_orbits(1,0,2,0,7))
       //   x =
       //     {
       //       4.2122982350847949694727649296954e-2,
@@ -1428,7 +1428,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=11 rule with 30 QPs.
-      // if (r.d==11 && r.nc==0 && r.nv==1 && r.ne==2 && r.ng==7)
+      // if (r.has_orbits(0,1,2,0,7))
       //   x =
       //     {
       //       7.5412493611041301804962310010194e-4,
@@ -1459,8 +1459,8 @@ int main(int argc, char ** argv)
       //       5.0240542970396197597182374396274e-2
       //     };
 
-      // A degree=11 0-0-4-6 rule with 30 QPs.
-      // if (r.d==11 && r.nc==0 && r.nv==0 && r.ne==4 && r.ng==6)
+      // A degree=11 rule with 30 QPs.
+      // if (r.has_orbits(0,0,4,0,6))
       //   x =
       //     {
       //       3.4042935191212521125417637423319e-3,
@@ -1491,8 +1491,8 @@ int main(int argc, char ** argv)
       //       4.7395330890231320202868021211856e-1
       //     };
 
-      // A degree=11 1-1-3-6 rule with 31 QPs.
-      // if (r.d==11 && r.nc==1 && r.nv==1 && r.ne==3 && r.ng==6)
+      // A degree=11 rule with 31 QPs.
+      // if (r.has_orbits(1,1,3,0,6))
       //   x =
       //     {
       //       2.8451667886196583694006718095887e-2,
@@ -1523,8 +1523,8 @@ int main(int argc, char ** argv)
       //       6.7793765488259040154212614118875e-1
       //     };
 
-      // A _second_ degree=11 1-1-3-6 rule with 31 QPs.
-      // if (r.d==11 && r.nc==1 && r.nv==1 && r.ne==3 && r.ng==6)
+      // A _second_ degree=11 rule with 31 QPs.
+      // if (r.has_orbits(1,1,3,0,6))
       //   x =
       //     {
       //       3.7542955251948995401672680293581e-2,
@@ -1556,7 +1556,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=14 rule with 43 QPs
-      // if (r.d==14 && r.nc==1 && r.nv==0 && r.ne==3 && r.ng==11)
+      // if (r.has_orbits(1,0,3,0,11))
       //   x =
       //     {
       //       8.7602731941396900630735811947358e-3,
@@ -1602,7 +1602,7 @@ int main(int argc, char ** argv)
       //     };
 
       // A degree=14 rule with 45 QPs
-      // if (r.d==14 && r.nc==0 && r.nv==1 && r.ne==3 && r.ng==11)
+      // if (r.has_orbits(0,1,3,0,11))
       //   x =
       //     {
       //       3.3341899592961390239330691261075e-4,
