@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Useful commands to place in .bashrc on instances:
+# alias latest_log="ls -tr *.log | tail -n 1"
+
 # Commands I ran to install all support software and build mp-quadrature.
 # This assumes you have already cloned the mp-quadrature package into
 # ~/projects/mp-quadrature and are sitting in that directory.
