@@ -207,6 +207,10 @@ if iflag == 1:
 
     # Wolfram-alpha input for transformed variables (eta1, eta2, eta3)
     # row reduce {{-4, 6, 0, -1/12}, {-6, 12, -6, -7/60}, {1, -3, 3, 1/60}}
+    # Wolfram-alpha input for the next larger problem (degree 5, 7 unknowns)
+    # This seemed to be senstive to the amount of space and the newlines (?) so
+    # I just removed all of them.
+    # row reduce {{-2/9,-4,6,0,0,0,-1/12},{-8/27,-6,12,-6,0,0,-7/60},{1/27,1,-3,3,0,0,1/60},{-26/81,-8,24,-32,18,0,-2/15},{-80/243,-10,40,-80,80,-30,-1/7},{1/243,1,-8,24,-31,15,1/210}}
 
     # Compute the transformed variables according to their definitions.
     eta3 = sol[0]*sol[1]**3 + sol[2]*sol[3]**3
