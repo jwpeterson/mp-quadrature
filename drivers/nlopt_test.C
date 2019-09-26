@@ -49,6 +49,16 @@ void usage();
 
 int main(int argc, char ** argv)
 {
+  // Convenience: Print exact integral values for some polynomials before returning.
+  // std::cout << "exact_00 = " << exact_tri(0,0) << std::endl;
+  // std::cout << "exact_20 = " << exact_tri(2,0) << std::endl;
+  // std::cout << "exact_30 = " << exact_tri(3,0) << std::endl;
+  // std::cout << "exact_21 = " << exact_tri(2,1) << std::endl;
+  // std::cout << "exact_40 = " << exact_tri(4,0) << std::endl;
+  // std::cout << "exact_50 = " << exact_tri(5,0) << std::endl;
+  // std::cout << "exact_41 = " << exact_tri(4,1) << std::endl;
+  // return 0;
+
   // You can't trust all these digits from doubles, but you can with
   // mpfr_class objects.
   std::cout.precision(32);
@@ -177,9 +187,11 @@ int main(int argc, char ** argv)
 
   // d==3, dim==4. Best known PI rule is a conical product rule with 4 QP.
   // -d3 -c1 -v0 -e0 -m0 -g1 # 4 QP <-- No solution (-ve wt soln only)
-  // -d3 -c0 -v0 -e2 -m0 -g0 # 6 QP <-- No solution
-  // -d3 -c0 -v0 -e0 -m2 -g0 # 6 QP <-- _Many_ solutions found?!
+  // -d3 -c0 -v0 -e2 -m0 -g0 # 6 QP <-- No solution (I think we can prove this.)
+  // -d3 -c0 -v0 -e1 -m1 -g0 # 6 QP <-- ???
+  // -d3 -c0 -v0 -e0 -m2 -g0 # 6 QP <-- _Many_ solutions found?! (We can show the possibility of infinitely many solutions.)
   // -d3 -c1 -v1 -e1 -m0 -g0 # 7 QP <-- New (?) solution
+  // -d3 -c1 -v1 -e0 -m1 -g0 # 7 QP <-- _Many_ solutions found
 
   // d==4, dim==5
   // o The best known deg=4 PI rule is a D3-invariant rule with 6 QP.
@@ -754,7 +766,7 @@ int main(int argc, char ** argv)
       // best known degree 3 rule has only 4 QPs. However, the weights
       // are all positive and it was a useful test case for making
       // sure that the VERTEX residual and Jacobian contributions were
-      // correct.
+      // correct. The exact solution = [9/40, 1/40, 1/15, 1/2] is in Q.
       // if (r.has_orbits(1,1,1,0,0))
       //   x =
       //     {
@@ -870,6 +882,58 @@ int main(int argc, char ** argv)
           //     7.8697876955276873231660503820351e-2,
           //     1.2200025851717823099515109050002e-1
           //   };
+        }
+
+      // Many solutions found for this case, even though only
+      // a *single* solution found for (1,1,1,0,0) case.
+      if (r.has_orbits(1,1,0,1,0))
+        {
+          // 1.)
+          // x =
+          //   {
+          //     1.9842138198894232087756355234257e-1,
+          //     2.4695416925122307603625640854424e-2,
+          //     7.5830789078563585437186508364720e-2,
+          //     4.9102649835703920944141032123298e-1
+          //   };
+
+          // 2.)
+          // x =
+          //   {
+          //     2.1821738936979620876016536190816e-1,
+          //     2.4917905757005788534116782239244e-2,
+          //     6.9009631119728808545828097124702e-2,
+          //     4.9754924428627855803597412887029e-1
+          //   };
+
+          // 3.)
+          // x =
+          //   {
+          //     5.4029040412956874973240568941493e-2,
+          //     2.3556967318214072640266582461888e-2,
+          //     1.2510001921080030236865322789095e-1,
+          //     4.6015856878625571724228393577505e-1
+          //   };
+
+          // 4.)
+          // x =
+          //   {
+          //     2.2461639812973749630910230345743e-1,
+          //     2.4995269549536343748391966980495e-2,
+          //     6.6799264407217824148573931867029e-2,
+          //     4.9985812675355217882255942640768e-1
+          //   };
+
+          // 5.)
+          // x =
+          //   {
+          //     2.1397421359078118356241649552057e-1,
+          //     2.4868152433225093792956322275115e-2,
+          //     7.0473776369847845019571512551361e-2,
+          //     4.9607561820817369646618999468046e-1
+          //   };
+
+          // And many more...
         }
 
       // degree=4 with 6 QPs
