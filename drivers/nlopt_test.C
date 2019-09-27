@@ -187,8 +187,8 @@ int main(int argc, char ** argv)
 
   // d==3, dim==4. Best known PI rule is a conical product rule with 4 QP.
   // -d3 -c1 -v0 -e0 -m0 -g1 # 4 QP <-- No solution (-ve wt soln only)
-  // -d3 -c0 -v0 -e2 -m0 -g0 # 6 QP <-- No solution
-  // -d3 -c0 -v0 -e0 -m2 -g0 # 6 QP <-- _Many_ solutions found?!
+  // -d3 -c0 -v0 -e2 -m0 -g0 # 6 QP <-- No solution (I think we can prove this.)
+  // -d3 -c0 -v0 -e0 -m2 -g0 # 6 QP <-- _Many_ solutions found?! (We can prove infinitely many solutions.)
   // -d3 -c1 -v1 -e1 -m0 -g0 # 7 QP <-- New (?) solution
 
   // d==4, dim==5
