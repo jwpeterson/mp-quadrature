@@ -188,7 +188,7 @@ int main(int argc, char ** argv)
   // d==3, dim==4. Best known PI rule is a conical product rule with 4 QP.
   // -d3 -c1 -v0 -e0 -m0 -g1 # 4 QP <-- No solution (-ve wt soln only)
   // -d3 -c0 -v0 -e2 -m0 -g0 # 6 QP <-- No solution (I think we can prove this.)
-  // -d3 -c0 -v0 -e0 -m2 -g0 # 6 QP <-- _Many_ solutions found?! (We can prove infinitely many solutions.)
+  // -d3 -c0 -v0 -e0 -m2 -g0 # 6 QP <-- _Many_ solutions found?! (We can show the possibility of infinitely many solutions.)
   // -d3 -c1 -v1 -e1 -m0 -g0 # 7 QP <-- New (?) solution
 
   // d==4, dim==5
@@ -764,7 +764,7 @@ int main(int argc, char ** argv)
       // best known degree 3 rule has only 4 QPs. However, the weights
       // are all positive and it was a useful test case for making
       // sure that the VERTEX residual and Jacobian contributions were
-      // correct.
+      // correct. The exact solution = [9/40, 1/40, 1/15, 1/2] is in Q.
       // if (r.has_orbits(1,1,1,0,0))
       //   x =
       //     {
