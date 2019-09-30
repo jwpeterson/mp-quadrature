@@ -45,6 +45,10 @@ int main(int argc, char** argv)
   // If the user passes -w on the command line, we also print the weights.
   bool output_weights = false;
 
+  // If the user passes --total-degree or -d on the command line, we verify
+  // that the rule exactly integrates polynomials of degree = total_degree.
+  unsigned int total_degree = 0;
+
   // options descriptor - this associates several "long" and "short"
   // command line options.  The last element of the longopts array has
   // to be filled with zeros.
@@ -52,6 +56,7 @@ int main(int argc, char** argv)
     {
       {"input-file",      required_argument, NULL, 'i'},
       {"print-weights",   no_argument,       NULL, 'w'},
+      {"total-degree",    required_argument, NULL, 'd'},
       {"help",            no_argument,       NULL, 'h'},
       { NULL,             0,                 NULL,  0 }
     };
@@ -69,7 +74,7 @@ int main(int argc, char** argv)
   // for example, "-oarg"), then it is returned in optarg, otherwise
   // optarg is set to zero. This is a GNU extension.
   int ch = -1;
-  while ((ch = getopt_long(argc, argv, "wi:h", longopts, NULL)) != -1)
+  while ((ch = getopt_long(argc, argv, "wi:d:h", longopts, NULL)) != -1)
     {
       switch (ch)
         {
@@ -77,6 +82,11 @@ int main(int argc, char** argv)
           {
             if (optarg != NULL)
               filename = std::string(optarg);
+            break;
+          }
+        case 'd':
+          {
+            total_degree = atoi(optarg);
             break;
           }
 
@@ -115,12 +125,15 @@ int main(int argc, char** argv)
         std::cout << "Error reading parameters for generator " << i << std::endl;
       }
 
-  // FIXME: Add command line arg for total degree
-  // if (!rule.verify(total_degree))
-  //   {
-  //     std::cerr << "Rule is not verified for total_degree = " << total_degree << std::endl;
-  //     std::abort();
-  //   }
+  if (total_degree)
+    {
+      bool verified = rule.verify(total_degree);
+      if (!verified)
+        {
+          std::cerr << "Rule is not verified for total_degree = " << total_degree << std::endl;
+          std::abort();
+        }
+    }
 
   // Generate the points and weights vectors for this Rule
   std::vector<Point<mpfr_class> > generated_points;
