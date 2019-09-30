@@ -42,7 +42,15 @@ int main(int argc, char** argv)
   // Filename must now be specified on the command line
   std::string filename = "";
 
-  // If the user passes -w on the command line, we also print the weights.
+  // If the user passes -e on the command line, we print the
+  // quadrature rule point locations on an equilateral triangle to an
+  // output file generated from the input filename.
+  bool output_points = false;
+
+  // If the user passes -w and -e on the command line, we print the
+  // quadrature rule weights, in addition to the quadrature point
+  // locations on an equilateral triangle, to an output file generated
+  // from the input filename.
   bool output_weights = false;
 
   // If the user passes --total-degree or -d on the command line, we verify
@@ -54,11 +62,12 @@ int main(int argc, char** argv)
   // to be filled with zeros.
   static struct option longopts[] =
     {
-      {"input-file",      required_argument, NULL, 'i'},
-      {"print-weights",   no_argument,       NULL, 'w'},
-      {"total-degree",    required_argument, NULL, 'd'},
-      {"help",            no_argument,       NULL, 'h'},
-      { NULL,             0,                 NULL,  0 }
+      {"input-file",         required_argument, NULL, 'i'},
+      {"print-weights",      no_argument,       NULL, 'w'},
+      {"output-equilateral", no_argument,       NULL, 'e'},
+      {"total-degree",       required_argument, NULL, 'd'},
+      {"help",               no_argument,       NULL, 'h'},
+      { NULL,                0,                 NULL,  0 }
     };
 
   // Parse command line options using getopt_long()
@@ -74,7 +83,7 @@ int main(int argc, char** argv)
   // for example, "-oarg"), then it is returned in optarg, otherwise
   // optarg is set to zero. This is a GNU extension.
   int ch = -1;
-  while ((ch = getopt_long(argc, argv, "wi:d:h", longopts, NULL)) != -1)
+  while ((ch = getopt_long(argc, argv, "wei:d:h", longopts, NULL)) != -1)
     {
       switch (ch)
         {
@@ -93,6 +102,11 @@ int main(int argc, char** argv)
         case 'w':
           {
             output_weights = true;
+            break;
+          }
+        case 'e':
+          {
+            output_points = true;
             break;
           }
 
@@ -133,31 +147,37 @@ int main(int argc, char** argv)
           std::cerr << "Rule is not verified for total_degree = " << total_degree << std::endl;
           std::abort();
         }
+      else
+        std::cout << "Rule verified for all polynomials up to total_degree = "
+                  << total_degree << std::endl;
     }
 
-  // Generate the points and weights vectors for this Rule
-  std::vector<Point<mpfr_class> > generated_points;
-  std::vector<mpfr_class> generated_weights;
-  rule.generate_points_and_weights(generated_points, generated_weights);
-
-  // Check that the rules are properly scaled.  If not, we can scale
-  // them now...  This should only be the case for "foo.in" files, since our
-  // foo.out files have all been scaled correctly.
-  mpfr_class weight_sum = 0.;
-  for (unsigned i=0; i<generated_weights.size(); ++i)
-    weight_sum += generated_weights[i];
-
-  if ( abs(weight_sum - mpfr_class(1.)/mpfr_class(2.)) > 1.e-30 )
+  if (output_points)
     {
-      // Scale weights by (1/2 * weight_sum)
-      for (unsigned i=0; i<generated_weights.size(); ++i)
-        generated_weights[i] /= (mpfr_class(2.) * weight_sum);
-    }
+      // Generate the points and weights vectors for this Rule
+      std::vector<Point<mpfr_class> > generated_points;
+      std::vector<mpfr_class> generated_weights;
+      rule.generate_points_and_weights(generated_points, generated_weights);
 
-  // Output points on the equilateral triangle
-  output_equilateral(filename,
-                     generated_points,
-                     output_weights ? &generated_weights : nullptr);
+      // Check that the rules are properly scaled.  If not, we can scale
+      // them now...  This should only be the case for "foo.in" files, since our
+      // foo.out files have all been scaled correctly.
+      mpfr_class weight_sum = 0.;
+      for (unsigned i=0; i<generated_weights.size(); ++i)
+        weight_sum += generated_weights[i];
+
+      if ( abs(weight_sum - mpfr_class(1.)/mpfr_class(2.)) > 1.e-30 )
+        {
+          // Scale weights by (1/2 * weight_sum)
+          for (unsigned i=0; i<generated_weights.size(); ++i)
+            generated_weights[i] /= (mpfr_class(2.) * weight_sum);
+        }
+
+      // Output points on the equilateral triangle
+      output_equilateral(filename,
+                         generated_points,
+                         output_weights ? &generated_weights : nullptr);
+    }
 
   // Compute the discrete residual function r_N
   // compute_rN(generated_points, generated_weights);
