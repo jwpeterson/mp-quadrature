@@ -211,6 +211,8 @@ if iflag == 1:
     # This seemed to be senstive to the amount of space and the newlines (?) so
     # I just removed all of them.
     # row reduce {{-2/9,-4,6,0,0,0,-1/12},{-8/27,-6,12,-6,0,0,-7/60},{1/27,1,-3,3,0,0,1/60},{-26/81,-8,24,-32,18,0,-2/15},{-80/243,-10,40,-80,80,-30,-1/7},{1/243,1,-8,24,-31,15,1/210}}
+    # For the (1,1,0,1,0) configuration with 7 QPs. I'm not sure if this is approach really makes sense, but Wolfram-alpha tells us this matrix is full rank (4).
+    # row reduce {{1,3,3,0,0,0,1/2},{1/9,1,1,-4,6,0,1/12},{1/27,1,1,-6,12,-6,1/20},{1/27,1,0,1,-3,3,1/60}}
 
     # Compute the transformed variables according to their definitions.
     eta3 = sol[0]*sol[1]**3 + sol[2]*sol[3]**3
