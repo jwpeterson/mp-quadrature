@@ -32,6 +32,11 @@ public:
   void generate_points_and_weights(std::vector<Point<mpfr_class> > & generated_points,
                                    std::vector<mpfr_class> & generated_weights) const;
 
+  // Returns true if the "generated" weights and points exactly
+  // integrate all polynomials up to the given total_degree, false
+  // otherwise.
+  bool verify(unsigned int total_degree) const;
+
 protected:
   std::vector<Generator> generators;
 };

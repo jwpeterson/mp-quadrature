@@ -115,13 +115,20 @@ int main(int argc, char** argv)
         std::cout << "Error reading parameters for generator " << i << std::endl;
       }
 
+  // FIXME: Add command line arg for total degree
+  // if (!rule.verify(total_degree))
+  //   {
+  //     std::cerr << "Rule is not verified for total_degree = " << total_degree << std::endl;
+  //     std::abort();
+  //   }
+
   // Generate the points and weights vectors for this Rule
   std::vector<Point<mpfr_class> > generated_points;
   std::vector<mpfr_class> generated_weights;
   rule.generate_points_and_weights(generated_points, generated_weights);
 
   // Check that the rules are properly scaled.  If not, we can scale
-  // them now...  This may be the case for "foo.in" files, since our
+  // them now...  This should only be the case for "foo.in" files, since our
   // foo.out files have all been scaled correctly.
   mpfr_class weight_sum = 0.;
   for (unsigned i=0; i<generated_weights.size(); ++i)
