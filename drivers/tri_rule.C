@@ -124,7 +124,7 @@ int main(int argc, char** argv)
     {
       std::cerr << "Error, filename was not specified!" << std::endl;
       usage();
-      std::abort();
+      return 1;
     }
 
   // Create a Rule object and fill it up from the file
@@ -145,7 +145,7 @@ int main(int argc, char** argv)
       if (!verified)
         {
           std::cerr << "Rule is not verified for total_degree = " << total_degree << std::endl;
-          std::abort();
+          return 1;
         }
       else
         std::cout << "Rule verified for all polynomials up to total_degree = "
