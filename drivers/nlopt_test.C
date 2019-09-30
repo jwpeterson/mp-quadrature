@@ -782,6 +782,7 @@ int main(int argc, char ** argv)
       if (r.has_orbits(0,0,0,2,0))
         {
           // 1.) This initial guess seems to converge to solution 2?
+          // This one also does not pass Rule::verify() so I don't think it's legit.
           //x =
           //  {
           //    3.53802775299147664878063324067625e-02,
