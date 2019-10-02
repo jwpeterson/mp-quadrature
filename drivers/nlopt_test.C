@@ -186,12 +186,12 @@ int main(int argc, char ** argv)
   // -d2 -c0 -v0 -e1 -g0 # 3 QP <-- Solution confirmed
 
   // d==3, dim==4. Best known PI rule is a conical product rule with 4 QP.
-  // -d3 -c1 -v0 -e0 -m0 -g1 # 4 QP <-- No solution (-ve wt soln only)
-  // -d3 -c0 -v0 -e2 -m0 -g0 # 6 QP <-- No solution (I think we can prove this.)
-  // -d3 -c0 -v0 -e1 -m1 -g0 # 6 QP <-- ???
-  // -d3 -c0 -v0 -e0 -m2 -g0 # 6 QP <-- _Many_ solutions found?! (We can show the possibility of infinitely many solutions.)
-  // -d3 -c1 -v1 -e1 -m0 -g0 # 7 QP <-- New (?) solution
-  // -d3 -c1 -v1 -e0 -m1 -g0 # 7 QP <-- _Many_ solutions found
+  // -d3 -c1 -v0 -e0 -m0 -g1 # 4 QP <-- No PI solution possible (-ve wt soln only)
+  // -d3 -c0 -v0 -e2 -m0 -g0 # 6 QP <-- No solutions at all (I think we can prove this.)
+  // -d3 -c0 -v0 -e1 -m1 -g0 # 6 QP <-- Seems to be no solution numerically, needs analysis.
+  // -d3 -c0 -v0 -e0 -m2 -g0 # 6 QP <-- Many solutions found and we can show the possibility of infinitely many solutions.
+  // -d3 -c1 -v1 -e1 -m0 -g0 # 7 QP <-- 1 solution with xe=1/2 can be found analytically, numerically this is also the only solution found.
+  // -d3 -c1 -v1 -e0 -m1 -g0 # 7 QP <-- Many solutions found and we can show exact form of all solns.
 
   // d==4, dim==5
   // o The best known deg=4 PI rule is a D3-invariant rule with 6 QP.
