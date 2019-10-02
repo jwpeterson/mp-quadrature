@@ -25,8 +25,9 @@ eqns.append(Fraction(1,27)*wc + wv + wm*(-6*xm**3 + 12*xm**2 - 6*xm + 1) - Fract
 # (2,1)
 eqns.append(Fraction(1,27)*wc + wm*(3*xm**3 - 3*xm**2 + xm) - Fraction(1,60))
 
-for eqn in eqns:
-    print('{}'.format(eqn))
+# Print to verify inputs.
+# for eqn in eqns:
+#     print('{}'.format(eqn))
 
 # Verify that some solutions found numerically satisfy the governing equations.
 # It seems to me that the solution should be unique, but for some reason my code
@@ -36,35 +37,35 @@ for eqn in eqns:
 # (Apparently they do integrate exactly all polynomials of the required degree,
 # so I'm leaning towards the equations above being wrong in some way, but then
 # it is interesting that they *do* lead to a different quadrature rule solution.)
-print('---')
-for eqn in eqns:
-    verified = eqn.subs([(wc, 1.9842138198894232087756355234257e-1),
-                         (wv, 2.4695416925122307603625640854424e-2),
-                         (wm, 7.5830789078563585437186508364720e-2),
-                         (xm, 4.9102649835703920944141032123298e-1)])
-    print('verified = {}, should be 0.'.format(verified))
+# print('---')
+# for eqn in eqns:
+#     verified = eqn.subs([(wc, 1.9842138198894232087756355234257e-1),
+#                          (wv, 2.4695416925122307603625640854424e-2),
+#                          (wm, 7.5830789078563585437186508364720e-2),
+#                          (xm, 4.9102649835703920944141032123298e-1)])
+#     print('verified = {}, should be 0.'.format(verified))
 
-print('---')
-for eqn in eqns:
-    verified = eqn.subs([(wc, 2.1821738936979620876016536190816e-1),
-                         (wv, 2.4917905757005788534116782239244e-2),
-                         (wm, 6.9009631119728808545828097124702e-2),
-                         (xm, 4.9754924428627855803597412887029e-1)])
-    print('verified = {}, should be 0.'.format(verified))
+# print('---')
+# for eqn in eqns:
+#     verified = eqn.subs([(wc, 2.1821738936979620876016536190816e-1),
+#                          (wv, 2.4917905757005788534116782239244e-2),
+#                          (wm, 6.9009631119728808545828097124702e-2),
+#                          (xm, 4.9754924428627855803597412887029e-1)])
+#     print('verified = {}, should be 0.'.format(verified))
 
-print('---')
-for eqn in eqns:
-    verified = eqn.subs([(wc, 5.4029040412956874973240568941493e-2),
-                         (wv, 2.3556967318214072640266582461888e-2),
-                         (wm, 1.2510001921080030236865322789095e-1),
-                         (xm, 4.6015856878625571724228393577505e-1)])
-    print('verified = {}, should be 0.'.format(verified))
+# print('---')
+# for eqn in eqns:
+#     verified = eqn.subs([(wc, 5.4029040412956874973240568941493e-2),
+#                          (wv, 2.3556967318214072640266582461888e-2),
+#                          (wm, 1.2510001921080030236865322789095e-1),
+#                          (xm, 4.6015856878625571724228393577505e-1)])
+#     print('verified = {}, should be 0.'.format(verified))
 
-# Recipe for generating an arbitrary valid solution:
-# Pick any value 1/5 <= alpha < 1/2 for xm
-# Note: alpha != 1/3, since that makes the numerator in wm_numerical 0
-alpha = .46
-# Compute other values directly, based on alpha
+# Recipe for generating an arbitrary, valid solution:
+# 1.) Let xm = alpha, where
+# (9 + sqrt(21))/30 ~ 0.45275 < alpha < 0.5
+alpha = .499
+# 2.) Compute other values directly, based on alpha
 wm_numerical = 1. / 180 / alpha / (6*alpha**2 - 4*alpha + 2./3)
 wv_numerical = 1./24 - 1. / 120 / alpha
 wc_numerical = 1./2 - 3*wm_numerical - 3*wv_numerical
