@@ -4,11 +4,10 @@ from fractions import Fraction
 import sys
 
 """
-This script uses sympy to verify that some algebra in my notes is correct.
 We are analyzing the degree=3 (1,1,0,1,0) Ro3-invariant rule with 7 QPs.
-Numerically this system of equation seems to have "many" solutions, but
-when I try to solve it by hand so far I only come up with a single "unique"
-solution...
+Numerically this system of equation seems to have "many" solutions, and
+once I corrected an error in my notes, the analysis also shows there are
+infinitely many possible solutions.
 """
 
 # Create sympy objects for the dofs of this rule.
