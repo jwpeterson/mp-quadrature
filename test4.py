@@ -60,6 +60,25 @@ for eqn in eqns:
                          (xm, 4.6015856878625571724228393577505e-1)])
     print('verified = {}, should be 0.'.format(verified))
 
+# Recipe for generating an arbitrary valid solution:
+# Pick any value 1/5 <= alpha < 1/2 for xm
+# Note: alpha != 1/3, since that makes the numerator in wm_numerical 0
+alpha = .46
+# Compute other values directly, based on alpha
+wm_numerical = 1. / 180 / alpha / (6*alpha**2 - 4*alpha + 2./3)
+wv_numerical = 1./24 - 1. / 120 / alpha
+wc_numerical = 1./2 - 3*wm_numerical - 3*wv_numerical
+
+print('---')
+print('Checking solution ({},{},{},{})'.format(wc_numerical, wv_numerical, wm_numerical, alpha))
+for eqn in eqns:
+    verified = eqn.subs([(wc, wc_numerical),
+                         (wv, wv_numerical),
+                         (wm, wm_numerical),
+                         (xm, alpha)])
+    print('verified = {}, should be 0.'.format(verified))
+
+
 # Add/subtract multiples of equations from each other to eliminate wc contribution.
 eqns[1] = simplify(eqns[1] - Fraction(1,9)*eqns[0])
 eqns[2] = simplify(eqns[2] - Fraction(1,27)*eqns[0])
