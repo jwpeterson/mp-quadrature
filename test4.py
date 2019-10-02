@@ -1,6 +1,7 @@
 #!/usr/bin/env python
 from sympy import sympify, simplify, collect, expand
 from fractions import Fraction
+import sys
 
 """
 This script uses sympy to verify that some algebra in my notes is correct.
@@ -22,7 +23,7 @@ eqns.append(Fraction(1,9)*wc + wv + wm*(6*xm**2 - 4*xm + 1) - Fraction(1,12))
 # (3,0)
 eqns.append(Fraction(1,27)*wc + wv + wm*(-6*xm**3 + 12*xm**2 - 6*xm + 1) - Fraction(1,20))
 # (2,1)
-eqns.append(Fraction(1,27)*wc + wv + wm*(3*xm**3 - 3*xm**2 + xm) - Fraction(1,60))
+eqns.append(Fraction(1,27)*wc + wm*(3*xm**3 - 3*xm**2 + xm) - Fraction(1,60))
 
 for eqn in eqns:
     print('{}'.format(eqn))
@@ -43,17 +44,42 @@ for eqn in eqns:
                          (xm, 4.9102649835703920944141032123298e-1)])
     print('verified = {}, should be 0.'.format(verified))
 
+print('---')
+for eqn in eqns:
+    verified = eqn.subs([(wc, 2.1821738936979620876016536190816e-1),
+                         (wv, 2.4917905757005788534116782239244e-2),
+                         (wm, 6.9009631119728808545828097124702e-2),
+                         (xm, 4.9754924428627855803597412887029e-1)])
+    print('verified = {}, should be 0.'.format(verified))
+
+print('---')
+for eqn in eqns:
+    verified = eqn.subs([(wc, 5.4029040412956874973240568941493e-2),
+                         (wv, 2.3556967318214072640266582461888e-2),
+                         (wm, 1.2510001921080030236865322789095e-1),
+                         (xm, 4.6015856878625571724228393577505e-1)])
+    print('verified = {}, should be 0.'.format(verified))
+
 # Add/subtract multiples of equations from each other to eliminate wc contribution.
 eqns[1] = simplify(eqns[1] - Fraction(1,9)*eqns[0])
 eqns[2] = simplify(eqns[2] - Fraction(1,27)*eqns[0])
 eqns[3] = simplify(eqns[3] - Fraction(1,27)*eqns[0])
 
+print('---')
+for eqn in eqns:
+    print('{}'.format(eqn))
+
 # Add/subtract multiples of equations from each other to eliminate wv contribution.
 eqns[2] = simplify(eqns[2] - Fraction(4,3)*eqns[1])
-eqns[3] = simplify(eqns[3] - Fraction(4,3)*eqns[1])
+eqns[3] = simplify(eqns[3] + Fraction(1,6)*eqns[1])
 
-# Eliminate the constant term from eqns[3]
-eqns[3] = simplify(eqns[3] - 7*eqns[2])
+print('---')
+for eqn in eqns:
+    print('{}'.format(eqn))
+
+# At this point, we recognize that eqns[2] and eqns[3] are constant
+# multiples of each other! So, the next step will zero out eqns[3].
+eqns[3] = simplify(eqns[3] + Fraction(1,2)*eqns[2])
 
 print('---')
 for eqn in eqns:
