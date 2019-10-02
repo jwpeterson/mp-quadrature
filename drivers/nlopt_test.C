@@ -188,7 +188,7 @@ int main(int argc, char ** argv)
   // d==3, dim==4. Best known PI rule is a conical product rule with 4 QP.
   // -d3 -c1 -v0 -e0 -m0 -g1 # 4 QP <-- No PI solution possible (-ve wt soln only)
   // -d3 -c0 -v0 -e2 -m0 -g0 # 6 QP <-- No solutions at all (I think we can prove this.)
-  // -d3 -c0 -v0 -e1 -m1 -g0 # 6 QP <-- Seems to be no solution numerically, needs analysis.
+  // -d3 -c0 -v0 -e1 -m1 -g0 # 6 QP <-- Analysis finds soln (we=1/60, xe=1/2, wm=3/20, xm=1/6).
   // -d3 -c0 -v0 -e0 -m2 -g0 # 6 QP <-- Many solutions found and we can show the possibility of infinitely many solutions.
   // -d3 -c1 -v1 -e1 -m0 -g0 # 7 QP <-- 1 solution with xe=1/2 can be found analytically, numerically this is also the only solution found.
   // -d3 -c1 -v1 -e0 -m1 -g0 # 7 QP <-- Many solutions found and we can show exact form of all solns.
@@ -775,6 +775,21 @@ int main(int argc, char ** argv)
       //       6.6666666666666666666666666666667e-2,
       //       5.0000000000000000000000000000000e-1
       //     };
+
+      // A degree 3 (0,0,1,1,0) rule with 6 QPs. This one actually has a solution in Q.
+      // The Newton minimization and root-finding algorithms fail to find a feasible
+      // step, probably since the edge orbit is right at the upper bound of 1/2.
+      // I wonder if this is a problem in general actually...
+      if (r.has_orbits(0,0,1,1,0))
+        {
+          // x =
+          //  {
+          //    1.6666666666666666666666666666666e-2, // we=1/60
+          //    5.0000000000000000000000000000000e-1, // xe=1/2
+          //    1.5000000000000000000000000000000e-1, // wm=3/20
+          //    1.6666666666666666666666666666666e-1  // xm=1/6
+          //  };
+        }
 
       // A new (?) degree=3 rule with 6 QPs composed of two median orbits.
       // I'm not totally sure what is happening here... maybe there are
