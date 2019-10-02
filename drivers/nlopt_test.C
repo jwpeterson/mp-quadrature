@@ -50,13 +50,13 @@ void usage();
 int main(int argc, char ** argv)
 {
   // Convenience: Print exact integral values for some polynomials before returning.
-  // std::cout << "exact_00 = " << exact_tri(0,0) << std::endl;
-  // std::cout << "exact_20 = " << exact_tri(2,0) << std::endl;
-  // std::cout << "exact_30 = " << exact_tri(3,0) << std::endl;
-  // std::cout << "exact_21 = " << exact_tri(2,1) << std::endl;
-  // std::cout << "exact_40 = " << exact_tri(4,0) << std::endl;
-  // std::cout << "exact_50 = " << exact_tri(5,0) << std::endl;
-  // std::cout << "exact_41 = " << exact_tri(4,1) << std::endl;
+  // std::cout << "exact_00 = " << exact_tri(0,0) << std::endl; // 1/2
+  // std::cout << "exact_20 = " << exact_tri(2,0) << std::endl; // 1/12
+  // std::cout << "exact_30 = " << exact_tri(3,0) << std::endl; // 1/20
+  // std::cout << "exact_21 = " << exact_tri(2,1) << std::endl; // 1/60
+  // std::cout << "exact_40 = " << exact_tri(4,0) << std::endl; // 1/30
+  // std::cout << "exact_50 = " << exact_tri(5,0) << std::endl; // 1/42
+  // std::cout << "exact_41 = " << exact_tri(4,1) << std::endl; // 1/210
   // return 0;
 
   // You can't trust all these digits from doubles, but you can with
