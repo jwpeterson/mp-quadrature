@@ -26,9 +26,60 @@ eqns.append(we*(xe**3 - 2*xe**2 + xe) + wm*(3*xm**3 - 3*xm**2 + xm) - Fraction(1
 for eqn in eqns:
     print('{}'.format(eqn))
 
-# Add/subtract multiples of equations from each other to eliminate wc contribution.
+# Verify that a solution we found by hand satisfies the original equations
+print('---')
+print('Checking solution [we=1/60, xe=1/2, wm=3/20, xm=1/6]')
+for eqn in eqns:
+    verified = eqn.subs([(we, Fraction(1,60)),
+                         (xe, Fraction(1,2)),
+                         (wm, Fraction(3,20)),
+                         (xm, Fraction(1,6))])
+    print('verified = {}, should be 0.'.format(verified))
+
+# Add/subtract multiples of equations from each other to eliminate variables.
 eqns[2] = simplify(3*eqns[1] - 2*eqns[2])
+eqns[3] = simplify(4*eqns[3] - eqns[2])
+eqns[3] = simplify(eqns[3] + eqns[1])
 
 print('---')
 for eqn in eqns:
     print('{}'.format(eqn))
+
+# At this point, we have shown that there are two possible solutions,
+# xe = (1/2, 1) which corresponds to either QPs at the midpoints of
+# each edge, or a "degenerate" edge orbit with points at the vertices.
+
+# First, consider the case xe = 1/2 and make that substitution
+eqns_case1 = []
+for eqn in eqns:
+    eqns_case1.append(eqn.subs(xe, Fraction(1,2)))
+
+print('---')
+print('Case 1')
+for eqn in eqns_case1:
+    print('{}'.format(eqn))
+
+# Substitute we = 1/6 - wm in remaining equations.
+# This loop does not modify the original?
+# for eqn in eqns_case1:
+#     eqn = eqn.subs(we, Fraction(1,6) - wm)
+for i in xrange(len(eqns_case1)):
+    eqns_case1[i] = simplify(eqns_case1[i].subs(we, Fraction(1,6) - wm))
+
+print('---')
+print('Case 1')
+for eqn in eqns_case1:
+    print('{}'.format(eqn))
+
+# The solution to eqns_case1[1] are xm = (1/6, 1/2). Since xe=1/2 has already
+# been chosen, we select xm = 1/6
+for i in xrange(len(eqns_case1)):
+    eqns_case1[i] = simplify(eqns_case1[i].subs(xm, Fraction(1,6)))
+
+print('---')
+print('Case 1')
+for eqn in eqns_case1:
+    print('{}'.format(eqn))
+
+# Solving the remaining equations gives wm=3/20, we=1/60. This concludes
+# the solution for Case 1.
