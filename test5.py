@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from sympy import sympify, simplify, collect, expand
+from sympy import sympify, simplify, collect, expand, sqrt
 from fractions import Fraction
 import sys
 
@@ -34,6 +34,15 @@ for eqn in eqns:
                          (xe, Fraction(1,2)),
                          (wm, Fraction(3,20)),
                          (xm, Fraction(1,6))])
+    print('verified = {}, should be 0.'.format(verified))
+
+print('---')
+print('Checking solution for Case 2a:')
+for eqn in eqns:
+    verified = eqn.subs([(we, Fraction(1,6) - Fraction(1,12) / (Fraction(13,25) + sqrt(21)/75)),
+                         (xe, 1),
+                         (wm, Fraction(1,12) / (Fraction(13,25) + sqrt(21)/75)),
+                         (xm, (9 + sqrt(21)) / 30)]).evalf()
     print('verified = {}, should be 0.'.format(verified))
 
 # Add/subtract multiples of equations from each other to eliminate variables.
@@ -83,3 +92,29 @@ for eqn in eqns_case1:
 
 # Solving the remaining equations gives wm=3/20, we=1/60. This concludes
 # the solution for Case 1.
+
+# Second, consider the case xe = 1 and make that substitution
+eqns_case2 = []
+for eqn in eqns:
+    eqns_case2.append(eqn.subs(xe, 1))
+
+# Substitute in we = 1/6 - wm
+for i in xrange(len(eqns_case2)):
+    eqns_case2[i] = simplify(eqns_case2[i].subs(we, Fraction(1,6) - wm))
+
+# Now combine the equations to cancel the constant term.
+eqns_case2[2] = eqns_case2[2] - Fraction(1,5)*eqns_case2[1]
+
+print('---')
+print('Case 2')
+for eqn in eqns_case2:
+    print('{}'.format(eqn))
+
+# The solutions are
+# 2a.) xm = (9 + sqrt(21)) / 30
+# 2b.) xm = (9 - sqrt(21)) / 30
+
+# First Consider case 2a. Substitute xm into eqns_case2[1],
+# then solve for wm, we. The results are given above.
+case_2a = simplify(eqns_case2[1].subs(xm, (9 + sqrt(21)) / 30))
+print('case_2a = {}'.format(case_2a))
