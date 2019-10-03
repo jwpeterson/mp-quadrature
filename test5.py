@@ -114,6 +114,7 @@ for eqn in eqns_case2:
 # 2a.) xm = (9 + sqrt(21)) / 30
 # 2b.) xm = (9 - sqrt(21)) / 30
 
-# First Consider case 2a
+# First Consider case 2a. Substitute xm into eqns_case2[1],
+# then solve for wm, we. The results are given above.
 case_2a = simplify(eqns_case2[1].subs(xm, (9 + sqrt(21)) / 30))
 print('case_2a = {}'.format(case_2a))

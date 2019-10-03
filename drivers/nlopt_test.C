@@ -789,6 +789,28 @@ int main(int argc, char ** argv)
           //    1.5000000000000000000000000000000e-1, // wm=3/20
           //    1.6666666666666666666666666666666e-1  // xm=1/6
           //  };
+
+          // The Newton solvers won't converge this initial guess
+          // because the edge orbit "degenerates" to a vertex orbit
+          // and thus is at the very limit of the feasible region.
+
+          // Compute high-precision representations
+          mpfr_class s21 = sqrt(mpfr_class(21));
+          mpfr_class wm = mpfr_class(1)/12 / (mpfr_class(13)/25 + s21/75);
+          mpfr_class we = mpfr_class(1)/6 - wm;
+          mpfr_class xe = mpfr_class(1);
+          mpfr_class xm = (mpfr_class(9) + s21) / 30;
+          std::cout << "we=" << we << std::endl;
+          std::cout << "xe=" << xe << std::endl;
+          std::cout << "wm=" << wm << std::endl;
+          std::cout << "xm=" << xm << std::endl;
+          x =
+           {
+             we.get_d(),
+             xe.get_d(),
+             wm.get_d(),
+             xm.get_d()
+           };
         }
 
       // A new (?) degree=3 rule with 6 QPs composed of two median orbits.
