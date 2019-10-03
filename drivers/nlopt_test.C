@@ -794,23 +794,34 @@ int main(int argc, char ** argv)
           // because the edge orbit "degenerates" to a vertex orbit
           // and thus is at the very limit of the feasible region.
 
-          // Compute high-precision representations
+          // Case 2a
           mpfr_class s21 = sqrt(mpfr_class(21));
           mpfr_class wm = mpfr_class(1)/12 / (mpfr_class(13)/25 + s21/75);
           mpfr_class we = mpfr_class(1)/6 - wm;
           mpfr_class xe = mpfr_class(1);
           mpfr_class xm = (mpfr_class(9) + s21) / 30;
-          std::cout << "we=" << we << std::endl;
-          std::cout << "xe=" << xe << std::endl;
-          std::cout << "wm=" << wm << std::endl;
-          std::cout << "xm=" << xm << std::endl;
-          x =
-           {
-             we.get_d(),
-             xe.get_d(),
-             wm.get_d(),
-             xm.get_d()
-           };
+          // std::cout << "we=" << we << std::endl;
+          // std::cout << "xe=" << xe << std::endl;
+          // std::cout << "wm=" << wm << std::endl;
+          // std::cout << "xm=" << xm << std::endl;
+          // x =
+          //  {
+          //    we.get_d(),
+          //    xe.get_d(),
+          //    wm.get_d(),
+          //    xm.get_d()
+          //  };
+
+          // Case 2b - This case has a negative edge weight, so the
+          // constrained nonlinear solver won't converge to it.
+          // mpfr_class wm_case2b = mpfr_class(1)/12 / (mpfr_class(13)/25 - s21/75);
+          // mpfr_class we_case2b = mpfr_class(1)/6 - wm_case2b;
+          // mpfr_class xe_case2b = mpfr_class(1);
+          // mpfr_class xm_case2b = (mpfr_class(9) - s21) / 30;
+          // std::cout << "we_case2b=" << we_case2b << std::endl;
+          // std::cout << "xe_case2b=" << xe_case2b << std::endl;
+          // std::cout << "wm_case2b=" << wm_case2b << std::endl;
+          // std::cout << "xm_case2b=" << xm_case2b << std::endl;
         }
 
       // A new (?) degree=3 rule with 6 QPs composed of two median orbits.
