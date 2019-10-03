@@ -47,10 +47,13 @@ def f2hex(f2rgb, f):
 
 # d=3
 # filename = 'quad_2d_p03_Ro3_11100_07QP_equilateral.csv'
-filename = 'quad_2d_p03_Ro3_0-0-0-2-0_06QP_equilateral.csv'
+# filename = 'quad_2d_p03_Ro3_0-0-0-2-0_06QP_equilateral.csv'
 # filename = 'quad_2d_p03_Ro3_0-0-0-2-0_06QP_second_equilateral.csv'
 # filename = 'quad_2d_p03_Ro3_0-0-0-2-0_06QP_third_equilateral.csv'
 # filename = 'quad_2d_p03_Ro3_00110_06QP_equilateral.csv'
+filename = 'quad_2d_p03_Ro3_11010_07QP_equilateral.csv'
+# filename = 'quad_2d_p03_Ro3_11010_07QP_second_equilateral.csv'
+# filename = 'quad_2d_p03_Ro3_11010_07QP_third_equilateral.csv'
 
 # d=4
 # filename = 'quad_2d_p04_06QP_equilateral.csv'
