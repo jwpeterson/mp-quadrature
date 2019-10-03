@@ -39,10 +39,21 @@ for eqn in eqns:
 print('---')
 print('Checking solution for Case 2a:')
 for eqn in eqns:
-    verified = eqn.subs([(we, Fraction(1,6) - Fraction(1,12) / (Fraction(13,25) + sqrt(21)/75)),
+    wm_val = Fraction(1,12) / (Fraction(13,25) + sqrt(21)/75)
+    verified = eqn.subs([(we, wm_val),
                          (xe, 1),
-                         (wm, Fraction(1,12) / (Fraction(13,25) + sqrt(21)/75)),
+                         (wm, wm_val),
                          (xm, (9 + sqrt(21)) / 30)]).evalf()
+    print('verified = {}, should be 0.'.format(verified))
+
+print('---')
+print('Checking solution for Case 2b (negative weight case):')
+for eqn in eqns:
+    wm_val = Fraction(1,12) / (Fraction(13,25) - sqrt(21)/75)
+    verified = eqn.subs([(we, Fraction(1,6) - wm_val),
+                         (xe, 1),
+                         (wm, wm_val),
+                         (xm, (9 - sqrt(21)) / 30)]).evalf()
     print('verified = {}, should be 0.'.format(verified))
 
 # Add/subtract multiples of equations from each other to eliminate variables.
@@ -118,3 +129,8 @@ for eqn in eqns_case2:
 # then solve for wm, we. The results are given above.
 case_2a = simplify(eqns_case2[1].subs(xm, (9 + sqrt(21)) / 30))
 print('case_2a = {}'.format(case_2a))
+
+# Now consider case 2b. This case has a negative we value.
+case_2b = simplify(eqns_case2[1].subs(xm, (9 - sqrt(21)) / 30))
+print('case_2b = {}'.format(case_2b))
+
