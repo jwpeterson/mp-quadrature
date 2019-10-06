@@ -5,7 +5,9 @@ import sys
 
 """
 We are analyzing the degree=3 (0,0,1,1,0) Ro3-invariant rule with 6 QPs.
-This rule seems to have no solutions numerically.
+Solutions for this rule did not seem to converge numerically, probably
+because the solutions were on the constraint boundaries, but we did find
+three solutions (Case 1, Case 2a, Case 2b) analytically.
 """
 
 # Create sympy objects for the dofs of this rule.
