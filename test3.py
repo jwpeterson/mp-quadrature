@@ -3,9 +3,9 @@
 import numpy as np
 from scipy.optimize import fsolve
 
-# This is the "transformed" nonlinear system of equations which is
-# generated from the (degree=3, dim=4) Ro3-invariant equations by
-# introducing the variable tranformation:
+# This is the "transformed" nonlinear system of equations for the
+# (0,0,0,2,0) case which is generated from the (degree=3, dim=4)
+# Ro3-invariant equations by introducing the variable tranformation:
 # eta1 := w1*x1 + w2*x2
 # eta2 := w1*x1**2 + w2*x2**2
 # eta3 := w1*x1**3 + w2*x2**3
@@ -90,6 +90,27 @@ x = [w1, x1, x2, x2]
 # 4.)
 # eta3=0.00430425249905
 # x=[0.14005297683451184, 0.2084716657413544, 0.4849539527287688, 0.4849539527287688]
+
+# 5.) inputs/quad_2d_p03_Ro3_0-0-0-2-0_06QP.in
+eta3 = 0.008003140073211422
+x = [7.7933915797683249045490620091667e-2,
+     1.2122610860169603123104488174293e-1,
+     8.8732750868983417621176046575000e-2,
+     4.4585335732240594543339113007394e-1]
+
+# 6.) inputs/quad_2d_p03_Ro3_0-0-0-2-0_06QP_second.in
+eta3 = 0.00990639530636686
+x = [5.5430438592710409604505936979277e-2,
+     9.2321219251293589274056663622764e-2,
+     1.1123622807395625706216072968739e-1,
+     4.4591389966593863706329438603431e-1]
+
+# 7.) inputs/quad_2d_p03_Ro3_0-0-0-2-0_06QP_third.in
+eta3 = 0.005631313823453519
+x = [5.7117599987543327605737790321850e-2,
+     4.5233569099773816153684027274282e-1,
+     1.0954906667912333906092887634482e-1,
+     1.4657918044063831712367103699393e-1]
 
 # Compute eta1, eta2 given eta3:
 eta1 = 1./40 + 3*eta3
