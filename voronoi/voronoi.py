@@ -47,10 +47,14 @@ def f2hex(f2rgb, f):
 
 # d=3
 
+# 4 QPs
+# filename = 'quad_2d_p03_NI_equilateral.csv'
+filename = 'quad_2d_p03_CP_equilateral.csv'
+
 # 6 QPs
-# filename = 'quad_2d_p03_Ro3_0-0-0-2-0_06QP_equilateral.csv'
-# filename = 'quad_2d_p03_Ro3_0-0-0-2-0_06QP_second_equilateral.csv'
-# filename = 'quad_2d_p03_Ro3_0-0-0-2-0_06QP_third_equilateral.csv'
+# filename = 'quad_2d_p03_Ro3_00020_06QP_equilateral.csv'
+# filename = 'quad_2d_p03_Ro3_00020_06QP_second_equilateral.csv'
+# filename = 'quad_2d_p03_Ro3_00020_06QP_third_equilateral.csv'
 # filename = 'quad_2d_p03_Ro3_00110_06QP_equilateral.csv'
 # filename = 'quad_2d_p03_Ro3_00110_06QP_Case2a_equilateral.csv'
 # filename = 'quad_2d_p03_Ro3_00110_06QP_Case2b_equilateral.csv' # negative weights
@@ -58,7 +62,7 @@ def f2hex(f2rgb, f):
 # 7 QPs
 # filename = 'quad_2d_p03_Ro3_11010_07QP_equilateral.csv'
 # filename = 'quad_2d_p03_Ro3_11010_07QP_second_equilateral.csv'
-filename = 'quad_2d_p03_Ro3_11010_07QP_third_equilateral.csv'
+# filename = 'quad_2d_p03_Ro3_11010_07QP_third_equilateral.csv'
 # filename = 'quad_2d_p03_Ro3_11100_07QP_equilateral.csv'
 
 # d=4
@@ -184,11 +188,11 @@ wts = data[:, 2]
 # print('wts={}'.format(wts))
 
 # Create a colormap. This is mostly a matter of preference?
-# cmap = cm.get_cmap('RdYlGn')
+cmap = cm.get_cmap('RdYlGn')
 # cmap = cm.get_cmap(plt.cm.jet)
 
 # Perceptually uniform sequential colormaps
-cmap = cm.get_cmap(plt.cm.viridis)
+# cmap = cm.get_cmap(plt.cm.viridis) # Can't see black QPs on purple background
 # cmap = cm.get_cmap(plt.cm.plasma)
 # cmap = cm.get_cmap(plt.cm.inferno)
 # cmap = cm.get_cmap(plt.cm.magma)
