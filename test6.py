@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-from sympy import sympify, simplify, collect, expand, sqrt
+from sympy import sympify, simplify, collect, expand, sqrt, solve
 from fractions import Fraction
 import sys
 
@@ -35,13 +35,33 @@ print('should_be_zero = {}'.format(should_be_zero))
 # Take linear combination of the two cubic equations, try to cancel
 # the constant term.
 res = simplify(7*eqns[3] + eqns[2])
+print('---')
 print('res = {}'.format(res))
 
-# Eliminate w2
-#res = simplify(res - w1 - w2 + Fraction(1,6))
-res = simplify(res.subs(w2, Fraction(1,6) - w1))
+# In res, we should now have:
+# sum_i w_i x_i (15*x_i**2 - 9*x_i + 1) = 0
+# This polynomial has roots:
+# (9 + sqrt(21)) / 30
+# (9 - sqrt(21)) / 30
+# If we pick x1 as the positive root and x2 as the negative root, the
+# equation should be satisifed! Note: We also have to eliminate the weights
+should_be_zero = simplify(res.subs([(x1, (9 + sqrt(21)) / 30),
+                                    (x2, (9 - sqrt(21)) / 30),
+                                    (w2, Fraction(1,6) - w1)]))
+print('should_be_zero = {}'.format(should_be_zero))
+
+# Now, let's substitute all this into one of the original eqns and simplify
+res = simplify(eqns[3].subs([(x1, (9 + sqrt(21)) / 30),
+                             (x2, (9 - sqrt(21)) / 30),
+                             (w2, Fraction(1,6) - w1)]))
+
+# Finally, we can use sympy to solve the equation res = 0, for w1
+w1_soln = solve(res, w1)
+w2_soln = Fraction(1,6) - w1_soln[0]
+
+print('---')
 print('res = {}'.format(res))
-res = expand(res)
-print('res = {}'.format(res))
-res = collect(res, w1)
-print('res = {}'.format(res))
+print('w1 = {}'.format(w1_soln))
+print('w1 ~ {}'.format(w1_soln[0].evalf()))
+print('w2 = {}'.format(w2_soln))
+print('w2 ~ {}'.format(w2_soln.evalf()))
