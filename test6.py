@@ -60,11 +60,62 @@ w1_soln = solve(res, w1)[0]
 w2_soln = Fraction(1,6) - w1_soln
 
 print('---')
-print('res = {}'.format(res))
+# print('res = {}'.format(res))
 print('w1 = {}'.format(w1_soln))
-print('w1 ~ {}'.format(w1_soln.evalf()))
 print('w2 = {}'.format(w2_soln))
-print('w2 ~ {}'.format(w2_soln.evalf()))
 
 # Compute the "eta" variables based on this solution (see also
 # test3.py for more information).
+x1_soln = (9 + sqrt(21)) / 30
+x2_soln = (9 - sqrt(21)) / 30
+
+print('w1 ~ {}'.format(w1_soln.evalf()))
+print('w2 ~ {}'.format(w2_soln.evalf()))
+print('x1 ~ {}'.format(x1_soln.evalf()))
+print('x2 ~ {}'.format(x2_soln.evalf()))
+
+eta1 = simplify(w1_soln*x1_soln + w2_soln*x2_soln)
+eta2 = simplify(w1_soln*x1_soln**2 + w2_soln*x2_soln**2)
+eta3 = simplify(w1_soln*x1_soln**3 + w2_soln*x2_soln**3)
+
+print('---')
+print('eta1 = {}'.format(eta1))
+print('eta2 = {}'.format(eta2))
+print('eta3 = {}'.format(eta3))
+
+# It seems that the points and weights have the following form:
+# w1 = a-b
+# x1 = c+d
+# w2 = a+b
+# x2 = c-d
+a, b, c, d = sympify('a, b, c, d')
+
+eta1 = simplify((a-b)*(c+d) + (a+b)*(c-d))
+eta2 = expand((a-b)*(c+d)**2 + (a+b)*(c-d)**2)
+eta3 = expand((a-b)*(c+d)**3 + (a+b)*(c-d)**3)
+
+print('---')
+print('eta1 = {}'.format(eta1))
+print('eta2 = {}'.format(eta2))
+print('eta3 = {}'.format(eta3))
+
+# Maybe it's a rational part plus an irrational part:
+w1 = Fraction(1,12) - a
+x1 = Fraction(3,10) + b
+w2 = Fraction(1,12) + a
+x2 = Fraction(3,10) - b
+
+eta0 = w1 + w2
+eta1 = simplify(w1*x1 + w2*x2)
+eta2 = expand(w1*x1**2 + w2*x2**2)
+eta3 = expand(w1*x1**3 + w2*x2**3)
+
+print('---')
+print('eta0 = {}'.format(eta0))
+print('eta1 = {}'.format(eta1))
+print('eta2 = {}'.format(eta2))
+print('eta3 = {}'.format(eta3))
+
+# After some thinking about it, I believe that the weights must
+# satisfy w1 = 1/12-a and w2=1/12+a, and then we can find the
+# other parameters of the solution from there, with 0 < a < 1/12.
