@@ -56,12 +56,15 @@ res = simplify(eqns[3].subs([(x1, (9 + sqrt(21)) / 30),
                              (w2, Fraction(1,6) - w1)]))
 
 # Finally, we can use sympy to solve the equation res = 0, for w1
-w1_soln = solve(res, w1)
-w2_soln = Fraction(1,6) - w1_soln[0]
+w1_soln = solve(res, w1)[0]
+w2_soln = Fraction(1,6) - w1_soln
 
 print('---')
 print('res = {}'.format(res))
 print('w1 = {}'.format(w1_soln))
-print('w1 ~ {}'.format(w1_soln[0].evalf()))
+print('w1 ~ {}'.format(w1_soln.evalf()))
 print('w2 = {}'.format(w2_soln))
 print('w2 ~ {}'.format(w2_soln.evalf()))
+
+# Compute the "eta" variables based on this solution (see also
+# test3.py for more information).
