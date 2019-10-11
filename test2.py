@@ -4,9 +4,10 @@ import numpy as np
 from scipy.optimize import fsolve
 
 # This is a hard-coded solver for the degree=3 Ro3-invariant case with
-# two edge orbits. There should be no solution to this system of
-# equations, and we can show this by deriving the "transformed" system
-# of eta variables as done in test.py
+# two edge orbits, configuration (0,0,2,0,0). There should be no
+# solution to this system of equations, and we can show this by
+# deriving the "transformed" system of eta variables as done in
+# test.py
 def residual(x):
     r = np.zeros(4)
     for i in xrange(2):

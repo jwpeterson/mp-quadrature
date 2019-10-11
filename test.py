@@ -4,8 +4,8 @@ import numpy as np
 from scipy.optimize import fsolve
 
 # This is a hard-coded solver for the degree=3 Ro3-invariant case with
-# two median orbits. This case behaved very strangely in our solver,
-# seeming to have many, many solutions.
+# two median orbits, configuration (0,0,0,2,0). This case behaved very
+# strangely in our solver, seeming to have many, many solutions.
 def residual(x):
     r = np.zeros(4)
     for i in xrange(2):
