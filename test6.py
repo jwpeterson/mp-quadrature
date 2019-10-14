@@ -83,39 +83,9 @@ print('eta1 = {}'.format(eta1))
 print('eta2 = {}'.format(eta2))
 print('eta3 = {}'.format(eta3))
 
-# It seems that the points and weights have the following form:
-# w1 = a-b
-# x1 = c+d
-# w2 = a+b
-# x2 = c-d
-a, b, c, d = sympify('a, b, c, d')
-
-eta1 = simplify((a-b)*(c+d) + (a+b)*(c-d))
-eta2 = expand((a-b)*(c+d)**2 + (a+b)*(c-d)**2)
-eta3 = expand((a-b)*(c+d)**3 + (a+b)*(c-d)**3)
-
-print('---')
-print('eta1 = {}'.format(eta1))
-print('eta2 = {}'.format(eta2))
-print('eta3 = {}'.format(eta3))
-
-# Maybe it's a rational part plus an irrational part:
-w1 = Fraction(1,12) - a
-x1 = Fraction(3,10) + b
-w2 = Fraction(1,12) + a
-x2 = Fraction(3,10) - b
-
-eta0 = w1 + w2
-eta1 = simplify(w1*x1 + w2*x2)
-eta2 = expand(w1*x1**2 + w2*x2**2)
-eta3 = expand(w1*x1**3 + w2*x2**3)
-
-print('---')
-print('eta0 = {}'.format(eta0))
-print('eta1 = {}'.format(eta1))
-print('eta2 = {}'.format(eta2))
-print('eta3 = {}'.format(eta3))
-
-# After some thinking about it, I believe that the weights must
-# satisfy w1 = 1/12-a and w2=1/12+a, and then we can find the
-# other parameters of the solution from there, with 0 < a < 1/12.
+# Check that
+# eta1 = 1/40 + 3*eta3
+# eta1 = 1/360 + 2*eta3
+# in agreement with our original analysis of this problem.
+print('eta1 - (1./40 + 3 * eta3)={} (should be zero)'.format(eta1 - (Fraction(1,40) + 3 * eta3)))
+print('eta2 - (1./360 + 2 * eta3)={} (should be zero)'.format(eta2 - (Fraction(1,360) + 2 * eta3)))
