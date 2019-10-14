@@ -78,6 +78,8 @@ print('---')
 # print('res = {}'.format(res))
 print('w1 = {}'.format(w1_soln))
 print('w2 = {}'.format(w2_soln))
+w_ratio = simplify(w2_soln/w1_soln)
+print('Baseline solution, ratio of weights w2/w1 = {} ~ {}'.format(w_ratio, w_ratio.evalf()))
 
 # Compute the "eta" variables based on this solution (see also
 # test3.py for more information).
@@ -116,13 +118,14 @@ print('---')
 # and then finding the root x of
 # x * (x-r1) * (x-r2) - sigma = 0
 # which is closest to r2
-xi = 1.56
+xi = 4*math.sqrt(21)/25 + 31./25 # ~1.973
 dx = .02
 x2_new = float(x2_soln.evalf() + dx)
 sigma = float((-xi * x2_new * ((x2_soln - x1_soln).evalf() + dx) * dx))
 
-print ('sigma={}'.format(sigma))
-print ('dx={}'.format(dx))
+print('xi={}'.format(xi))
+print('sigma={}'.format(sigma))
+print('dx={}'.format(dx))
 
 (x1_new, infodict, iflag, mesg) = fsolve(charpoly,
                                       float(x2_soln.evalf()),
