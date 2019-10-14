@@ -16,14 +16,14 @@ def mypoly(xvec, *args):
     x = xvec[0]
     # print ('x={}, type(x)={}'.format(x, type(x)))
     # print ('sigma={}, type(sigma)={}'.format(sigma, type(sigma)))
-    r1 = (9 + math.sqrt(21)) / 30
-    r2 = (9 - math.sqrt(21)) / 30
 
     # Factored form
+    # r1 = (9 + math.sqrt(21)) / 30
+    # r2 = (9 - math.sqrt(21)) / 30
     # resid = x * (x-r1) * (x-r2) - sigma
 
     # Unfactored form
-    resid = 15*x**2 - 9*x + 1 - sigma
+    resid = x * (15*x**2 - 9*x + 1) - sigma
 
     # print ('r1={}, type(r1)={}'.format(r1, type(r1)))
     # print ('r2={}'.format(r2))
@@ -157,12 +157,13 @@ else:
     print('Number of function evaluations = {}'.format(infodict['nfev']))
     print('w1_new = {}, x1_new = {},\nw2_new = {}, x2_new = {}'.format(w1_new, x1_new,
                                                                        w2_new, x2_new))
-    # Check lhs and rhs
-    lhs = w1_new * x1_new * (15*x1_new**2 - 9*x1_new + 1)
-    rhs = w2_new * x2_new * (15*x2_new**2 - 9*x2_new + 1)
+    # Check terms of the sum, they should sum to zero.
+    term1 = w1_new * x1_new * (15*x1_new**2 - 9*x1_new + 1)
+    term2 = w2_new * x2_new * (15*x2_new**2 - 9*x2_new + 1)
     print('---')
-    print('lhs = {}'.format(lhs))
-    print('rhs = {}'.format(rhs))
+    print('term1 = {}'.format(term1))
+    print('term2 = {}'.format(term2))
+    print('term1 + term2 = {}'.format(term1 + term2))
 
     # Check that this new "solution" satisfies the original equations...
     print('---')
