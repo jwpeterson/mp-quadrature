@@ -1,13 +1,28 @@
 #!/usr/bin/env python
 from sympy import sympify, simplify, collect, expand, sqrt, solve
 from fractions import Fraction
+from scipy.optimize import fsolve
 import sys
+import math
 
 """
 We are analyzing the degree=3 (0,0,0,2,0) Ro3-invariant rule with two
 median orbits and 6 QPs. We initially analyzed this rule numerically
 in "test.py", but here the goal is to analyze it using sympy.
 """
+
+def charpoly(xvec, *args):
+    sigma = args[0]
+    x = xvec[0]
+    # print ('x={}, type(x)={}'.format(x, type(x)))
+    # print ('sigma={}, type(sigma)={}'.format(sigma, type(sigma)))
+    r1 = (9 + math.sqrt(21)) / 30
+    r2 = (9 - math.sqrt(21)) / 30
+    resid = x * (x-r1) * (x-r2) - sigma
+    # print ('r1={}, type(r1)={}'.format(r1, type(r1)))
+    # print ('r2={}'.format(r2))
+    # print ('resid={}, type(resid)={}'.format(resid, type(resid)))
+    return resid
 
 # Create sympy objects for the dofs of this rule.
 w1, x1, w2, x2 = sympify('w1, x1, w2, x2')
@@ -89,3 +104,45 @@ print('eta3 = {}'.format(eta3))
 # in agreement with our original analysis of this problem.
 print('eta1 - (1./40 + 3 * eta3)={} (should be zero)'.format(eta1 - (Fraction(1,40) + 3 * eta3)))
 print('eta2 - (1./360 + 2 * eta3)={} (should be zero)'.format(eta2 - (Fraction(1,360) + 2 * eta3)))
+
+print('---')
+# We should be able to derive other solutions by choosing two values
+# somewhat arbitrarily:
+# 1.) xi = w2/w1
+# 2.) x2_new = r2 + dx
+# where r2 = x2_soln is the second root above, by first computing
+# the right-hand side:
+# sigma := -xi * (r2 + dx) * (r2 - r1 + dx) * dx.
+# and then finding the root x of
+# x * (x-r1) * (x-r2) - sigma = 0
+# which is closest to r2
+xi = 1.56
+dx = .02
+x2_new = float(x2_soln.evalf() + dx)
+sigma = float((-xi * x2_new * ((x2_soln - x1_soln).evalf() + dx) * dx))
+
+print ('sigma={}'.format(sigma))
+print ('dx={}'.format(dx))
+
+(x1_new, infodict, iflag, mesg) = fsolve(charpoly,
+                                      float(x2_soln.evalf()),
+                                      args=sigma,
+                                      full_output=True)
+
+# Once xi is chosen, w1 and w2 are given immediately in terms of xi:
+w1_new = (1. / 6) / (xi+1)
+w2_new = (xi / 6) / (xi+1)
+
+if iflag != 1:
+    print(mesg)
+else:
+    print('w1_new = {}, x1_new = {},\nw2_new = {}, x2_new = {}'.format(w1_new, x1_new[0],
+                                                                       w2_new, x2_new))
+
+    # Check that this new "solution" satisfies the original equations...
+    for eqn in eqns:
+        verified = eqn.subs([(w1, w1_new),
+                             (x1, x1_new[0]),
+                             (w2, w2_new),
+                             (x2, x2_new)])
+        print('verified = {}, should be 0.'.format(verified))
