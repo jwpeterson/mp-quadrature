@@ -165,11 +165,13 @@ else:
     print('term2 = {}'.format(term2))
     print('term1 + term2 = {}'.format(term1 + term2))
 
+    # Print to verify inputs.
+    print('---')
+    for eqn in eqns:
+        print('{}'.format(eqn))
+
     # Check that this new "solution" satisfies the original equations...
     print('---')
     for eqn in eqns:
-        verified = eqn.subs([(w1, w1_new),
-                             (x1, x1_new),
-                             (w2, w2_new),
-                             (x2, x2_new)])
+        verified = eqn.subs({w1:w1_new, w2:w2_new, x1:x1_new, x2:x2_new})
         print('verified = {}, should be 0.'.format(verified))
