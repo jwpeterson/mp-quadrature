@@ -4,6 +4,7 @@ from fractions import Fraction
 from scipy.optimize import fsolve
 import sys
 import math
+import numpy as np
 
 """
 We are analyzing the degree=3 (0,0,0,2,0) Ro3-invariant rule with two
@@ -27,6 +28,23 @@ def mypoly(xvec, *args):
 
     # print ('r1={}, type(r1)={}'.format(r1, type(r1)))
     # print ('r2={}'.format(r2))
+    # print ('resid={}, type(resid)={}'.format(resid, type(resid)))
+    return resid
+
+# The polynomials f and g which we use to derive additional solutions.
+def f(x):
+    return 6*x**2 - 4*x + 0.5
+
+def g(x):
+    return x * (15*x**2 - 9*x + 1)
+
+def mypoly2(xvec, *args):
+    sigma = args[0]
+    x = xvec[0]
+
+    # f(x_1) - sigma * g(x_1) = 0
+    resid = f(x) - sigma * g(x)
+
     # print ('resid={}, type(resid)={}'.format(resid, type(resid)))
     return resid
 
@@ -113,6 +131,83 @@ print('eta3 = {}'.format(eta3))
 print('---')
 print('eta1 - (1./40 + 3 * eta3)={} (should be zero)'.format(eta1 - (Fraction(1,40) + 3 * eta3)))
 print('eta2 - (1./360 + 2 * eta3)={} (should be zero)'.format(eta2 - (Fraction(1,360) + 2 * eta3)))
+
+# Idea to find more solutions.
+#
+# Rewrite any two equations as:
+# a.) w1/w2 = -f(x_2) / f(x_1)
+# b.) w1/w2 = -g(x_2) / g(x_1)
+# Where f, g are polynomials in their argument, and f(x_1) != 0, g(x_1) != 0
+# This seems to always be possible.
+#
+# Then we can equate a.) and b.) to eliminate the weights and obtain:
+# f(x_2)/f(x_1) = g(x_2)/g(x_1)
+# Since the system is underdetermined, set x_2 = alpha, where alpha
+# is "close" to the x_2 solution we found analytically. Then we have:
+# f(alpha)/g(alpha) = f(x_1)/g(x_1)
+#
+# Let sigma := f(alpha)/g(alpha). Then we have to solve the equation
+# f(x_1) - sigma * g(x_1) = 0  (*)
+# for x_1. In general (*) will be a cubic polynomial in x_1, so it
+# may up to three real roots. We will choose the root which is closest
+# to the x_1 value we found analytically.
+#
+# Then we can use either a.) or b.) above to solve for the ratio
+# w1/w2, and finally we can use the fact that w1 + w2 = 1/6 to solve
+# for w1 and w2 separately.
+
+# Choose x2=alpha, where x2 is close to the analytical root, x2_soln
+alpha = float(x2_soln) + np.random.uniform(low=-.03, high=.03)
+
+# Compute sigma based on alpha
+sigma = f(alpha) / g(alpha)
+
+# Call fsolve to solve for x1, using an initial guess which is close to the
+# analytical value of x1.
+(sol, infodict, iflag, mesg) = fsolve(mypoly2,
+                                      float(x1_soln),
+                                      args=sigma,
+                                      full_output=True)
+
+# If the solve failed, print the reason and exit.
+if iflag != 1:
+    print(mesg)
+    sys.exit(1)
+
+print('---')
+print('Final residual = {}'.format(infodict['fvec']))
+print('Number of function evaluations = {}'.format(infodict['nfev']))
+x1_new = sol[0]
+x2_new = alpha
+
+# Check for x1 ~ x2
+if (np.abs(x1_new - x2_new) < 1.e-9):
+    print('Error: nonlinear solver converged to invalid solution, x1=x2')
+    sys.exit(1)
+
+# Now solve for the ratio w1/w2
+w1_over_w2 = -f(x2_new) / f(x1_new)
+w2_over_w1 = 1. / w1_over_w2
+print('w1_over_w2={}'.format(w1_over_w2))
+print('w2_over_w1={}'.format(w2_over_w1))
+
+# Now solve for w1 and w2 separately
+w1_new = 1. / 6 / (1 + w2_over_w1)
+w2_new = 1. / 6 / (1 + w1_over_w2)
+
+# Print the solution
+print('w1 = {}'.format(w1_new))
+print('w2 = {}'.format(w2_new))
+print('x1 = {}'.format(x1_new))
+print('x2 = {}'.format(x2_new))
+
+# Check that this new "solution" satisfies the original equations...
+print('---')
+for eqn in eqns:
+    verified = eqn.subs({w1:w1_new, w2:w2_new, x1:x1_new, x2:x2_new})
+    print('verified = {}, should be 0.'.format(verified))
+
+sys.exit(0)
 
 # We should be able to derive other solutions by choosing two values
 # somewhat arbitrarily:
