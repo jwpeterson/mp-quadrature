@@ -12,25 +12,6 @@ median orbits and 6 QPs. We initially analyzed this rule numerically
 in "test.py", but here the goal is to analyze it using sympy.
 """
 
-def mypoly(xvec, *args):
-    sigma = args[0]
-    x = xvec[0]
-    # print ('x={}, type(x)={}'.format(x, type(x)))
-    # print ('sigma={}, type(sigma)={}'.format(sigma, type(sigma)))
-
-    # Factored form
-    # r1 = (9 + math.sqrt(21)) / 30
-    # r2 = (9 - math.sqrt(21)) / 30
-    # resid = x * (x-r1) * (x-r2) - sigma
-
-    # Unfactored form
-    resid = x * (15*x**2 - 9*x + 1) - sigma
-
-    # print ('r1={}, type(r1)={}'.format(r1, type(r1)))
-    # print ('r2={}'.format(r2))
-    # print ('resid={}, type(resid)={}'.format(resid, type(resid)))
-    return resid
-
 # The polynomials f and g which we use to derive additional solutions.
 def f(x):
     return 6*x**2 - 4*x + 0.5
@@ -38,7 +19,7 @@ def f(x):
 def g(x):
     return x * (15*x**2 - 9*x + 1)
 
-def mypoly2(xvec, *args):
+def myfunc(xvec, *args):
     sigma = args[0]
     x = xvec[0]
 
@@ -164,7 +145,7 @@ sigma = f(alpha) / g(alpha)
 
 # Call fsolve to solve for x1, using an initial guess which is close to the
 # analytical value of x1.
-(sol, infodict, iflag, mesg) = fsolve(mypoly2,
+(sol, infodict, iflag, mesg) = fsolve(myfunc,
                                       float(x1_soln),
                                       args=sigma,
                                       full_output=True)
@@ -175,8 +156,9 @@ if iflag != 1:
     sys.exit(1)
 
 print('---')
-print('Final residual = {}'.format(infodict['fvec']))
-print('Number of function evaluations = {}'.format(infodict['nfev']))
+print('Computing arbitrary solution numerically')
+# print('Final residual = {}'.format(infodict['fvec']))
+# print('Number of function evaluations = {}'.format(infodict['nfev']))
 x1_new = sol[0]
 x2_new = alpha
 
@@ -188,8 +170,8 @@ if (np.abs(x1_new - x2_new) < 1.e-9):
 # Now solve for the ratio w1/w2
 w1_over_w2 = -f(x2_new) / f(x1_new)
 w2_over_w1 = 1. / w1_over_w2
-print('w1_over_w2={}'.format(w1_over_w2))
-print('w2_over_w1={}'.format(w2_over_w1))
+# print('w1_over_w2={}'.format(w1_over_w2))
+# print('w2_over_w1={}'.format(w2_over_w1))
 
 # Now solve for w1 and w2 separately
 w1_new = 1. / 6 / (1 + w2_over_w1)
@@ -206,67 +188,3 @@ print('---')
 for eqn in eqns:
     verified = eqn.subs({w1:w1_new, w2:w2_new, x1:x1_new, x2:x2_new})
     print('verified = {}, should be 0.'.format(verified))
-
-sys.exit(0)
-
-# We should be able to derive other solutions by choosing two values
-# somewhat arbitrarily:
-# 1.) Set xi = w2/w1
-# 2.) x2_new = r2 + dx
-# where r2 = x2_soln is the second root above, and dx is a small
-# distance, by first computing the right-hand side:
-# sigma := -xi * (r2 + dx) * (r2 - r1 + dx) * dx.
-# and then finding the root x of
-# x * (x-r1) * (x-r2) - sigma = 0
-# which is closest to r1
-# Note: For the baseline solution, xi = 4*math.sqrt(21)/25 + 31./25 ~ 1.973
-xi = 2.4
-dx = .01
-x1_old = float(x1_soln.evalf())
-x2_new = float(x2_soln.evalf() + dx)
-# sigma = float((-xi * x2_new * (x2_new - x1_soln.evalf()) * dx))
-sigma = -xi * x2_new * (15*x2_new**2 - 9*x2_new + 1)
-
-print('---')
-print('xi={}'.format(xi))
-print('sigma={}'.format(sigma))
-print('dx={}'.format(dx))
-print('x2_new={}'.format(x2_new))
-print('x1_old={}'.format(x1_old))
-
-(sol, infodict, iflag, mesg) = fsolve(mypoly,
-                                         x1_old,
-                                         args=sigma,
-                                         full_output=True)
-
-# Once xi is chosen, w1 and w2 are given immediately in terms of xi:
-x1_new = sol[0]
-w1_new = (1. / 6) / (xi+1)
-w2_new = (xi / 6) / (xi+1)
-
-if iflag != 1:
-    print(mesg)
-else:
-    print('---')
-    print('Final residual = {}'.format(infodict['fvec']))
-    print('Number of function evaluations = {}'.format(infodict['nfev']))
-    print('w1_new = {}, x1_new = {},\nw2_new = {}, x2_new = {}'.format(w1_new, x1_new,
-                                                                       w2_new, x2_new))
-    # Check terms of the sum, they should sum to zero.
-    term1 = w1_new * x1_new * (15*x1_new**2 - 9*x1_new + 1)
-    term2 = w2_new * x2_new * (15*x2_new**2 - 9*x2_new + 1)
-    print('---')
-    print('term1 = {}'.format(term1))
-    print('term2 = {}'.format(term2))
-    print('term1 + term2 = {}'.format(term1 + term2))
-
-    # Print to verify inputs.
-    print('---')
-    for eqn in eqns:
-        print('{}'.format(eqn))
-
-    # Check that this new "solution" satisfies the original equations...
-    print('---')
-    for eqn in eqns:
-        verified = eqn.subs({w1:w1_new, w2:w2_new, x1:x1_new, x2:x2_new})
-        print('verified = {}, should be 0.'.format(verified))
