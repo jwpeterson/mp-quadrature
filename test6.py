@@ -131,7 +131,8 @@ print('eta2 - (1./360 + 2 * eta3)={} (should be zero)'.format(eta2 - (Fraction(1
 # Choose x2=alpha, where x2 is close to the analytical root, x2_soln
 pert = np.random.uniform(low=-.022, high=.022)
 print('---')
-print('pert={}'.format(pert))
+print('Computing arbitrary solution numerically')
+# print('pert={}'.format(pert))
 alpha = float(x2_soln) + pert
 
 # Compute sigma based on alpha
@@ -143,7 +144,7 @@ sigma = f(alpha) / g(alpha)
 roots = np.roots([15*sigma, -(9*sigma + 6), (sigma + 4), -0.5])
 print('roots={}'.format(roots))
 
-# Find root which is closes to the analytical solution's x1 value
+# Find root which is closest to the analytical solution's x1 value
 x1_new = min(roots, key=lambda x : abs(x - float(x1_soln)))
 
 # Exit if we failed to find a real root
@@ -151,13 +152,7 @@ if not np.isreal(x1_new):
     print('Imaginary root found, try different initial guess.')
     sys.exit(1)
 
-print('Computing arbitrary solution numerically')
 x2_new = alpha
-
-# Check for x1 ~ x2
-if (np.abs(x1_new - x2_new) < 1.e-9):
-    print('Error: nonlinear solver converged to invalid solution, x1=x2')
-    sys.exit(1)
 
 # Now solve for the ratio w1/w2
 w1_over_w2 = -f(x2_new) / f(x1_new)
