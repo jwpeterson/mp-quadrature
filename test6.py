@@ -19,16 +19,6 @@ def f(x):
 def g(x):
     return x * (15*x**2 - 9*x + 1)
 
-def myfunc(xvec, *args):
-    sigma = args[0]
-    x = xvec[0]
-
-    # f(x_1) - sigma * g(x_1) = 0
-    resid = f(x) - sigma * g(x)
-
-    # print ('resid={}, type(resid)={}'.format(resid, type(resid)))
-    return resid
-
 # Create sympy objects for the dofs of this rule.
 w1, x1, w2, x2 = sympify('w1, x1, w2, x2')
 
@@ -84,13 +74,14 @@ print('---')
 print('w1 = {}'.format(w1_soln))
 print('w2 = {}'.format(w2_soln))
 w_ratio = simplify(w2_soln/w1_soln)
-print('Baseline solution, ratio of weights w2/w1 = {} ~ {}'.format(w_ratio, w_ratio.evalf()))
+# print('Baseline solution, ratio of weights w2/w1 = {} ~ {}'.format(w_ratio, w_ratio.evalf()))
 
 # Compute the "eta" variables based on this solution (see also
 # test3.py for more information).
 x1_soln = (9 + sqrt(21)) / 30
 x2_soln = (9 - sqrt(21)) / 30
 
+print('---')
 print('w1 ~ {}'.format(w1_soln.evalf()))
 print('w2 ~ {}'.format(w2_soln.evalf()))
 print('x1 ~ {}'.format(x1_soln.evalf()))
@@ -100,10 +91,10 @@ eta1 = simplify(w1_soln*x1_soln + w2_soln*x2_soln)
 eta2 = simplify(w1_soln*x1_soln**2 + w2_soln*x2_soln**2)
 eta3 = simplify(w1_soln*x1_soln**3 + w2_soln*x2_soln**3)
 
-print('---')
-print('eta1 = {}'.format(eta1))
-print('eta2 = {}'.format(eta2))
-print('eta3 = {}'.format(eta3))
+# print('---')
+# print('eta1 = {}'.format(eta1))
+# print('eta2 = {}'.format(eta2))
+# print('eta3 = {}'.format(eta3))
 
 # Check that
 # eta1 = 1/40 + 3*eta3
@@ -138,28 +129,29 @@ print('eta2 - (1./360 + 2 * eta3)={} (should be zero)'.format(eta2 - (Fraction(1
 # for w1 and w2 separately.
 
 # Choose x2=alpha, where x2 is close to the analytical root, x2_soln
-alpha = float(x2_soln) + np.random.uniform(low=-.03, high=.03)
+pert = np.random.uniform(low=-.022, high=.022)
+print('---')
+print('pert={}'.format(pert))
+alpha = float(x2_soln) + pert
 
 # Compute sigma based on alpha
 sigma = f(alpha) / g(alpha)
 
-# Call fsolve to solve for x1, using an initial guess which is close to the
-# analytical value of x1.
-(sol, infodict, iflag, mesg) = fsolve(myfunc,
-                                      float(x1_soln),
-                                      args=sigma,
-                                      full_output=True)
+# Instead of calling a full nonlinear solver, get all the roots of the cubic
+# equation, and choose exactly the one that you want. The input to the roots
+# function is the polynomial coefficients, starting with the highest power of x.
+roots = np.roots([15*sigma, -(9*sigma + 6), (sigma + 4), -0.5])
+print('roots={}'.format(roots))
 
-# If the solve failed, print the reason and exit.
-if iflag != 1:
-    print(mesg)
+# Find root which is closes to the analytical solution's x1 value
+x1_new = min(roots, key=lambda x : abs(x - float(x1_soln)))
+
+# Exit if we failed to find a real root
+if not np.isreal(x1_new):
+    print('Imaginary root found, try different initial guess.')
     sys.exit(1)
 
-print('---')
 print('Computing arbitrary solution numerically')
-# print('Final residual = {}'.format(infodict['fvec']))
-# print('Number of function evaluations = {}'.format(infodict['nfev']))
-x1_new = sol[0]
 x2_new = alpha
 
 # Check for x1 ~ x2
