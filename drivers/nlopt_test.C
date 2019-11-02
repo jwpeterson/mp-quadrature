@@ -866,7 +866,7 @@ int main(int argc, char ** argv)
           //   };
         }
 
-      // degree=3 rules with 7 QPs. Many solutions found for this
+      // degree=3 rules with 7 QPs. Many PB solutions found for this
       // case, even though only a *single* solution found for
       // (1,1,1,0,0) case.
       if (r.has_orbits(1,1,0,1,0))
