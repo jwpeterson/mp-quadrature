@@ -28,11 +28,8 @@ eqns.append(Fraction(1,27)*wc + wm*(3*xm**3 - 3*xm**2 + xm) - Fraction(1,60))
 # for eqn in eqns:
 #     print('{}'.format(eqn))
 
-# Verify that some solutions found numerically satisfy the governing equations.
-# It seems to me that the solution should be unique, but for some reason my code
-# finds multiple solutions, and I think this is not correct... And indeed, either
-# my governing equations above are wrong or they are wrong in the code, because
-# the numerical solutions from the code don't satisfy these governing equations.
+# The numerical solutions below, which are from my C++ code, don't
+# satisfy these governing equations.  I'm not sure why this is.
 # (Apparently they do integrate exactly all polynomials of the required degree,
 # so I'm leaning towards the equations above being wrong in some way, but then
 # it is interesting that they *do* lead to a different quadrature rule solution.)
@@ -61,16 +58,20 @@ eqns.append(Fraction(1,27)*wc + wm*(3*xm**3 - 3*xm**2 + xm) - Fraction(1,60))
 #     print('verified = {}, should be 0.'.format(verified))
 
 # Recipe for generating an arbitrary, valid solution:
-# 1.) Let xm = alpha, where
-# (9 + sqrt(21))/30 ~ 0.45275 < alpha < 0.5
-alpha = .499
-# 2.) Compute other values directly, based on alpha
-wm_numerical = 1. / 180 / alpha / (6*alpha**2 - 4*alpha + 2./3)
-wv_numerical = 1./24 - 1. / 120 / alpha
+# .) 0 < alpha <= 1/2,
+# .) alpha != 1/3
+# .) Rule is PB if alpha > (9 + sqrt(21))/30 ~ 0.45275, otherwise, rule is NB.
+# .) If alpha=1/2, median orbit conservatively degnerates to edge (midpoint) orbit.
+alpha = .5
+# wm_numerical = 1. / 180 / alpha / (6*alpha**2 - 4*alpha + 2./3) # equivalent!
+# wv_numerical = 1./24 - 1. / 120 / alpha # equivalent!
+wm_numerical = 1. / 1080 / alpha / (alpha - 1./3)**2
+wv_numerical = 1./24 * (1. - 1. / 5 / alpha)
 wc_numerical = 1./2 - 3*wm_numerical - 3*wv_numerical
 
 print('---')
-print('Checking solution ({},{},{},{})'.format(wc_numerical, wv_numerical, wm_numerical, alpha))
+print('Checking solution (wc={},wv={},wm={},xm={})'.format
+      (wc_numerical, wv_numerical, wm_numerical, alpha))
 for eqn in eqns:
     verified = eqn.subs([(wc, wc_numerical),
                          (wv, wv_numerical),
