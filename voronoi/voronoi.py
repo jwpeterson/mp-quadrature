@@ -67,7 +67,9 @@ def f2hex(f2rgb, f):
 # filename = 'quad_2d_p03_Ro3_11010_07QP_third_equilateral.csv'
 # filename = 'quad_2d_p03_Ro3_11100_07QP_equilateral.csv'
 # Case I: alpha < (9 - sqrt(21))/30 ~ .14725 -> wv negative
-filename = 'quad_2d_p03_Ro3_11010_07QP_CaseI_NB_equilateral.csv'
+# filename = 'quad_2d_p03_Ro3_11010_07QP_CaseI_NB_equilateral.csv'
+# Case II: .14725 < alpha < 0.2 -> wc _and_ wv negative
+filename = 'quad_2d_p03_Ro3_11010_07QP_CaseII_NB_equilateral.csv'
 
 # d=4
 # filename = 'quad_2d_p04_06QP_equilateral.csv'
