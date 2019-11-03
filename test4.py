@@ -43,14 +43,32 @@ for vals in all_vals:
         verified = eqn.subs([(wc, vals[0]), (wv, vals[1]), (wm, vals[2]), (xm, vals[3])])
         print('verified = {}, should be 0.'.format(verified))
 
-# Recipe for generating an arbitrary, valid solution:
-# .) 0 < alpha <= 1/2,
-# .) alpha != 1/3
-# .) Rule is PB if alpha > (9 + sqrt(21))/30 ~ 0.45275, otherwise, rule is NB.
+# Choose alpha such that:
+# 0 < alpha <= 1/2; alpha != 1/3
+
+# Notes:
+# .) Rule is PB if alpha > (9 + sqrt(21))/30 ~ 0.45275, otherwise,
+#    rule is NB. See different cases below for more details.
 # .) If alpha=1/2, median orbit conservatively degnerates to edge (midpoint) orbit.
-alpha = .5
-# wm_numerical = 1. / 180 / alpha / (6*alpha**2 - 4*alpha + 2./3) # equivalent!
-# wv_numerical = 1./24 - 1. / 120 / alpha # equivalent!
+# .) If (9 - sqrt(21))/30 ~ .14725 < alpha < 1/5, then vertex weight
+#    *and* median weights are negative.
+
+# Case I: alpha < (9 - sqrt(21))/30 ~ .14725 -> wv negative
+# Ex: wc=0.114795918367,wv=-0.0416666666667,wm=0.170068027211,xm=0.1
+
+# Case II: .14725 < alpha < 0.2 -> wc _and_ wv negative
+# Ex: wc=-0.142485822306,wv=-0.00462962962963,wm=0.218791570398,xm=0.18
+
+# Case III: alpha = 0.2 -> Reduces "classical" 4 QP case with wc<0
+# Ex: wc=-0.28125,wv=0.0,wm=0.260416666667,xm=0.2
+
+# Case IV: 0.2 < alpha < (9 + sqrt(21))/30 ~ 0.45275 -> wc negative
+# wc blows up to negative infinity as xm -> 1/3.
+# Ex: wc=-7.875,wv=0.0138888888889,wm=2.77777777778,xm=0.3
+
+# Case V: 0.45275 < alpha <= 0.5 -> All weights positive
+# Ex: wc=0.15805785124,wv=0.0243055555556,wm=0.0896751606979,xm=0.48
+alpha = .2
 wm_numerical = 1. / 1080 / alpha / (alpha - 1./3)**2
 wv_numerical = 1./24 * (1. - 1. / 5 / alpha)
 wc_numerical = 1./2 - 3*wm_numerical - 3*wv_numerical
