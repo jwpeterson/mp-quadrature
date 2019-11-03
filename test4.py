@@ -28,34 +28,20 @@ eqns.append(Fraction(1,27)*wc + wm*(3*xm**3 - 3*xm**2 + xm) - Fraction(1,60))
 # for eqn in eqns:
 #     print('{}'.format(eqn))
 
-# The numerical solutions below, which are from my C++ code, don't
-# satisfy these governing equations.  I'm not sure why this is.
-# (Apparently they do integrate exactly all polynomials of the required degree,
-# so I'm leaning towards the equations above being wrong in some way, but then
-# it is interesting that they *do* lead to a different quadrature rule solution.)
-# print('---')
-# for eqn in eqns:
-#     verified = eqn.subs([(wc, 1.9842138198894232087756355234257e-1),
-#                          (wv, 2.4695416925122307603625640854424e-2),
-#                          (wm, 7.5830789078563585437186508364720e-2),
-#                          (xm, 4.9102649835703920944141032123298e-1)])
-#     print('verified = {}, should be 0.'.format(verified))
+# Check the numerical solutions below, which are from my C++ code.
+all_vals = [
+    [1.98421381988942e-1, 2.46954169251223e-2, 7.58307890785635e-2, 4.91026498357039e-1],
+    [2.18217389369796e-1, 2.49179057570057e-2, 6.90096311197288e-2, 4.97549244286278e-1],
+    [5.40290404129568e-2, 2.35569673182140e-2, 1.25100019210800e-1, 4.60158568786255e-1],
+    [2.24616398129737e-1, 2.49952695495363e-2, 6.67992644072178e-2, 4.99858126753552e-1]
+]
 
-# print('---')
-# for eqn in eqns:
-#     verified = eqn.subs([(wc, 2.1821738936979620876016536190816e-1),
-#                          (wv, 2.4917905757005788534116782239244e-2),
-#                          (wm, 6.9009631119728808545828097124702e-2),
-#                          (xm, 4.9754924428627855803597412887029e-1)])
-#     print('verified = {}, should be 0.'.format(verified))
-
-# print('---')
-# for eqn in eqns:
-#     verified = eqn.subs([(wc, 5.4029040412956874973240568941493e-2),
-#                          (wv, 2.3556967318214072640266582461888e-2),
-#                          (wm, 1.2510001921080030236865322789095e-1),
-#                          (xm, 4.6015856878625571724228393577505e-1)])
-#     print('verified = {}, should be 0.'.format(verified))
+for vals in all_vals:
+    print('---')
+    print('Checking solution (wc={},wv={},wm={},xm={})'.format(vals[0], vals[1], vals[2], vals[3]))
+    for eqn in eqns:
+        verified = eqn.subs([(wc, vals[0]), (wv, vals[1]), (wm, vals[2]), (xm, vals[3])])
+        print('verified = {}, should be 0.'.format(verified))
 
 # Recipe for generating an arbitrary, valid solution:
 # .) 0 < alpha <= 1/2,
