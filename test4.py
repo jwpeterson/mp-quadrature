@@ -70,7 +70,7 @@ for vals in all_vals:
 # Ex: wc=0.15805785124,wv=0.0243055555556,wm=0.0896751606979,xm=0.48
 alpha = .2
 wm_numerical = 1. / 120 / alpha / (3*alpha - 1)**2
-wv_numerical = 1./24 * (1. - 1. / 5 / alpha)
+wv_numerical = (5. * alpha - 1) / (120 * alpha)
 wc_numerical = 1./2 - 3*wm_numerical - 3*wv_numerical
 
 print('---')
