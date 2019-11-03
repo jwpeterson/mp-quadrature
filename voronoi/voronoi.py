@@ -72,9 +72,9 @@ def f2hex(f2rgb, f):
 # filename = 'quad_2d_p03_Ro3_11010_07QP_CaseII_NB_equilateral.csv'
 # Case III: Same as 4 QPs case
 # Case IV: 0.2 < alpha < (9 + sqrt(21))/30 ~ 0.45275 -> wc negative
-filename = 'quad_2d_p03_Ro3_11010_07QP_CaseIV_NB_equilateral.csv'
+# filename = 'quad_2d_p03_Ro3_11010_07QP_CaseIV_NB_equilateral.csv'
 # Case V: 0.45275 < alpha <= 0.5 -> All weights positive
-filename = 'quad_2d_p03_Ro3_11010_07QP_CaseV_NB_equilateral.csv'
+filename = 'quad_2d_p03_Ro3_11010_07QP_CaseV_PB_equilateral.csv'
 
 # d=4
 # filename = 'quad_2d_p04_06QP_equilateral.csv'
