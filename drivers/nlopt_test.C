@@ -187,7 +187,7 @@ int main(int argc, char ** argv)
 
   // d==3, dim==4. Best known PI rule is a conical product rule with 4 QP.
   // -d3 -r 1,0,0,0,1 # 4 QP <-- No PI solution possible (-ve wt soln only)
-  // -d3 -r 0,0,2,0,0 # 6 QP <-- No solutions at all (I think we can prove this.)
+  // -d3 -r 0,0,2,0,0 # 6 QP <-- No solutions.
   // -d3 -r 0,0,1,1,0 # 6 QP <-- Analysis finds soln (we=1/60, xe=1/2, wm=3/20, xm=1/6).
   // -d3 -r 0,0,0,2,0 # 6 QP <-- Many solutions found and we can show the possibility of infinitely many solutions.
   // -d3 -r 1,1,1,0,0 # 7 QP <-- 1 solution with xe=1/2 can be found analytically, numerically this is also the only solution found.
@@ -863,6 +863,30 @@ int main(int argc, char ** argv)
           //     1.6613607984476272598242131053447e-1,
           //     1.8079751368544469811524040371505e-2,
           //     4.9557369943661873640529541830763e-1
+          //   };
+
+          // .) This solution has approximately equal weights of 1/12.
+          // Since this case is underdetermined, I don't think it's
+          // possible to get 32 "exact" digits? The Jacobian should
+          // actually have a zero eigenvalue, but for some reason I
+          // don't get a zero pivot, possibly because we never
+          // actually divide by the zero pivot?
+          // x =
+          //   {
+          //     8.3333333331533405406739119454671e-2,
+          //     4.4633385587086572320033069231352e-1,
+          //     8.3333333335133261259927547211996e-2,
+          //     1.2648450577767170386910697029396e-1
+          //   };
+
+          // .) This is the so-called "min x1" solution, i.e. choosing alpha
+          // such that x1 is minimized.
+          // x =
+          //   {
+          //     9.9522225632086485702139108470380e-2,
+          //     4.4548049546731721270412942873631e-1,
+          //     6.7144441034580180964527558196287e-2,
+          //     1.0903764052115264468087737089365e-1
           //   };
         }
 

@@ -60,6 +60,8 @@ def f2hex(f2rgb, f):
 # filename = 'quad_2d_p03_Ro3_00110_06QP_equilateral.csv'
 # filename = 'quad_2d_p03_Ro3_00110_06QP_Case2a_equilateral.csv'
 # filename = 'quad_2d_p03_Ro3_00110_06QP_Case2b_equilateral.csv' # negative weights
+# filename = 'quad_2d_p03_Ro3_00020_06QP_equal_weights_equilateral.csv'
+filename = 'quad_2d_p03_Ro3_00020_06QP_min_x1_equilateral.csv'
 
 # 7 QPs
 # filename = 'quad_2d_p03_Ro3_11010_07QP_equilateral.csv'
@@ -74,7 +76,7 @@ def f2hex(f2rgb, f):
 # Case IV: 0.2 < alpha < (9 + sqrt(21))/30 ~ 0.45275 -> wc negative
 # filename = 'quad_2d_p03_Ro3_11010_07QP_CaseIV_NB_equilateral.csv'
 # Case V: 0.45275 < alpha <= 0.5 -> All weights positive
-filename = 'quad_2d_p03_Ro3_11010_07QP_CaseV_PB_equilateral.csv'
+# filename = 'quad_2d_p03_Ro3_11010_07QP_CaseV_PB_equilateral.csv'
 
 # d=4
 # filename = 'quad_2d_p04_06QP_equilateral.csv'
@@ -210,7 +212,14 @@ cmap = cm.get_cmap('RdYlGn')
 
 # Create a numerical value -> color mapping based on the quadrature weights.
 # We use f2rgb when calling 'f2hex', see below.
-norm = colors.Normalize(vmin=np.min(wts), vmax=np.max(wts))
+minw = np.min(wts)
+maxw = np.max(wts)
+# If the weights are approximately equal, use a default range, since
+# otherwise the text on the colorbar is formatted strangely.
+if np.abs(maxw - minw) < 1.e-6:
+    minw = 0
+    maxw = 1./2
+norm = colors.Normalize(vmin=minw, vmax=maxw)
 f2rgb = cm.ScalarMappable(norm=norm, cmap=cmap)
 
 # To create a "bounded" Voronoi region, we first reflect the original
