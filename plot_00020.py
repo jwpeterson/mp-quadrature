@@ -139,3 +139,23 @@ ax1.set_ylabel(r'$x_2$')
 ax1.set_xlim([0.443, 0.505])
 # ax1.axis('equal')
 plt.savefig('plot_00020_x1.pdf', format='pdf')
+
+# Plot (alpha, x1(alpha))
+fig = plt.figure()
+ax1 = fig.add_subplot(111)
+# Plot line x=1/6
+ax1.plot([1./6,1./6], [0.44,0.55],color='lightgray', linestyle='--', linewidth=1)
+# Plot line x=0
+ax1.plot([0.,0.],[0.44,0.55], color='lightgray', linestyle='--', linewidth=1)
+# Plot line y=0.5
+ax1.plot([-0.1,0.18], [0.5,0.5], color='lightgray', linestyle='--', linewidth=1)
+ax1.plot(alphas[0:end], x1[0:end], color='black', marker=None)
+ax1.plot([0], [r1], color='black', linestyle='', marker='o')
+ax1.plot([1./6], [0.5], color='black', linestyle='', marker='o')
+ax1.set_xlabel(r'$\alpha$')
+ax1.set_ylabel(r'$x_1(\alpha)$')
+ax1.text(0.+.002, r1+.001, r'$\alpha = 0$')
+ax1.text(1./6-.018, 0.5-.004, r'$\alpha = \frac{1}{6}$')
+ax1.set_xlim([-0.01, 0.175])
+ax1.set_ylim([0.443, 0.505])
+plt.savefig('plot_00020_x1_vs_alpha.pdf', format='pdf')
