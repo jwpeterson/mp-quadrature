@@ -331,6 +331,12 @@ ax1 = fig.add_subplot(111)
 # ax1.plot([alpha_weights_equal,alpha_weights_equal], [0.,0.2],color='lightgray', linestyle='--', linewidth=1)
 ax1.plot(min_root_alphas, min_root_w1, color='blue', marker=None, linewidth=2, label=r'$w_1$')
 ax1.plot(min_root_alphas, min_root_w2, color='red', marker=None, linewidth=2, label=r'$w_2$')
+
+# Plot second half of data, which is just the other weight due to symmetry, and
+# we can use the min_root_x1 for the x-values for the same reason.
+ax1.plot(min_root_x1, min_root_w2, color='blue', marker=None, linewidth=2)
+ax1.plot(min_root_x1, min_root_w1, color='red', marker=None, linewidth=2)
+
 ax1.set_xlabel(r'$\alpha$')
 # ax1.set_xlim([-0.01, 0.175])
 # ax1.set_ylim([0.01, 0.155])
