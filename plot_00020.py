@@ -68,12 +68,12 @@ min_x1 = result.fun
 # The solution is:
 # min x1(alpha) occurs for alpha = 1.090376405285E-01
 # min x1(alpha) = 4.454804954673E-01
-print('min x1(alpha) occurs for alpha = {:.12E}'.format(min_alpha))
-print('min x1(alpha) = {:.12E}'.format(min_x1))
+# print('min x1(alpha) occurs for alpha = {:.12E}'.format(min_alpha))
+# print('min x1(alpha) = {:.12E}'.format(min_x1))
 # Compute the corresponding weights at the (alpha, x1(alpha)) solution
 w1, w2 = compute_weights(min_x1, min_alpha)
-print('w1 (min x1) ={}'.format(w1))
-print('w2 (min x1) ={}'.format(w2))
+# print('w1 (min x1) ={}'.format(w1))
+# print('w2 (min x1) ={}'.format(w2))
 
 ################################################################################
 
@@ -172,3 +172,18 @@ ax1.text(min_alpha-.01, min_x1+.002, r'$\alpha \approx 0.109$')
 ax1.set_xlim([-0.01, 0.175])
 ax1.set_ylim([0.443, 0.505])
 plt.savefig('plot_00020_x1_vs_alpha.pdf', format='pdf')
+
+# Plot w1 and w2 vs. alpha. Do they cross somewhere?
+fig = plt.figure()
+ax1 = fig.add_subplot(111)
+# Plot line y=1/12. The weights are symmetric about this line.
+ax1.plot([-0.1,0.18], [1./12,1./12], color='lightgray', linestyle='--', linewidth=1)
+# Plot line x=1/8. For this value of alpha, the weights are almost equal, but not quite.
+# ax1.plot([1./8,1./8], [0.,0.15],color='lightgray', linestyle='--', linewidth=1)
+ax1.plot(alphas, w1, color='blue', marker=None, linewidth=2, label=r'$w_1$')
+ax1.plot(alphas, w2, color='red', marker=None, linewidth=2, label=r'$w_2$')
+ax1.set_xlabel(r'$\alpha$')
+ax1.set_xlim([-0.01, 0.175])
+ax1.set_ylim([0.01, 0.155])
+ax1.legend()
+plt.savefig('plot_00020_weights_vs_alpha.pdf', format='pdf')
