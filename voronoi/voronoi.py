@@ -60,7 +60,8 @@ def f2hex(f2rgb, f):
 # filename = 'quad_2d_p03_Ro3_00110_06QP_equilateral.csv'
 # filename = 'quad_2d_p03_Ro3_00110_06QP_Case2a_equilateral.csv'
 # filename = 'quad_2d_p03_Ro3_00110_06QP_Case2b_equilateral.csv' # negative weights
-filename = 'quad_2d_p03_Ro3_00020_06QP_equal_weights_equilateral.csv'
+# filename = 'quad_2d_p03_Ro3_00020_06QP_equal_weights_equilateral.csv'
+filename = 'quad_2d_p03_Ro3_00020_06QP_min_x1_equilateral.csv'
 
 # 7 QPs
 # filename = 'quad_2d_p03_Ro3_11010_07QP_equilateral.csv'
