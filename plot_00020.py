@@ -192,8 +192,11 @@ for i in xrange(len(alphas)):
 ################################################################################
 
 # Starting from alpha=r2 and taking min roots, we can recover a branch
-# of NI rules instead.
-min_root_alphas = np.linspace(1.e-6, r2 - 1.e-6)
+# of NI rules instead. There is a singularity at alpha=min_alpha where
+# one set of weights blows up to +infty while the other set blows up to -infty.
+min_root_alphas = np.linspace(1.e-6, min_alpha - 1.e-3)
+#min_root_alphas2 = np.linspace(min_alpha + 1.e-2, r2 - 1.e-6)
+# min_root_alphas = np.concatenate((min_root_alphas1, min_root_alphas2))
 min_root_w1 = np.zeros(len(min_root_alphas))
 min_root_w2 = np.zeros(len(min_root_alphas))
 min_root_x1 = np.zeros(len(min_root_alphas))
@@ -296,16 +299,17 @@ plt.savefig('plot_00020_weights_vs_alpha.pdf', format='pdf')
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
 # Plot dashed line for y=x
-ax1.plot([0,1], [0,1], color='lightgray', linestyle='--', linewidth=1)
+# ax1.plot([0,1], [0,1], color='lightgray', linestyle='--', linewidth=1)
 # Plot dashed line for y=0
 ax1.plot([0,1], [0,0], color='lightgray', linestyle='--', linewidth=1)
 # Plot dashed line for x=0
 ax1.plot([0,0], [0,1], color='lightgray', linestyle='--', linewidth=1)
 # Plot the data, which forms a symmetric path about the origin
-ax1.plot(min_root_alphas, min_root_x1, color='black', linestyle='--', marker=None)
+ax1.plot(min_root_alphas, min_root_x1, color='black', linestyle='-', marker=None)
 # Plot single points
 ax1.plot([0], [r2], color='black', linestyle='', marker='o')
 ax1.plot([r2], [0], color='black', linestyle='', marker='o')
+ax1.plot([min_alpha], [min_alpha], color='black', linestyle='', marker='o', markerfacecolor='white')
 # Add plot labels
 ax1.text(0+.002, r2+.001, r'NB, $\alpha = 0$')
 ax1.text(r2-.04, 0+.001, r'NB, $\alpha = r_2$')
@@ -315,3 +319,18 @@ ax1.set_ylim([-0.001, r2 + .01])
 ax1.set_xlabel(r'$\alpha$')
 ax1.set_ylabel(r'$x_1(\alpha)$')
 plt.savefig('plot_00020_min_root.pdf', format='pdf')
+
+# Plot weights on "min" root NI/NB branch (w1 vs. alpha, w2 vs. alpha)
+fig = plt.figure()
+ax1 = fig.add_subplot(111)
+# Plot line y=1/12. The weights are symmetric about this line.
+# ax1.plot([-0.1,0.18], [1./12,1./12], color='lightgray', linestyle='--', linewidth=1)
+# Plot vertical line for the value of alpha where the weights are equal.
+# ax1.plot([alpha_weights_equal,alpha_weights_equal], [0.,0.2],color='lightgray', linestyle='--', linewidth=1)
+ax1.plot(min_root_alphas, min_root_w1, color='blue', marker=None, linewidth=2, label=r'$w_1$')
+ax1.plot(min_root_alphas, min_root_w2, color='red', marker=None, linewidth=2, label=r'$w_2$')
+ax1.set_xlabel(r'$\alpha$')
+# ax1.set_xlim([-0.01, 0.175])
+# ax1.set_ylim([0.01, 0.155])
+ax1.legend()
+plt.savefig('plot_00020_min_root_weights_vs_alpha.pdf', format='pdf')
