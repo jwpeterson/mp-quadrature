@@ -10,14 +10,12 @@ rcParams['font.serif'] = ['Computer Modern Roman']
 rcParams['text.usetex'] = True
 
 """
-For configuration (0,0,0,2,0), plots the curve:
-
-(w1(alpha), w2(alpha))
-
-for r2-eps < alpha < r2+eps, where r2 = (9-sqrt(21))/30 and eps ~ .022
+For configuration (0,0,0,2,0), plots x1(alpha) vs. alpha
 """
 
-# It's convenient to have Python functions for these polynomials.
+"""
+It's convenient to have Python functions for these polynomials.
+"""
 def f(x):
     return 6*x**2 - 4*x + 0.5
 
@@ -46,7 +44,7 @@ Given x1 and x2, computes the weights w1 and w2
 """
 def compute_weights(x1, x2):
     w1_over_w2 = -f(x2) / f(x1)
-    # w1_over_w2 = -g(x2) / g(x1)
+    # w1_over_w2 = -g(x2) / g(x1) # Same
     w2_over_w1 = 1. / w1_over_w2
     w1 = 1. / 6 / (1 + w2_over_w1)
     w2 = 1. / 6 / (1 + w1_over_w2)
