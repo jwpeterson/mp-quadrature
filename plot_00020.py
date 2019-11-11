@@ -80,23 +80,7 @@ x1 = np.zeros(len(alphas))
 end = len(alphas)
 for i in xrange(len(alphas)):
     alpha = alphas[i]
-    # Compute sigma based on alpha
-    sigma = f(alpha) / g(alpha)
-    # Compute roots of "characteristic" eqn.
-    roots = np.roots([15*sigma, -(9*sigma + 6), (sigma + 4), -0.5])
-    # print('roots={}'.format(roots))
-    # Find root which is closest to r1
-    candidate_x1 = min(roots, key=lambda x : abs(x - r1))
-
-    # Don't accept candidate result if root is imaginary or outside the reference element.
-    if (not np.isreal(candidate_x1)) or (candidate_x1 > 0.5):
-        print('Invalid root = {} found for i={}, alpha={}, try smaller neighborhood around r2.'.format(candidate_x1, i, alpha))
-        # Record the last valid index and break out of the loop
-        end = i
-        break
-
-    # If we made it here, we accept the candidate solution
-    x1[i] = candidate_x1
+    x1[i] = compute_x1(alpha)
 
     # Now solve for the weights w1, w2. Result should be the same
     # regardless of whether we use the ratio of f's or g's to compute.
