@@ -73,21 +73,26 @@ result = minimize(compute_x1, 0.11, method='CG', \
 # Extract the min x1 value and the alpha where it occurs.
 min_alpha = result.x[0]
 min_x1 = result.fun
-
-# The solution is:
-# min x1(alpha) occurs for alpha = 1.090376405285E-01
-# min x1(alpha) = 4.454804954673E-01
-# print('min x1(alpha) occurs for alpha = {:.12E}'.format(min_alpha))
-# print('min x1(alpha) = {:.12E}'.format(min_x1))
 # Compute the corresponding weights at the (alpha, x1(alpha)) solution
 w1, w2 = compute_weights(min_x1, min_alpha)
-# print('w1 (min x1) ={}'.format(w1))
-# print('w2 (min x1) ={}'.format(w2))
+
+# The solution is:
+# w1=0.0995222256262
+# x1=0.445480495467
+# w2=0.0671444410405
+# x2=0.109037640529
+print('---')
+print('Min x1 solution:')
+print('w1={}'.format(w1))
+print('x1={}'.format(min_x1))
+print('w2={}'.format(w2))
+print('x2={}'.format(min_alpha))
 
 ################################################################################
 
-# Solve for the value of alpha which gives w1(alpha) = 1/12. Initial guess
-# is alpha=1/8 based on the graph of w1(alpha). The solution obtained numerically is:
+# Solve for the value of alpha which gives w1 = w2 = 1/12. Initial guess
+# is alpha=1/8 based on the graph of w1(alpha). The solution obtained
+# numerically is (note: x2=alpha):
 # w1=0.0833333333333
 # x1=0.446333855871
 # w2=0.0833333333333
