@@ -31,7 +31,7 @@ solution.
 def compute_x1(alpha, max_root=True):
     # Don't accept input values outside the range
     if (alpha <= 0.) or (alpha >= 0.5):
-        print('Invalid input, 0 < alpha < 0.5 is required.')
+        print('Invalid input, alpha={}; 0 < alpha < 0.5 is required.'.format(alpha))
         sys.exit(1)
 
     sigma = f(alpha) / g(alpha)
@@ -189,6 +189,29 @@ for i in xrange(len(alphas)):
     x1[i] = compute_x1(alpha)
     w1[i], w2[i] = compute_weights(x1[i], alpha)
 
+################################################################################
+
+# Starting from alpha=r2 and taking min roots, we can recover a branch
+# of NI rules instead.
+min_root_alphas = np.linspace(1.e-6, r2 - 1.e-6)
+min_root_w1 = np.zeros(len(min_root_alphas))
+min_root_w2 = np.zeros(len(min_root_alphas))
+min_root_x1 = np.zeros(len(min_root_alphas))
+
+for i in xrange(len(min_root_alphas)):
+    alpha = min_root_alphas[i]
+    min_root_x1[i] = compute_x1(alpha, max_root=False)
+    min_root_w1[i], min_root_w2[i] = compute_weights(min_root_x1[i], alpha)
+
+# print('min_root_w1={}'.format(min_root_w1))
+# print('min_root_x1={}'.format(min_root_x1))
+# print('min_root_w2={}'.format(min_root_w2))
+# print('min_root_x2={}'.format(min_root_alphas))
+
+################################################################################
+
+# Make plots
+
 # Plot (alpha, x1(alpha))
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
@@ -268,3 +291,27 @@ ax1.set_xlim([-0.01, 0.175])
 ax1.set_ylim([0.01, 0.155])
 ax1.legend()
 plt.savefig('plot_00020_weights_vs_alpha.pdf', format='pdf')
+
+# Plot "min" root NI/NB branch (alpha, x1(alpha))
+fig = plt.figure()
+ax1 = fig.add_subplot(111)
+# Plot dashed line for y=x
+ax1.plot([0,1], [0,1], color='lightgray', linestyle='--', linewidth=1)
+# Plot dashed line for y=0
+ax1.plot([0,1], [0,0], color='lightgray', linestyle='--', linewidth=1)
+# Plot dashed line for x=0
+ax1.plot([0,0], [0,1], color='lightgray', linestyle='--', linewidth=1)
+# Plot the data, which forms a symmetric path about the origin
+ax1.plot(min_root_alphas, min_root_x1, color='black', linestyle='--', marker=None)
+# Plot single points
+ax1.plot([0], [r2], color='black', linestyle='', marker='o')
+ax1.plot([r2], [0], color='black', linestyle='', marker='o')
+# Add plot labels
+ax1.text(0+.002, r2+.001, r'NB, $\alpha = 0$')
+ax1.text(r2-.04, 0+.001, r'NB, $\alpha = r_2$')
+ax1.axis('square')
+ax1.set_xlim([-0.001, r2 + .01])
+ax1.set_ylim([-0.001, r2 + .01])
+ax1.set_xlabel(r'$\alpha$')
+ax1.set_ylabel(r'$x_1(\alpha)$')
+plt.savefig('plot_00020_min_root.pdf', format='pdf')
