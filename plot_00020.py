@@ -2,6 +2,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 import sys
 from scipy.optimize import minimize
+from scipy.optimize import fsolve
 
 from matplotlib import rcParams
 rcParams['font.family'] = 'DejaVu Sans'
@@ -50,6 +51,14 @@ def compute_weights(x1, x2):
     w2 = 1. / 6 / (1 + w1_over_w2)
     return w1, w2
 
+"""
+Function used with fsolve to find alpha for which w1(alpha) = w2(alpha) = 1/12
+"""
+def residual(alpha):
+    x1 = compute_x1(alpha)
+    w1, w2 = compute_weights(x1, alpha)
+    return w1 - 1./12
+
 ################################################################################
 
 # Find the minimum value of x1(alpha). Interestingly, it does not
@@ -74,6 +83,36 @@ min_x1 = result.fun
 w1, w2 = compute_weights(min_x1, min_alpha)
 # print('w1 (min x1) ={}'.format(w1))
 # print('w2 (min x1) ={}'.format(w2))
+
+################################################################################
+
+# Solve for the value of alpha which gives w1(alpha) = 1/12. Initial guess
+# is alpha=1/8 based on the graph of w1(alpha). The solution obtained numerically is:
+# w1=0.0833333333333
+# x1=0.446333855871
+# w2=0.0833333333333
+# x2=0.126484505776
+(sol, infodict, iflag, mesg) = fsolve(residual, 1./8, full_output=True)
+alpha_weights_equal = 0
+if iflag == 1:
+    alpha_weights_equal = sol[0]
+    # print('Solution = {:.12E}'.format(alpha_weights_equal))
+    # print('Number of function evaluations = {}'.format(infodict['nfev']))
+    # print('Final residual norm = {}'.format(np.linalg.norm(infodict['fvec'])))
+
+    # Compute and print full solution for this value of alpha
+    x1_weights_equal = compute_x1(alpha_weights_equal)
+    w1, w2 = compute_weights(x1_weights_equal, alpha_weights_equal)
+    # Print current result
+    print('---')
+    print('Equal weights solution:')
+    print('w1={}'.format(w1))
+    print('x1={}'.format(x1_weights_equal))
+    print('w2={}'.format(w2))
+    print('x2={}'.format(alpha_weights_equal))
+else:
+    print('fsolve not converged.')
+
 
 ################################################################################
 
@@ -178,8 +217,8 @@ fig = plt.figure()
 ax1 = fig.add_subplot(111)
 # Plot line y=1/12. The weights are symmetric about this line.
 ax1.plot([-0.1,0.18], [1./12,1./12], color='lightgray', linestyle='--', linewidth=1)
-# Plot line x=1/8. For this value of alpha, the weights are almost equal, but not quite.
-# ax1.plot([1./8,1./8], [0.,0.15],color='lightgray', linestyle='--', linewidth=1)
+# Plot vertical line for the value of alpha where the weights are equal.
+ax1.plot([alpha_weights_equal,alpha_weights_equal], [0.,0.2],color='lightgray', linestyle='--', linewidth=1)
 ax1.plot(alphas, w1, color='blue', marker=None, linewidth=2, label=r'$w_1$')
 ax1.plot(alphas, w2, color='red', marker=None, linewidth=2, label=r'$w_2$')
 ax1.set_xlabel(r'$\alpha$')
