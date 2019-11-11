@@ -86,27 +86,6 @@ r2 = (9 - np.sqrt(21))/30
 
 ################################################################################
 
-# There should be a "symmetric" part for larger values of alpha > (9 +
-# sqrt(21))/30 as well. When searching for the correct root, we want
-# the one that is furthest from the input value alpha, not closest
-# to any fixed value.
-# alpha_vec = np.linspace(r1 + 1.e-6, .5 - 1.e-6)
-# for alpha in alpha_vec:
-#     x1 = compute_x1(alpha)
-#     w1, w2 = compute_weights(x1, alpha)
-#
-#     # Print current result
-#     print('---')
-#     print('w1={}'.format(w1))
-#     print('x1={}'.format(x1))
-#     print('w2={}'.format(w2))
-#     print('x2={}'.format(alpha))
-#
-# # Early
-# sys.exit(0)
-
-################################################################################
-
 # Find the minimum value of x1(alpha). Interestingly, it does not
 # seem to coincide with either of the limits alpha=0 or alpha=1/6.
 # method='L-BFGS-B'
@@ -184,8 +163,19 @@ for i in xrange(len(alphas)):
     x1[i] = compute_x1(alpha)
     w1[i], w2[i] = compute_weights(x1[i], alpha)
 
-# Print results
-# print('w1={}, w2={}'.format(w1, w2))
+# There is a "symmetric" part for larger values of alpha, i.e.
+# alpha > (9 + sqrt(21))/30
+symm_alphas = np.linspace(r1 + 1.e-6, .5 - 1.e-6)
+symm_w1 = np.zeros(len(symm_alphas))
+symm_w2 = np.zeros(len(symm_alphas))
+symm_x1 = np.zeros(len(symm_alphas))
+
+for i in xrange(len(symm_alphas)):
+    alpha = symm_alphas[i]
+    symm_x1[i] = compute_x1(alpha)
+    symm_w1[i], symm_w2[i] = compute_weights(symm_x1[i], alpha)
+
+# print('symm_x1={}'.format(symm_x1))
 
 # Plot results
 fig = plt.figure()
@@ -198,34 +188,6 @@ ax1.plot([0,.2],[0,.2], color='lightgray', linestyle='--', linewidth=1)
 ax1.plot([0,0],[0,.2], color='lightgray', linestyle='--', linewidth=1)
 # Plot line y=0
 ax1.plot([0,.2],[0,0], color='lightgray', linestyle='--', linewidth=1)
-
-# Plot main solutions (and symmetric solutions
-ax1.plot(w1, w2, color='black', marker=None)
-# ax1.plot(w2, w1, color='salmon', marker=None)
-
-# Plot other solutions.
-
-# The PI solution: should be on the curve since we are expanding about
-# the PI solution.
-ax1.plot([1./12 - np.sqrt(21)/168],
-         [1./12 + np.sqrt(21)/168], color='red', linestyle='', marker='o')
-
-# The PB/NB solution pair
-ax1.plot([(39 - np.sqrt(21))/240],
-         [(1 + np.sqrt(21))/240], color='blue', linestyle='', marker='o')
-ax1.plot([(1 - np.sqrt(21))/240],
-         [(39 + np.sqrt(21))/240], color='green', linestyle='', marker='o')
-
-# The PB solution without partner
-ax1.plot([1./60],
-         [3./20], color='khaki', linestyle='', marker='o')
-
-#ax1.set_xlim([0, 0.1])
-#ax1.set_ylim([0, 0.1])
-ax1.set_xlabel(r'$w_1$')
-ax1.set_ylabel(r'$w_2$')
-ax1.axis('equal')
-plt.savefig('plot_00020.pdf', format='pdf')
 
 # Plot (alpha, x1(alpha))
 fig = plt.figure()
@@ -254,6 +216,28 @@ ax1.set_xlim([-0.01, 0.175])
 ax1.set_ylim([0.443, 0.505])
 plt.savefig('plot_00020_x1_vs_alpha.pdf', format='pdf')
 
+# Instead of messing with the existing plot, plot the "symmetric" values separately
+fig = plt.figure()
+ax1 = fig.add_subplot(111)
+# Plot line y=1/6
+ax1.plot([0.4,0.51], [1./6,1./6], color='lightgray', linestyle='--', linewidth=1)
+# Plot line y=r2
+ax1.plot([0.4,0.51], [r2,r2], color='lightgray', linestyle='--', linewidth=1)
+# Plot line x=r1
+ax1.plot([r1,r1], [0.1,0.18], color='lightgray', linestyle='--', linewidth=1)
+# Plot line x=0.5
+ax1.plot([0.5,0.5], [0.1,0.18], color='lightgray', linestyle='--', linewidth=1)
+ax1.plot(symm_alphas, symm_x1, color='black', marker=None)
+ax1.plot([r1], [r2], color='black', linestyle='', marker='o')
+ax1.plot([0.5], [1./6], color='black', linestyle='', marker='o')
+ax1.text(r1+.002, r2+.0005, r'PI, $\alpha = r_1$')
+ax1.text(0.5 - .005, 1./6 - .002, r'PB, $\alpha = \frac{1}{2}$')
+ax1.set_xlim([0.4475, 0.505])
+ax1.set_ylim([0.146, 0.1676])
+ax1.set_xlabel(r'$\alpha$')
+ax1.set_ylabel(r'$x_1(\alpha)$')
+plt.savefig('plot_00020_weights_vs_alpha_2.pdf', format='pdf')
+
 # Plot w1 and w2 vs. alpha. Do they cross somewhere?
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
@@ -268,3 +252,4 @@ ax1.set_xlim([-0.01, 0.175])
 ax1.set_ylim([0.01, 0.155])
 ax1.legend()
 plt.savefig('plot_00020_weights_vs_alpha.pdf', format='pdf')
+
