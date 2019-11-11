@@ -878,6 +878,16 @@ int main(int argc, char ** argv)
           //     8.3333333335133261259927547211996e-2,
           //     1.2648450577767170386910697029396e-1
           //   };
+
+          // .) This is the so-called "min x1" solution, i.e. choosing alpha
+          // such that x1 is minimized.
+          // x =
+          //   {
+          //     9.9522225632086485702139108470380e-2,
+          //     4.4548049546731721270412942873631e-1,
+          //     6.7144441034580180964527558196287e-2,
+          //     1.0903764052115264468087737089365e-1
+          //   };
         }
 
       // degree=3 rules with 7 QPs. Many PB solutions found for this
