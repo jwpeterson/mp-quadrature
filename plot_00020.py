@@ -146,26 +146,6 @@ ax1.set_ylabel(r'$w_2$')
 ax1.axis('equal')
 plt.savefig('plot_00020.pdf', format='pdf')
 
-# Plot (x1(alpha), alpha)
-fig = plt.figure()
-ax1 = fig.add_subplot(111)
-# Plot line y=1/6
-ax1.plot([0.44,0.55],[1./6,1./6], color='lightgray', linestyle='--', linewidth=1)
-# Plot line y=0
-ax1.plot([0.44,0.55],[0.,0.], color='lightgray', linestyle='--', linewidth=1)
-# Plot line x=0.5
-# ax1.plot([0.5,0.5],[0,1./6], color='lightgray', linestyle='--', linewidth=1)
-ax1.plot(x1, alphas, color='black', marker=None)
-ax1.plot([r1], [0], color='black', linestyle='', marker='o')
-ax1.plot([0.5], [1./6], color='black', linestyle='', marker='o')
-ax1.text(r1+.001, 0.+.002, r'$\alpha = 0$')
-ax1.text(0.5-.003, 1./6-.015, r'$\alpha = \frac{1}{6}$')
-ax1.set_xlabel(r'$x_1$')
-ax1.set_ylabel(r'$x_2$')
-ax1.set_xlim([0.443, 0.505])
-# ax1.axis('equal')
-plt.savefig('plot_00020_x1.pdf', format='pdf')
-
 # Plot (alpha, x1(alpha))
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
