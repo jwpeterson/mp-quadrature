@@ -28,15 +28,34 @@ Given alpha, computes x1(alpha), throwing an error if an invalid
 value is obtained.
 """
 def compute_x1(alpha):
-    r1 = (9 + np.sqrt(21))/30 # We search for root closest to this value
+    # Don't accept input values outside the range
+    if (alpha <= 0.) or (alpha >= 0.5):
+        print('Invalid input, 0 < alpha < 0.5 is required.')
+        sys.exit(1)
+
     sigma = f(alpha) / g(alpha)
     roots = np.roots([15*sigma, -(9*sigma + 6), (sigma + 4), -0.5])
-    x1 = min(roots, key=lambda x : abs(x - r1))
 
-    # Error if result is imaginary or outside the reference element.
-    if (not np.isreal(x1)) or (x1 > 0.5):
+    # We want to pick the positive, real root which is in the interval
+    # [0, 1/2] and which is farthest from the input value of alpha. I didn't
+    # realize this before, but alpha itself should always be one of the roots?
+    # print('alpha={}'.format(alpha))
+    # print('roots={}'.format(roots))
+
+    # Return value
+    x1 = 0
+    found_x1 = False
+    for candidate_root in roots:
+        if np.isreal(candidate_root) and (np.abs(candidate_root - alpha) > 1.e-3) \
+           and (candidate_root > 0.) and (candidate_root < 0.5):
+            found_x1 = True
+            x1 = candidate_root
+            break
+
+    # Error if an acceptable root was not found.
+    if not found_x1:
         print('Invalid root = {} found for alpha={}.'.format(x1, alpha))
-        sys.exit(0)
+        sys.exit(1)
 
     return x1
 
@@ -58,6 +77,33 @@ def residual(alpha):
     x1 = compute_x1(alpha)
     w1, w2 = compute_weights(x1, alpha)
     return w1 - 1./12
+
+################################################################################
+
+# Some useful constants
+r1 = (9 + np.sqrt(21))/30
+r2 = (9 - np.sqrt(21))/30
+
+################################################################################
+
+# There should be a "symmetric" part for larger values of alpha > (9 +
+# sqrt(21))/30 as well. When searching for the correct root, we want
+# the one that is furthest from the input value alpha, not closest
+# to any fixed value.
+# alpha_vec = np.linspace(r1 + 1.e-6, .5 - 1.e-6)
+# for alpha in alpha_vec:
+#     x1 = compute_x1(alpha)
+#     w1, w2 = compute_weights(x1, alpha)
+#
+#     # Print current result
+#     print('---')
+#     print('w1={}'.format(w1))
+#     print('x1={}'.format(x1))
+#     print('w2={}'.format(w2))
+#     print('x2={}'.format(alpha))
+#
+# # Early
+# sys.exit(0)
 
 ################################################################################
 
@@ -121,8 +167,6 @@ else:
 
 ################################################################################
 
-r1 = (9 + np.sqrt(21))/30
-r2 = (9 - np.sqrt(21))/30
 # The curve goes from:
 # (x1,x2) = ((9 + np.sqrt(21))/30, 0) to
 # (x1,x2) = (1/2, 1/6)
@@ -139,13 +183,6 @@ for i in xrange(len(alphas)):
     alpha = alphas[i]
     x1[i] = compute_x1(alpha)
     w1[i], w2[i] = compute_weights(x1[i], alpha)
-
-    # Print current result
-    # print('---')
-    # print('w1={}'.format(w1[i]))
-    # print('x1={}'.format(x1[i]))
-    # print('w2={}'.format(w2[i]))
-    # print('x2={}'.format(alpha))
 
 # Print results
 # print('w1={}, w2={}'.format(w1, w2))
