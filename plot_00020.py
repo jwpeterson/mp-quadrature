@@ -183,34 +183,6 @@ for i in xrange(len(alphas)):
     x1[i] = compute_x1(alpha)
     w1[i], w2[i] = compute_weights(x1[i], alpha)
 
-# There is a second part of the curve for larger values of alpha, i.e.
-# alpha > (9 + sqrt(21))/30
-symm_alphas1 = np.linspace(min_x1 + 1.e-6, r1)
-symm_alphas2 = np.linspace(r1, .5 - 1.e-6)
-symm_alphas = np.concatenate((symm_alphas1,symm_alphas2))
-symm_w1 = np.zeros(len(symm_alphas))
-symm_w2 = np.zeros(len(symm_alphas))
-symm_x1 = np.zeros(len(symm_alphas))
-
-for i in xrange(len(symm_alphas)):
-    alpha = symm_alphas[i]
-    symm_x1[i] = compute_x1(alpha)
-    symm_w1[i], symm_w2[i] = compute_weights(symm_x1[i], alpha)
-
-# print('symm_x1={}'.format(symm_x1))
-
-# Plot results
-fig = plt.figure()
-ax1 = fig.add_subplot(111)
-
-# Plot y=x line of symmetry
-ax1.plot([0,.2],[0,.2], color='lightgray', linestyle='--', linewidth=1)
-
-# Plot line x=0
-ax1.plot([0,0],[0,.2], color='lightgray', linestyle='--', linewidth=1)
-# Plot line y=0
-ax1.plot([0,.2],[0,0], color='lightgray', linestyle='--', linewidth=1)
-
 # Plot (alpha, x1(alpha))
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
@@ -261,7 +233,6 @@ ax1.plot([r1,r1], [-1,1], color='lightgray', linestyle='--', linewidth=1)
 ax1.plot([0.5,0.5], [-1,1], color='lightgray', linestyle='--', linewidth=1)
 # Plot the data - note we just flip the x and y coordinates from the first plot,
 # since the solutions are symmetric about the line y=x
-# ax1.plot(symm_alphas, symm_x1, color='black', marker=None)
 ax1.plot(x1, alphas, color='black', marker=None)
 ax1.plot([r1], [r2], color='black', linestyle='', marker='o')
 ax1.plot([0.5], [1./6], color='black', linestyle='', marker='o')
