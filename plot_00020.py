@@ -25,30 +25,43 @@ def g(x):
 
 r1 = (9 + np.sqrt(21))/30
 r2 = (9 - np.sqrt(21))/30
-alphas = np.linspace(1.e-3, 0.17048)
-print('alphas={}'.format(alphas))
+# The curve goes from:
+# (x1,x2) = ((9 + np.sqrt(21))/30, 0) to
+# (x1,x2) = (1/2, 1/6)
+# But w1/w2 -> \infty at alpha=1/6
+alphas1 = np.linspace(1.e-6, 0.15)
+alphas2 = np.linspace(0.15, 1./6 - 1.e-6)
+alphas = np.concatenate((alphas1,alphas2))
+# print('alphas={}'.format(alphas))
 w1 = np.zeros(len(alphas))
 w2 = np.zeros(len(alphas))
+x1 = np.zeros(len(alphas))
 
+end = len(alphas)
 for i in xrange(len(alphas)):
     alpha = alphas[i]
     # Compute sigma based on alpha
     sigma = f(alpha) / g(alpha)
     # Compute roots of "characteristic" eqn.
     roots = np.roots([15*sigma, -(9*sigma + 6), (sigma + 4), -0.5])
-    print('roots={}'.format(roots))
+    # print('roots={}'.format(roots))
     # Find root which is closest to r1
-    x1_new = min(roots, key=lambda x : abs(x - r1))
+    candidate_x1 = min(roots, key=lambda x : abs(x - r1))
 
-    # Exit if we failed to find a real root
-    if not np.isreal(x1_new):
-        print('Imaginary root found for alpha={}, try smaller neighborhood around r2.'.format(alpha))
-        sys.exit(1)
+    # Don't accept candidate result if root is imaginary or outside the reference element.
+    if (not np.isreal(candidate_x1)) or (candidate_x1 > 0.5):
+        print('Invalid root = {} found for i={}, alpha={}, try smaller neighborhood around r2.'.format(candidate_x1, i, alpha))
+        # Record the last valid index and break out of the loop
+        end = i
+        break
+
+    # If we made it here, we accept the candidate solution
+    x1[i] = candidate_x1
 
     # Now solve for the weights w1, w2. Result should be the same
     # regardless of whether we use the ratio of f's or g's to compute.
-    w1_over_w2 = -f(alpha) / f(x1_new)
-    # w1_over_w2 = -g(alpha) / g(x1_new)
+    w1_over_w2 = -f(alpha) / f(x1[i])
+    # w1_over_w2 = -g(alpha) / g(x1[i])
     w2_over_w1 = 1. / w1_over_w2
 
     # It seems that w1/w2 = constant, the plot in (w1, w2) space is a straight line.
@@ -60,7 +73,7 @@ for i in xrange(len(alphas)):
     # Print current result
     # print('---')
     # print('w1={}'.format(w1[i]))
-    # print('x1={}'.format(x1_new))
+    # print('x1={}'.format(x1[i]))
     # print('w2={}'.format(w2[i]))
     # print('x2={}'.format(alpha))
 
@@ -106,3 +119,23 @@ ax1.set_xlabel(r'$w_1$')
 ax1.set_ylabel(r'$w_2$')
 ax1.axis('equal')
 plt.savefig('plot_00020.pdf', format='pdf')
+
+# Plot (x1(alpha), alpha)
+fig = plt.figure()
+ax1 = fig.add_subplot(111)
+# Plot line y=1/6
+ax1.plot([0.44,0.55],[1./6,1./6], color='lightgray', linestyle='--', linewidth=1)
+# Plot line y=0
+ax1.plot([0.44,0.55],[0.,0.], color='lightgray', linestyle='--', linewidth=1)
+# Plot line x=0.5
+# ax1.plot([0.5,0.5],[0,1./6], color='lightgray', linestyle='--', linewidth=1)
+ax1.plot(x1[0:end], alphas[0:end], color='black', marker=None)
+ax1.plot([r1], [0], color='black', linestyle='', marker='o')
+ax1.plot([0.5], [1./6], color='black', linestyle='', marker='o')
+ax1.text(r1+.001, 0.+.002, r'$\alpha = 0$')
+ax1.text(0.5-.003, 1./6-.015, r'$\alpha = \frac{1}{6}$')
+ax1.set_xlabel(r'$x_1$')
+ax1.set_ylabel(r'$x_2$')
+ax1.set_xlim([0.443, 0.505])
+# ax1.axis('equal')
+plt.savefig('plot_00020_x1.pdf', format='pdf')
