@@ -54,7 +54,7 @@ def compute_x1(alpha):
 
     # Error if an acceptable root was not found.
     if not found_x1:
-        print('Invalid root = {} found for alpha={}.'.format(x1, alpha))
+        print('No valid root found for alpha={}, roots={}.'.format(alpha, roots))
         sys.exit(1)
 
     return x1
@@ -83,6 +83,26 @@ def residual(alpha):
 # Some useful constants
 r1 = (9 + np.sqrt(21))/30
 r2 = (9 - np.sqrt(21))/30
+
+################################################################################
+
+# Testing: are there solutions for 1/6 < alpha < r1? It appears that
+# there are mostly one real root (alpha) and two imaginary roots in this interval,
+# but we can go a bit outside the interval? I suspect the minimum is the
+# min_x1 which we computed previously...
+# # alpha = r1 - .007
+# alpha = 0.445480495467 # min_x1
+# # alpha = 0.444 imaginary
+# x1 = compute_x1(alpha)
+# w1, w2 = compute_weights(x1, alpha)
+# print('---')
+# print('w1={}'.format(w1))
+# print('x1={}'.format(x1))
+# print('w2={}'.format(w2))
+# print('x2={}'.format(alpha))
+#
+# # Early
+# sys.exit(0)
 
 ################################################################################
 
@@ -163,9 +183,9 @@ for i in xrange(len(alphas)):
     x1[i] = compute_x1(alpha)
     w1[i], w2[i] = compute_weights(x1[i], alpha)
 
-# There is a "symmetric" part for larger values of alpha, i.e.
+# There is a second part of the curve for larger values of alpha, i.e.
 # alpha > (9 + sqrt(21))/30
-symm_alphas = np.linspace(r1 + 1.e-6, .5 - 1.e-6)
+symm_alphas = np.linspace(min_x1 + 1.e-6, .5 - 1.e-6)
 symm_w1 = np.zeros(len(symm_alphas))
 symm_w2 = np.zeros(len(symm_alphas))
 symm_x1 = np.zeros(len(symm_alphas))
@@ -222,18 +242,21 @@ ax1 = fig.add_subplot(111)
 # Plot line y=1/6
 ax1.plot([0.4,0.51], [1./6,1./6], color='lightgray', linestyle='--', linewidth=1)
 # Plot line y=r2
-ax1.plot([0.4,0.51], [r2,r2], color='lightgray', linestyle='--', linewidth=1)
-# Plot line x=r1
-ax1.plot([r1,r1], [0.1,0.18], color='lightgray', linestyle='--', linewidth=1)
+# ax1.plot([0.4,0.51], [r2,r2], color='lightgray', linestyle='--', linewidth=1)
+# Plot line y=min_alpha
+ax1.plot([0.4,0.51], [min_alpha,min_alpha], color='lightgray', linestyle='--', linewidth=1)
+# Plot line x=min_x1
+ax1.plot([min_x1,min_x1], [0.1,0.18], color='lightgray', linestyle='--', linewidth=1)
 # Plot line x=0.5
 ax1.plot([0.5,0.5], [0.1,0.18], color='lightgray', linestyle='--', linewidth=1)
 ax1.plot(symm_alphas, symm_x1, color='black', marker=None)
 ax1.plot([r1], [r2], color='black', linestyle='', marker='o')
 ax1.plot([0.5], [1./6], color='black', linestyle='', marker='o')
-ax1.text(r1+.002, r2+.0005, r'PI, $\alpha = r_1$')
-ax1.text(0.5 - .005, 1./6 - .002, r'PB, $\alpha = \frac{1}{2}$')
-ax1.set_xlim([0.4475, 0.505])
-ax1.set_ylim([0.146, 0.1676])
+ax1.plot([min_x1], [min_alpha], color='black', linestyle='', marker='o')
+ax1.text(r1+.001, r2-.002, r'PI, $\alpha = r_1$')
+ax1.text(0.5 - .005, 1./6 - .0045, r'PB, $\alpha = \frac{1}{2}$')
+ax1.set_xlim([min_x1 - .005, 0.505])
+ax1.set_ylim([min_alpha - .005, 0.169])
 ax1.set_xlabel(r'$\alpha$')
 ax1.set_ylabel(r'$x_1(\alpha)$')
 plt.savefig('plot_00020_weights_vs_alpha_2.pdf', format='pdf')
