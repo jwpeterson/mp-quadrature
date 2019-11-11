@@ -251,18 +251,28 @@ ax1.plot([0.4,0.51], [1./6,1./6], color='lightgray', linestyle='--', linewidth=1
 # ax1.plot([0.4,0.51], [r2,r2], color='lightgray', linestyle='--', linewidth=1)
 # Plot line y=min_alpha
 ax1.plot([0.4,0.51], [min_alpha,min_alpha], color='lightgray', linestyle='--', linewidth=1)
+# Plot line y=0
+ax1.plot([0.4,0.51], [0,0], color='lightgray', linestyle='--', linewidth=1)
 # Plot line x=min_x1
-ax1.plot([min_x1,min_x1], [0.1,0.18], color='lightgray', linestyle='--', linewidth=1)
+ax1.plot([min_x1,min_x1], [-1,1], color='lightgray', linestyle='--', linewidth=1)
+# Plot line x=r1
+ax1.plot([r1,r1], [-1,1], color='lightgray', linestyle='--', linewidth=1)
 # Plot line x=0.5
-ax1.plot([0.5,0.5], [0.1,0.18], color='lightgray', linestyle='--', linewidth=1)
-ax1.plot(symm_alphas, symm_x1, color='black', marker=None)
+ax1.plot([0.5,0.5], [-1,1], color='lightgray', linestyle='--', linewidth=1)
+# Plot the data - note we just flip the x and y coordinates from the first plot,
+# since the solutions are symmetric about the line y=x
+# ax1.plot(symm_alphas, symm_x1, color='black', marker=None)
+ax1.plot(x1, alphas, color='black', marker=None)
 ax1.plot([r1], [r2], color='black', linestyle='', marker='o')
 ax1.plot([0.5], [1./6], color='black', linestyle='', marker='o')
 ax1.plot([min_x1], [min_alpha], color='black', linestyle='', marker='o')
-ax1.text(r1+.001, r2-.002, r'PI, $\alpha = r_1$')
-ax1.text(0.5 - .005, 1./6 - .0045, r'PB, $\alpha = \frac{1}{2}$')
+ax1.plot([r1], [0], color='black', linestyle='', marker='o')
+ax1.text(r1+.001, r2-.008, r'PI, $\alpha = r_1$')
+ax1.text(min_x1+.001, min_alpha+.0015, r'PI, $\alpha \approx 0.445$')
+ax1.text(0.5 - .005, 1./6 - .015, r'PB, $\alpha = \frac{1}{2}$')
+ax1.text(r1+.001, 0+.001, r'PB, $\alpha = r_1$')
 ax1.set_xlim([min_x1 - .005, 0.505])
-ax1.set_ylim([min_alpha - .005, 0.169])
+ax1.set_ylim([-0.02, 0.18])
 ax1.set_xlabel(r'$\alpha$')
 ax1.set_ylabel(r'$x_1(\alpha)$')
 plt.savefig('plot_00020_weights_vs_alpha_2.pdf', format='pdf')
