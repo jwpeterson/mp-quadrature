@@ -2,6 +2,7 @@
 import sympy
 from sympy.abc import a, x
 from fractions import Fraction
+# import mpmath
 
 # Test from website: https://docs.sympy.org/latest/modules/polys/reference.html
 # The return value is a (result, remainder) pair.
@@ -29,4 +30,26 @@ remainder = sympy.simplify(result_tuple[1])
 # to be nonzero. Therefore, we can just worry about the numerator when searching
 # for the roots.
 numerator = sympy.collect(sympy.numer(result), x)
-print('numerator={}'.format(numerator))
+# print('numerator={}'.format(numerator))
+
+# roo is a dict, and it seems that the keys are the roots and the dict
+# values are their multiplicities (maybe?) Also, note there are two
+# roots, so this should correspond to the possibility of having
+# multiple solutions for a given value of alpha which we observed
+# graphically.
+root_dict = sympy.simplify(sympy.roots(numerator, x))
+for r in root_dict:
+    print(r)
+
+# print(roo[1])
+# print('roo={}'.format(roo))
+# help(roo)
+
+# Extra coefficients
+# coeff_a =
+# poly = sympy.Poly(numerator, x)
+# coe = poly.coeffs()
+# print('coe={}'.format(coe))
+# roo = poly.roots()
+# print('roo={}'.format(roo))
+# roo = sympy.solve(poly)
