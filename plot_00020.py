@@ -185,7 +185,9 @@ for i in xrange(len(alphas)):
 
 # There is a second part of the curve for larger values of alpha, i.e.
 # alpha > (9 + sqrt(21))/30
-symm_alphas = np.linspace(min_x1 + 1.e-6, .5 - 1.e-6)
+symm_alphas1 = np.linspace(min_x1 + 1.e-6, r1)
+symm_alphas2 = np.linspace(r1, .5 - 1.e-6)
+symm_alphas = np.concatenate((symm_alphas1,symm_alphas2))
 symm_w1 = np.zeros(len(symm_alphas))
 symm_w2 = np.zeros(len(symm_alphas))
 symm_x1 = np.zeros(len(symm_alphas))
