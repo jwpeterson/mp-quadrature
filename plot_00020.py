@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+from scipy.optimize import minimize
 
 from matplotlib import rcParams
 rcParams['font.family'] = 'DejaVu Sans'
@@ -22,6 +23,40 @@ def f(x):
 
 def g(x):
     return x * (15*x**2 - 9*x + 1)
+
+"""
+Given alpha, computes x1(alpha), throwing an error if an invalid
+value is obtained.
+"""
+def compute_x1(alpha):
+    r1 = (9 + np.sqrt(21))/30 # We search for root closest to this value
+    sigma = f(alpha) / g(alpha)
+    roots = np.roots([15*sigma, -(9*sigma + 6), (sigma + 4), -0.5])
+    x1 = min(roots, key=lambda x : abs(x - r1))
+
+    # Error if result is imaginary or outside the reference element.
+    if (not np.isreal(x1)) or (x1 > 0.5):
+        print('Invalid root = {} found for alpha={}.'.format(x1, alpha))
+        sys.exit(0)
+
+    return x1
+
+
+# Find the minimum value of x1(alpha). Interestingly, it does not
+# seem to coincide with either of the limits alpha=0 or alpha=1/6.
+# method='L-BFGS-B'
+# method='Newton-CG' # requires Jacobian
+# method='CG' # cannot handle constraints or bounds
+result = minimize(compute_x1, 0.11, method='CG', \
+                  options={'disp': False,
+                           'gtol' : 1.e-10})
+
+# Extract the min x1 value and the alpha where it occurs.
+min_alpha = result.x[0]
+min_x1 = result.fun
+print('min x1(alpha) occurs for alpha = {:.12E}'.format(min_alpha))
+print('min x1(alpha) = {:.12E}'.format(min_x1))
+
 
 r1 = (9 + np.sqrt(21))/30
 r2 = (9 - np.sqrt(21))/30
