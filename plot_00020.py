@@ -41,6 +41,17 @@ def compute_x1(alpha):
 
     return x1
 
+"""
+Given x1 and x2, computes the weights w1 and w2
+"""
+def compute_weights(x1, x2):
+    w1_over_w2 = -f(x2) / f(x1)
+    # w1_over_w2 = -g(x2) / g(x1)
+    w2_over_w1 = 1. / w1_over_w2
+    w1 = 1. / 6 / (1 + w2_over_w1)
+    w2 = 1. / 6 / (1 + w1_over_w2)
+    return w1, w2
+
 ################################################################################
 
 # Find the minimum value of x1(alpha). Interestingly, it does not
@@ -55,11 +66,16 @@ result = minimize(compute_x1, 0.11, method='CG', \
 # Extract the min x1 value and the alpha where it occurs.
 min_alpha = result.x[0]
 min_x1 = result.fun
+
 # The solution is:
 # min x1(alpha) occurs for alpha = 1.090376405285E-01
 # min x1(alpha) = 4.454804954673E-01
-# print('min x1(alpha) occurs for alpha = {:.12E}'.format(min_alpha))
-# print('min x1(alpha) = {:.12E}'.format(min_x1))
+print('min x1(alpha) occurs for alpha = {:.12E}'.format(min_alpha))
+print('min x1(alpha) = {:.12E}'.format(min_x1))
+# Compute the corresponding weights at the (alpha, x1(alpha)) solution
+w1, w2 = compute_weights(min_x1, min_alpha)
+print('w1 (min x1) ={}'.format(w1))
+print('w2 (min x1) ={}'.format(w2))
 
 ################################################################################
 
