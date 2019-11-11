@@ -276,7 +276,7 @@ ax1.set_xlim([min_x1 - .005, 0.505])
 ax1.set_ylim([-0.02, 0.18])
 ax1.set_xlabel(r'$\alpha$')
 ax1.set_ylabel(r'$x_1(\alpha)$')
-plt.savefig('plot_00020_weights_vs_alpha_2.pdf', format='pdf')
+plt.savefig('plot_00020_x1_vs_alpha_2.pdf', format='pdf')
 
 # Plot w1 and w2 vs. alpha. Do they cross somewhere?
 fig = plt.figure()
