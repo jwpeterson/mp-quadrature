@@ -24,10 +24,11 @@ def g(x):
     return x * (15*x**2 - 9*x + 1)
 
 """
-Given alpha, computes x1(alpha), throwing an error if an invalid
-value is obtained.
+Given alpha, computes x1(alpha), throwing an error if no valid
+roots are found. By default, we take the maximum eligible root for the
+solution.
 """
-def compute_x1(alpha):
+def compute_x1(alpha, max_root=True):
     # Don't accept input values outside the range
     if (alpha <= 0.) or (alpha >= 0.5):
         print('Invalid input, 0 < alpha < 0.5 is required.')
@@ -42,15 +43,19 @@ def compute_x1(alpha):
     # print('alpha={}'.format(alpha))
     # print('roots={}'.format(roots))
 
-    # Return value
-    x1 = 0
+    # Default value should be "small" if we are returning max roots, "large" otherwise.
+    x1 = 0 # small
+    if not max_root:
+        x1 = 100 # large
     found_x1 = False
     for candidate_root in roots:
         if np.isreal(candidate_root) and (np.abs(candidate_root - alpha) > 1.e-3) \
            and (candidate_root > 0.) and (candidate_root < 0.5):
             found_x1 = True
-            x1 = candidate_root
-            break
+            if max_root:
+                x1 = np.maximum(candidate_root, x1)
+            else:
+                x1 = np.minimum(candidate_root, x1)
 
     # Error if an acceptable root was not found.
     if not found_x1:
@@ -81,8 +86,8 @@ def residual(alpha):
 ################################################################################
 
 # Some useful constants
-r1 = (9 + np.sqrt(21))/30
-r2 = (9 - np.sqrt(21))/30
+r1 = (9 + np.sqrt(21))/30 # .45275
+r2 = (9 - np.sqrt(21))/30 # .14725
 
 ################################################################################
 
@@ -90,10 +95,11 @@ r2 = (9 - np.sqrt(21))/30
 # there are mostly one real root (alpha) and two imaginary roots in this interval,
 # but we can go a bit outside the interval? I suspect the minimum is the
 # min_x1 which we computed previously...
-# # alpha = r1 - .007
-# alpha = 0.445480495467 # min_x1
+# alpha = r2 - .01
+# # alpha = r2 # error in roots: array must not contain Infs or NaNs
+# # alpha = 0.445480495467 # min_x1
 # # alpha = 0.444 imaginary
-# x1 = compute_x1(alpha)
+# x1 = compute_x1(alpha, max_root=False)
 # w1, w2 = compute_weights(x1, alpha)
 # print('---')
 # print('w1={}'.format(w1))
@@ -262,4 +268,3 @@ ax1.set_xlim([-0.01, 0.175])
 ax1.set_ylim([0.01, 0.155])
 ax1.legend()
 plt.savefig('plot_00020_weights_vs_alpha.pdf', format='pdf')
-
