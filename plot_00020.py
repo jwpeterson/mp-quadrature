@@ -93,7 +93,6 @@ w1 = np.zeros(len(alphas))
 w2 = np.zeros(len(alphas))
 x1 = np.zeros(len(alphas))
 
-end = len(alphas)
 for i in xrange(len(alphas)):
     alpha = alphas[i]
     x1[i] = compute_x1(alpha)
@@ -158,7 +157,7 @@ ax1.plot([0.44,0.55],[1./6,1./6], color='lightgray', linestyle='--', linewidth=1
 ax1.plot([0.44,0.55],[0.,0.], color='lightgray', linestyle='--', linewidth=1)
 # Plot line x=0.5
 # ax1.plot([0.5,0.5],[0,1./6], color='lightgray', linestyle='--', linewidth=1)
-ax1.plot(x1[0:end], alphas[0:end], color='black', marker=None)
+ax1.plot(x1, alphas, color='black', marker=None)
 ax1.plot([r1], [0], color='black', linestyle='', marker='o')
 ax1.plot([0.5], [1./6], color='black', linestyle='', marker='o')
 ax1.text(r1+.001, 0.+.002, r'$\alpha = 0$')
@@ -180,7 +179,7 @@ ax1.plot([0.,0.],[0.44,0.55], color='lightgray', linestyle='--', linewidth=1)
 ax1.plot([-0.1,0.18], [0.5,0.5], color='lightgray', linestyle='--', linewidth=1)
 # Plot line y=min_x1
 ax1.plot([-0.1,0.18], [min_x1,min_x1], color='lightgray', linestyle='--', linewidth=1)
-ax1.plot(alphas[0:end], x1[0:end], color='black', marker=None)
+ax1.plot(alphas, x1, color='black', marker=None)
 ax1.plot([0], [r1], color='black', linestyle='', marker='o')
 ax1.plot([1./6], [0.5], color='black', linestyle='', marker='o')
 ax1.plot([min_alpha], [min_x1], color='black', linestyle='', marker='o')
