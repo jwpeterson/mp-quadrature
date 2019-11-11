@@ -97,18 +97,7 @@ end = len(alphas)
 for i in xrange(len(alphas)):
     alpha = alphas[i]
     x1[i] = compute_x1(alpha)
-
-    # Now solve for the weights w1, w2. Result should be the same
-    # regardless of whether we use the ratio of f's or g's to compute.
-    w1_over_w2 = -f(alpha) / f(x1[i])
-    # w1_over_w2 = -g(alpha) / g(x1[i])
-    w2_over_w1 = 1. / w1_over_w2
-
-    # It seems that w1/w2 = constant, the plot in (w1, w2) space is a straight line.
-    # print('w1_over_w2={}'.format(w1_over_w2))
-    # print('w2_over_w1={}'.format(w2_over_w1))
-    w1[i] = 1. / 6 / (1 + w2_over_w1)
-    w2[i] = 1. / 6 / (1 + w1_over_w2)
+    w1[i], w2[i] = compute_weights(x1[i], alpha)
 
     # Print current result
     # print('---')
