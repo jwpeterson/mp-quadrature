@@ -211,7 +211,14 @@ cmap = cm.get_cmap('RdYlGn')
 
 # Create a numerical value -> color mapping based on the quadrature weights.
 # We use f2rgb when calling 'f2hex', see below.
-norm = colors.Normalize(vmin=np.min(wts), vmax=np.max(wts))
+minw = np.min(wts)
+maxw = np.max(wts)
+# If the weights are approximately equal, use a default range, since
+# otherwise the text on the colorbar is formatted strangely.
+if np.abs(maxw - minw) < 1.e-6:
+    minw = 0
+    maxw = 1./2
+norm = colors.Normalize(vmin=minw, vmax=maxw)
 f2rgb = cm.ScalarMappable(norm=norm, cmap=cmap)
 
 # To create a "bounded" Voronoi region, we first reflect the original
