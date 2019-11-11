@@ -41,6 +41,7 @@ def compute_x1(alpha):
 
     return x1
 
+################################################################################
 
 # Find the minimum value of x1(alpha). Interestingly, it does not
 # seem to coincide with either of the limits alpha=0 or alpha=1/6.
@@ -54,9 +55,13 @@ result = minimize(compute_x1, 0.11, method='CG', \
 # Extract the min x1 value and the alpha where it occurs.
 min_alpha = result.x[0]
 min_x1 = result.fun
-print('min x1(alpha) occurs for alpha = {:.12E}'.format(min_alpha))
-print('min x1(alpha) = {:.12E}'.format(min_x1))
+# The solution is:
+# min x1(alpha) occurs for alpha = 1.090376405285E-01
+# min x1(alpha) = 4.454804954673E-01
+# print('min x1(alpha) occurs for alpha = {:.12E}'.format(min_alpha))
+# print('min x1(alpha) = {:.12E}'.format(min_x1))
 
+################################################################################
 
 r1 = (9 + np.sqrt(21))/30
 r2 = (9 - np.sqrt(21))/30
@@ -184,13 +189,17 @@ ax1.plot([1./6,1./6], [0.44,0.55],color='lightgray', linestyle='--', linewidth=1
 ax1.plot([0.,0.],[0.44,0.55], color='lightgray', linestyle='--', linewidth=1)
 # Plot line y=0.5
 ax1.plot([-0.1,0.18], [0.5,0.5], color='lightgray', linestyle='--', linewidth=1)
+# Plot line y=min_x1
+ax1.plot([-0.1,0.18], [min_x1,min_x1], color='lightgray', linestyle='--', linewidth=1)
 ax1.plot(alphas[0:end], x1[0:end], color='black', marker=None)
 ax1.plot([0], [r1], color='black', linestyle='', marker='o')
 ax1.plot([1./6], [0.5], color='black', linestyle='', marker='o')
+ax1.plot([min_alpha], [min_x1], color='black', linestyle='', marker='o')
 ax1.set_xlabel(r'$\alpha$')
 ax1.set_ylabel(r'$x_1(\alpha)$')
 ax1.text(0.+.002, r1+.001, r'$\alpha = 0$')
 ax1.text(1./6-.018, 0.5-.004, r'$\alpha = \frac{1}{6}$')
+ax1.text(min_alpha-.01, min_x1+.002, r'$\alpha \approx 0.109$')
 ax1.set_xlim([-0.01, 0.175])
 ax1.set_ylim([0.443, 0.505])
 plt.savefig('plot_00020_x1_vs_alpha.pdf', format='pdf')
