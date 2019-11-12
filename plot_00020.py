@@ -43,6 +43,15 @@ def compute_x1(alpha, max_root=True):
     # print('alpha={}'.format(alpha))
     # print('roots={}'.format(roots))
 
+    # Using the polynomial_division.py code, we found the following roots analytically.
+    # Note: you have to keep terms combined under the square root, otherwise numpy will
+    # generate a NaN when trying to take the sqrt of a negative number.
+    A = (40*alpha**2 - 25*alpha + 3) / (10 * (2*alpha - 1) * (6*alpha - 1))
+    B = np.sqrt(3.) * np.sqrt((5*alpha-1)*(240*alpha**3 - 240*alpha**2 + 75*alpha - 7)) \
+        / (30 * (12*alpha**2 - 8*alpha + 1))
+    analytical_roots = [A + B, A - B]
+    # print('analytical_roots={}'.format(analytical_roots))
+
     # Default value should be "small" if we are returning max roots, "large" otherwise.
     x1 = 0 # small
     if not max_root:
