@@ -1,6 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import sys
+import cmath # sqrt(negative) returns imaginary number instead of nan
 from scipy.optimize import minimize
 from scipy.optimize import fsolve
 
@@ -47,10 +48,10 @@ def compute_x1(alpha, max_root=True):
     # Note: you have to keep terms combined under the square root, otherwise numpy will
     # generate a NaN when trying to take the sqrt of a negative number.
     A = (40*alpha**2 - 25*alpha + 3) / (10 * (2*alpha - 1) * (6*alpha - 1))
-    B = np.sqrt(3.) * np.sqrt((5*alpha-1)*(240*alpha**3 - 240*alpha**2 + 75*alpha - 7)) \
+    B = np.sqrt(3.) * cmath.sqrt((5*alpha-1)*(240*alpha**3 - 240*alpha**2 + 75*alpha - 7)) \
         / (30 * (12*alpha**2 - 8*alpha + 1))
     analytical_roots = [A + B, A - B]
-    # print('analytical_roots={}'.format(analytical_roots))
+    print('analytical_roots={}'.format(analytical_roots))
 
     # Default value should be "small" if we are returning max roots, "large" otherwise.
     x1 = 0 # small
@@ -68,8 +69,7 @@ def compute_x1(alpha, max_root=True):
 
     # Error if an acceptable root was not found.
     if not found_x1:
-        print('No valid root found for alpha={}, roots={}.'.format(alpha, roots))
-        sys.exit(1)
+        raise RuntimeError('No valid root found for alpha={}, roots={}.'.format(alpha, roots))
 
     return x1
 
@@ -104,20 +104,56 @@ r2 = (9 - np.sqrt(21))/30 # .14725
 # there are mostly one real root (alpha) and two imaginary roots in this interval,
 # but we can go a bit outside the interval? I suspect the minimum is the
 # min_x1 which we computed previously...
+# ---
+# Roots of "A"
+# alpha = (25 + np.sqrt(145)) / 80 ~ 0.46302 # A = 0, x1= +/- 0.15701394368037236
+# alpha = (25 - np.sqrt(145)) / 80 ~ 0.16198 # A = 0, x1= +/- 0.47470687954772173
+# ---
+# Roots of "B"
+# alpha = 0.2 # B=0, x1=1/3 (points at centroid)
+# alpha = 0.170486188812954 # "alpha1", B = 0, x1 = 0.65902762237408341 (outside the region)
+# alpha = 0.384033315723485 # "alpha2",B = 0, x1 = 0.23193336855303029 (inside the region)
+# alpha = 0.445480495463561 # "alpha3", B = 0, x1 = 0.10903900907287808 (inside the region*)
+# * The values 0.445480495463561 and 0.10903900907287808 correspond to the (min_alpha, min_x1)
+#   values we had found earlier. The analytical expression for these alphas is very complicated
+#   but perhaps it is worth writing down since the value seems to be important?
+# ---
+# Testing intervals
+# .) 0 < alpha < 1/6 = the PI/NI region we already investigated
+alpha = 0.1 # x1 = 0.44562222747978653, 0.11687777252021356
+# .) 1/6 < alpha < alpha1
+# alpha = 0.169 # x1 = (0.53366013542957336, 1.2479540208069468) (points outside region)
+# .) alpha1 < alpha < 0.2
+# alpha = 0.18 # x1 = Imaginary, 0.3984375-0.12540624091494318j (IMAG)
+# .) 0.2 < alpha < 1/3
+# alpha = 0.25 # x1 = (0.21835034190722738, 0.38164965809277263) (NI)
+# .) 1/3 < alpha < alpha2
+# alpha = 0.375 # x1 = (0.20944949536696106, 0.27055050463303892) (NI)
+# .) alpha2 < alpha < alpha3
+# alpha = 0.4 # x1 = Imaginary, 0.2142857-0.0412393049j (IMAG)
+# .) alpha3 < alpha < 0.5 = the PI region we already investigated
+# alpha = 0.48 # x1 = -0.737867, 0.1633997                (PI)
+# ---
+# Other values
 # alpha = r2 - .01
-# # alpha = r2 # error in roots: array must not contain Infs or NaNs
-# # alpha = 0.445480495467 # min_x1
-# # alpha = 0.444 imaginary
-# x1 = compute_x1(alpha, max_root=False)
-# w1, w2 = compute_weights(x1, alpha)
-# print('---')
-# print('w1={}'.format(w1))
-# print('x1={}'.format(x1))
-# print('w2={}'.format(w2))
-# print('x2={}'.format(alpha))
-#
-# # Early
-# sys.exit(0)
+# alpha = r2 # error in roots: array must not contain Infs or NaNs
+# alpha = 0.445480495467 # min_x1
+# alpha = 0.444 imaginary
+### try:
+###     x1 = compute_x1(alpha, max_root=False)
+### except Exception as e:
+###     print('Exception caught: ' + str(e))
+###     sys.exit(0)
+###
+### w1, w2 = compute_weights(x1, alpha)
+### print('---')
+### print('w1={}'.format(w1))
+### print('x1={}'.format(x1))
+### print('w2={}'.format(w2))
+### print('x2={}'.format(alpha))
+###
+### # Early
+### sys.exit(0)
 
 ################################################################################
 
