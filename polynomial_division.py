@@ -28,6 +28,7 @@ print('result={}'.format(sympy.collect(result, x)))
 # The denominator is the same as the denominator of sigma, which we assumed
 # to be nonzero. Therefore, we can just worry about the numerator when searching
 # for the roots.
+# x**2*(180*a**2 - 120*a + 15) + x*(-120*a**2 + 75*a - 9) + (15*a**2 - 9*a + 1)
 numerator = sympy.numer(result)
 print('numerator={}'.format(sympy.collect(numerator, x)))
 
