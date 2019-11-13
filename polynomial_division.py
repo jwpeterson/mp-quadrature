@@ -37,7 +37,13 @@ print('numerator={}'.format(sympy.collect(numerator, x)))
 # roots, so this should correspond to the possibility of having
 # multiple solutions for a given value of alpha which we observed
 # graphically.
+# 1.) -sqrt(3)*sqrt((5*a - 1)*(240*a**3 - 240*a**2 + 75*a - 7))/(30*(12*a**2 - 8*a + 1)) + (40*a**2 - 25*a + 3)/(10*(2*a - 1)*(6*a - 1))
+# 2.) sqrt(3)*sqrt((5*a - 1)*(240*a**3 - 240*a**2 + 75*a - 7))/(30*(12*a**2 - 8*a + 1)) + (40*a**2 - 25*a + 3)/(10*(2*a - 1)*(6*a - 1))
 root_dict = sympy.simplify(sympy.roots(numerator, x))
 for r in root_dict:
     print(r)
-
+    # Substitute in some specific values.
+    x1_onefifth = r.subs([(a,Fraction(1,5))])
+    print('x1(alpha=1/5)={}'.format(x1_onefifth))
+    x1_rootA = sympy.simplify(r.subs([(a, (25 + sympy.sqrt(145))/80)]))
+    print('x1(alpha=root of A)={}, ~ {}'.format(x1_rootA, x1_rootA.evalf()))
