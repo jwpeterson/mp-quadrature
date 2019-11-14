@@ -74,6 +74,31 @@ def compute_x1(alpha, max_root=True):
     return x1
 
 """
+Given alpha, computes x1(alpha) analytically. Returns a pair of
+(possibly complex) values, throws an error for input values of
+alpha=1/2 or 1/6 since computing x1 by this method is not well-defined
+for those values.
+"""
+def compute_x1_analytical(alpha):
+    # Don't accept input values outside the range
+    if (alpha <= 0.) or (alpha >= 0.5) or (np.abs(alpha - 1./6) < 1.e-8):
+        print('Invalid input, alpha={}; 0 < alpha < 0.5 is required.'.format(alpha))
+        raise RuntimeError('Invalid input, alpha=1/6.'.format(alpha))
+
+    # Using the polynomial_division.py code, we found the following roots analytically.
+    # Note 1: we intentionally use cmath.sqrt so that we can obtain an imaginary root
+    # instead of a NaN!
+    # Note 2: If the roots are real-valued, the second one will always be smaller since
+    # in that case B > 0
+    # Note 3: The notation here matches the discussion in the paper.
+    A = 120*alpha**2 - 75*alpha + 9
+    B = cmath.sqrt(3 * (5*alpha-1) * (240*alpha**3 - 240*alpha**2 + 75*alpha - 7))
+    den = 30 * (2*alpha - 1) * (6*alpha - 1)
+    analytical_roots = [(A + B)/den, (A - B)/den]
+    print('analytical_roots_v2={}'.format(analytical_roots))
+    return analytical_roots
+
+"""
 Given x1 and x2, computes the weights w1 and w2
 """
 def compute_weights(x1, x2):
@@ -117,20 +142,20 @@ r2 = (9 - np.sqrt(21))/30 # .14725
 # * The values 0.445480495463561 and 0.10903900907287808 correspond to the (min_alpha, min_x1)
 #   values we had found earlier. The analytical expression for these alphas is very complicated
 #   but perhaps it is worth writing down since the value seems to be important?
-# ---
-# Trigonometric forms:
+
+# Roots of "B", trigonometric forms:
 # alpha
-theta=(np.pi - np.arctan(3./4))
-alpha1_trig = (8 - 2*np.cos(theta/3) - 2*np.sqrt(3)*np.sin(theta/3)) / 24
-print('alpha1_trig={:.16E}'.format(alpha1_trig)) # 1.7048618881295388E-01
-alpha2_trig = (8 - 2*np.cos(theta/3) + 2*np.sqrt(3)*np.sin(theta/3)) / 24
-print('alpha2_trig={:.16E}'.format(alpha2_trig)) # 3.8403331572348476E-01
-alpha3_trig = (4 + 2*np.cos(theta/3)) / 12
-print('alpha3_trig={:.16E}'.format(alpha3_trig)) # 4.4548049546356139E-01
-# ---
+# theta=(np.pi - np.arctan(3./4))
+# alpha1_trig = (8 - 2*np.cos(theta/3) - 2*np.sqrt(3)*np.sin(theta/3)) / 24
+# print('alpha1_trig={:.16E}'.format(alpha1_trig)) # 1.7048618881295388E-01
+# alpha2_trig = (8 - 2*np.cos(theta/3) + 2*np.sqrt(3)*np.sin(theta/3)) / 24
+# print('alpha2_trig={:.16E}'.format(alpha2_trig)) # 3.8403331572348476E-01
+# alpha3_trig = (4 + 2*np.cos(theta/3)) / 12
+# print('alpha3_trig={:.16E}'.format(alpha3_trig)) # 4.4548049546356139E-01
+
 # Testing intervals
 # .) 0 < alpha < 1/6 = the PI/NI region we already investigated
-alpha = 0.1 # x1 = 0.44562222747978653, 0.11687777252021356
+# alpha = 0.1 # x1 = 0.44562222747978653, 0.11687777252021356
 # .) 1/6 < alpha < alpha1
 # alpha = 0.169 # x1 = (0.53366013542957336, 1.2479540208069468) (points outside region)
 # .) alpha1 < alpha < 0.2
@@ -142,29 +167,28 @@ alpha = 0.1 # x1 = 0.44562222747978653, 0.11687777252021356
 # .) alpha2 < alpha < alpha3
 # alpha = 0.4 # x1 = Imaginary, 0.2142857-0.0412393049j (IMAG)
 # .) alpha3 < alpha < 0.5 = the PI region we already investigated
-# alpha = 0.48 # x1 = -0.737867, 0.1633997                (PI)
+alpha = 0.48 # x1 = -0.737867, 0.1633997                (PI)
 # ---
 # Other values
 # alpha = r2 - .01
 # alpha = r2 # error in roots: array must not contain Infs or NaNs
 # alpha = 0.445480495467 # min_x1
 # alpha = 0.444 imaginary
-### try:
-###     x1 = compute_x1(alpha, max_root=False)
-### except Exception as e:
-###     print('Exception caught: ' + str(e))
-###     sys.exit(0)
-###
-### w1, w2 = compute_weights(x1, alpha)
-### print('---')
-### print('w1={}'.format(w1))
-### print('x1={}'.format(x1))
-### print('w2={}'.format(w2))
-### print('x2={}'.format(alpha))
-###
+try:
+    analytical_roots = compute_x1_analytical(alpha)
+    x1 = compute_x1(alpha, max_root=False)
+    w1, w2 = compute_weights(x1, alpha)
+    print('---')
+    print('w1={}'.format(w1))
+    print('x1={}'.format(x1))
+    print('w2={}'.format(w2))
+    print('x2={}'.format(alpha))
+except Exception as e:
+    print('Exception caught: ' + str(e))
+    # sys.exit(0)
 
 # Early
-# sys.exit(0)
+sys.exit(0)
 
 ################################################################################
 
