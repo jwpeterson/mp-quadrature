@@ -51,7 +51,7 @@ def compute_x1(alpha, max_root=True):
     B = np.sqrt(3.) * cmath.sqrt((5*alpha-1)*(240*alpha**3 - 240*alpha**2 + 75*alpha - 7)) \
         / (30 * (12*alpha**2 - 8*alpha + 1))
     analytical_roots = [A + B, A - B]
-    print('analytical_roots={}'.format(analytical_roots))
+    # print('analytical_roots={}'.format(analytical_roots))
 
     # Default value should be "small" if we are returning max roots, "large" otherwise.
     x1 = 0 # small
@@ -95,7 +95,7 @@ def compute_x1_analytical(alpha):
     B = cmath.sqrt(3 * (5*alpha-1) * (240*alpha**3 - 240*alpha**2 + 75*alpha - 7))
     den = 30 * (2*alpha - 1) * (6*alpha - 1)
     analytical_roots = [(A + B)/den, (A - B)/den]
-    print('analytical_roots_v2={}'.format(analytical_roots))
+    # print('analytical_roots_v2={}'.format(analytical_roots))
     return analytical_roots
 
 """
@@ -174,21 +174,21 @@ alpha = 0.48 # x1 = -0.737867, 0.1633997                (PI)
 # alpha = r2 # error in roots: array must not contain Infs or NaNs
 # alpha = 0.445480495467 # min_x1
 # alpha = 0.444 imaginary
-try:
-    analytical_roots = compute_x1_analytical(alpha)
-    x1 = compute_x1(alpha, max_root=False)
-    w1, w2 = compute_weights(x1, alpha)
-    print('---')
-    print('w1={}'.format(w1))
-    print('x1={}'.format(x1))
-    print('w2={}'.format(w2))
-    print('x2={}'.format(alpha))
-except Exception as e:
-    print('Exception caught: ' + str(e))
-    # sys.exit(0)
+### try:
+###     analytical_roots = compute_x1_analytical(alpha)
+###     x1 = compute_x1(alpha, max_root=False)
+###     w1, w2 = compute_weights(x1, alpha)
+###     print('---')
+###     print('w1={}'.format(w1))
+###     print('x1={}'.format(x1))
+###     print('w2={}'.format(w2))
+###     print('x2={}'.format(alpha))
+### except Exception as e:
+###     print('Exception caught: ' + str(e))
+###     # sys.exit(0)
 
 # Early
-sys.exit(0)
+# sys.exit(0)
 
 ################################################################################
 
@@ -253,21 +253,20 @@ else:
 
 ################################################################################
 
-# The curve goes from:
-# (x1,x2) = ((9 + np.sqrt(21))/30, 0) to
-# (x1,x2) = (1/2, 1/6)
-# But w1/w2 -> \infty at alpha=1/6
-alphas1 = np.linspace(1.e-6, 0.15)
-alphas2 = np.linspace(0.15, 1./6 - 1.e-6)
-alphas = np.concatenate((alphas1,alphas2))
-# print('alphas={}'.format(alphas))
+# This curve is for 0 <= alpha < 1/6, with clustering near 1/6 to
+# capture the rapid change near that value.
+alphas = np.concatenate((np.linspace(1.e-6, 0.15), np.linspace(0.15, 1./6 - 1.e-6)))
 w1 = np.zeros(len(alphas))
 w2 = np.zeros(len(alphas))
 x1 = np.zeros(len(alphas))
 
 for i in xrange(len(alphas)):
     alpha = alphas[i]
-    x1[i] = compute_x1(alpha)
+    # We always take the larger root for this plot which is in
+    # entry [0] of the returned array. Note: we take the real part
+    # without verifying that the imaginary part is zero or nearly
+    # zero, but for consistency we should probably do that.
+    x1[i] = compute_x1_analytical(alpha)[0].real
     w1[i], w2[i] = compute_weights(x1[i], alpha)
 
 ################################################################################
