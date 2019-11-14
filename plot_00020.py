@@ -118,6 +118,16 @@ r2 = (9 - np.sqrt(21))/30 # .14725
 #   values we had found earlier. The analytical expression for these alphas is very complicated
 #   but perhaps it is worth writing down since the value seems to be important?
 # ---
+# Trigonometric forms:
+# alpha
+theta=(np.pi - np.arctan(3./4))
+alpha1_trig = (8 - 2*np.cos(theta/3) - 2*np.sqrt(3)*np.sin(theta/3)) / 24
+print('alpha1_trig={:.16E}'.format(alpha1_trig)) # 1.7048618881295388E-01
+alpha2_trig = (8 - 2*np.cos(theta/3) + 2*np.sqrt(3)*np.sin(theta/3)) / 24
+print('alpha2_trig={:.16E}'.format(alpha2_trig)) # 3.8403331572348476E-01
+alpha3_trig = (4 + 2*np.cos(theta/3)) / 12
+print('alpha3_trig={:.16E}'.format(alpha3_trig)) # 4.4548049546356139E-01
+# ---
 # Testing intervals
 # .) 0 < alpha < 1/6 = the PI/NI region we already investigated
 alpha = 0.1 # x1 = 0.44562222747978653, 0.11687777252021356
@@ -152,8 +162,9 @@ alpha = 0.1 # x1 = 0.44562222747978653, 0.11687777252021356
 ### print('w2={}'.format(w2))
 ### print('x2={}'.format(alpha))
 ###
-### # Early
-### sys.exit(0)
+
+# Early
+# sys.exit(0)
 
 ################################################################################
 
