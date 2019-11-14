@@ -94,6 +94,7 @@ def compute_x1_analytical(alpha):
     A = 120*alpha**2 - 75*alpha + 9
     B = cmath.sqrt(3 * (5*alpha-1) * (240*alpha**3 - 240*alpha**2 + 75*alpha - 7))
     den = 30 * (2*alpha - 1) * (6*alpha - 1)
+    print('A={}, B={}, den={}'.format(A,B,den))
     analytical_roots = [(A + B)/den, (A - B)/den]
     # print('analytical_roots_v2={}'.format(analytical_roots))
     return analytical_roots
