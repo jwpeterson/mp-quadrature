@@ -202,6 +202,7 @@ result = minimize(compute_x1, 0.11, method='CG', \
                            'gtol' : 1.e-10})
 
 # Extract the min x1 value and the alpha where it occurs.
+# Note: the value of x1 at the minimum is "alpha3_trig" which is computed exactly above.
 min_alpha = result.x[0]
 min_x1 = result.fun
 # Compute the corresponding weights at the (alpha, x1(alpha)) solution
