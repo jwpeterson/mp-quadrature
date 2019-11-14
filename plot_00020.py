@@ -255,6 +255,10 @@ else:
 
 # This curve is for 0 <= alpha < 1/6, with clustering near 1/6 to
 # capture the rapid change near that value.
+# We always take the larger root for this plot which is in
+# entry [0] of the returned array. Note: we take the real part
+# without verifying that the imaginary part is zero or nearly
+# zero, but for consistency we should probably do that.
 alphas = np.concatenate((np.linspace(1.e-6, 0.15), np.linspace(0.15, 1./6 - 1.e-6)))
 w1 = np.zeros(len(alphas))
 w2 = np.zeros(len(alphas))
@@ -262,10 +266,6 @@ x1 = np.zeros(len(alphas))
 
 for i in xrange(len(alphas)):
     alpha = alphas[i]
-    # We always take the larger root for this plot which is in
-    # entry [0] of the returned array. Note: we take the real part
-    # without verifying that the imaginary part is zero or nearly
-    # zero, but for consistency we should probably do that.
     x1[i] = compute_x1_analytical(alpha)[0].real
     w1[i], w2[i] = compute_weights(x1[i], alpha)
 
@@ -274,6 +274,8 @@ for i in xrange(len(alphas)):
 # Starting from alpha=0+eps and taking min roots, we can recover a branch
 # of NI rules instead. There is a singularity at alpha=min_alpha where
 # one set of weights blows up to +infty while the other set blows up to -infty.
+# We always take the real part of the smaller root, but we should verify that
+# the imaginary part is zero.
 min_root_alphas = np.linspace(1.e-6, min_alpha - 1.e-3)
 min_root_w1 = np.zeros(len(min_root_alphas))
 min_root_w2 = np.zeros(len(min_root_alphas))
@@ -281,7 +283,7 @@ min_root_x1 = np.zeros(len(min_root_alphas))
 
 for i in xrange(len(min_root_alphas)):
     alpha = min_root_alphas[i]
-    min_root_x1[i] = compute_x1(alpha, max_root=False)
+    min_root_x1[i] = compute_x1_analytical(alpha)[1].real
     min_root_w1[i], min_root_w2[i] = compute_weights(min_root_x1[i], alpha)
 
 # print('min_root_w1={}'.format(min_root_w1))
