@@ -145,12 +145,12 @@ r2 = (9 - np.sqrt(21))/30 # .14725
 
 # Roots of "B", trigonometric forms:
 # alpha
-# theta=(np.pi - np.arctan(3./4))
-# alpha1_trig = (8 - 2*np.cos(theta/3) - 2*np.sqrt(3)*np.sin(theta/3)) / 24
+theta=(np.pi - np.arctan(3./4))
+alpha1_trig = (8 - 2*np.cos(theta/3) - 2*np.sqrt(3)*np.sin(theta/3)) / 24
+alpha2_trig = (8 - 2*np.cos(theta/3) + 2*np.sqrt(3)*np.sin(theta/3)) / 24
+alpha3_trig = (4 + 2*np.cos(theta/3)) / 12
 # print('alpha1_trig={:.16E}'.format(alpha1_trig)) # 1.7048618881295388E-01
-# alpha2_trig = (8 - 2*np.cos(theta/3) + 2*np.sqrt(3)*np.sin(theta/3)) / 24
 # print('alpha2_trig={:.16E}'.format(alpha2_trig)) # 3.8403331572348476E-01
-# alpha3_trig = (4 + 2*np.cos(theta/3)) / 12
 # print('alpha3_trig={:.16E}'.format(alpha3_trig)) # 4.4548049546356139E-01
 
 # Testing intervals
@@ -293,6 +293,27 @@ for i in xrange(len(min_root_alphas)):
 
 ################################################################################
 
+# Make plot for 1/6 < alpha < alpha1. These should be real-valued points and
+# weights, but the points will be outside the region.
+outside_alphas = np.linspace(1./6 + 1.e-3, alpha1_trig)
+outside_w1 = np.zeros(len(outside_alphas))
+outside_w2 = np.zeros(len(outside_alphas))
+outside_x1 = np.zeros(len(outside_alphas))
+
+for i in xrange(len(outside_alphas)):
+    alpha = outside_alphas[i]
+    roots = compute_x1_analytical(alpha)
+    print('alpha={}, roots={}'.format(alpha, roots))
+    outside_x1[i] = roots[0].real
+    outside_w1[i], outside_w2[i] = compute_weights(outside_x1[i], alpha)
+
+# print('outside_w1={}'.format(outside_w1))
+# print('outside_x1={}'.format(outside_x1))
+# print('outside_w2={}'.format(outside_w2))
+# print('outside_x2={}'.format(outside_alphas))
+
+################################################################################
+
 # Make plots
 
 # Plot (alpha, x1(alpha))
@@ -413,12 +434,10 @@ ax1 = fig.add_subplot(111)
 # ax1.plot([alpha_weights_equal,alpha_weights_equal], [0.,0.2],color='lightgray', linestyle='--', linewidth=1)
 ax1.plot(min_root_alphas, min_root_w1, color='blue', marker=None, linewidth=2, label=r'$w_1$')
 ax1.plot(min_root_alphas, min_root_w2, color='red', marker=None, linewidth=2, label=r'$w_2$')
-
 # Plot second half of data, which is just the other weight due to symmetry, and
 # we can use the min_root_x1 for the x-values for the same reason.
 ax1.plot(min_root_x1, min_root_w2, color='blue', marker=None, linewidth=2)
 ax1.plot(min_root_x1, min_root_w1, color='red', marker=None, linewidth=2)
-
 ax1.set_xlabel(r'$\alpha$')
 # ax1.set_xlim([-0.01, 0.175])
 # ax1.set_ylim([0.01, 0.155])
