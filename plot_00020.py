@@ -280,7 +280,7 @@ for i in xrange(len(outside_alphas)):
 
 # Make plots
 
-# Plot (alpha, x1(alpha))
+# Plot (alpha, x1(alpha)) for 0 < alpha < 1/6
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
 # Plot line x=1/6
@@ -311,7 +311,9 @@ ax1.set_xlim([-0.01, 0.175])
 ax1.set_ylim([0.443, 0.505])
 plt.savefig('plot_00020_x1_vs_alpha.pdf', format='pdf')
 
-# Instead of messing with the existing plot, plot the "symmetric" values separately
+# Plot (x1(alpha), alpha) for 0 < alpha < 1/6
+# We use the same values, simply reversing the x and y data.
+# We make a separate plot so that the details of the first plot are not lost.
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
 # Plot line y=1/6
@@ -360,7 +362,8 @@ ax1.set_ylim([0.01, 0.155])
 ax1.legend()
 plt.savefig('plot_00020_weights_vs_alpha.pdf', format='pdf')
 
-# Plot "min" root NI/NB branch (alpha, x1(alpha))
+# Plot "min" root NI/NB branch (alpha, x1(alpha)) for 0 < alpha < min_alpha
+# and then the symmetric part, since it is "connected" in this case.
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
 # Plot dashed line for y=x
