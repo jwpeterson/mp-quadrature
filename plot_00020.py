@@ -239,7 +239,7 @@ if iflag == 1:
     # print('Final residual norm = {}'.format(np.linalg.norm(infodict['fvec'])))
 
     # Compute and print full solution for this value of alpha
-    x1_weights_equal = compute_x1(alpha_weights_equal)
+    x1_weights_equal = compute_x1_analytical(alpha_weights_equal)[0].real
     w1, w2 = compute_weights(x1_weights_equal, alpha_weights_equal)
     # Print current result
     print('---')
