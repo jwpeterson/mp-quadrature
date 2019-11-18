@@ -25,55 +25,6 @@ def g(x):
     return x * (15*x**2 - 9*x + 1)
 
 """
-Given alpha, computes x1(alpha), throwing an error if no valid
-roots are found. By default, we take the maximum eligible root for the
-solution.
-"""
-def compute_x1(alpha, max_root=True):
-    # Don't accept input values outside the range
-    if (alpha <= 0.) or (alpha >= 0.5):
-        print('Invalid input, alpha={}; 0 < alpha < 0.5 is required.'.format(alpha))
-        sys.exit(1)
-
-    sigma = f(alpha) / g(alpha)
-    roots = np.roots([15*sigma, -(9*sigma + 6), (sigma + 4), -0.5])
-
-    # We want to pick the positive, real root which is in the interval
-    # [0, 1/2] and which is farthest from the input value of alpha. I didn't
-    # realize this before, but alpha itself should always be one of the roots?
-    # print('alpha={}'.format(alpha))
-    # print('roots={}'.format(roots))
-
-    # Using the polynomial_division.py code, we found the following roots analytically.
-    # Note: you have to keep terms combined under the square root, otherwise numpy will
-    # generate a NaN when trying to take the sqrt of a negative number.
-    A = (40*alpha**2 - 25*alpha + 3) / (10 * (2*alpha - 1) * (6*alpha - 1))
-    B = np.sqrt(3.) * cmath.sqrt((5*alpha-1)*(240*alpha**3 - 240*alpha**2 + 75*alpha - 7)) \
-        / (30 * (12*alpha**2 - 8*alpha + 1))
-    analytical_roots = [A + B, A - B]
-    # print('analytical_roots={}'.format(analytical_roots))
-
-    # Default value should be "small" if we are returning max roots, "large" otherwise.
-    x1 = 0 # small
-    if not max_root:
-        x1 = 100 # large
-    found_x1 = False
-    for candidate_root in roots:
-        if np.isreal(candidate_root) and (np.abs(candidate_root - alpha) > 1.e-3) \
-           and (candidate_root > 0.) and (candidate_root < 0.5):
-            found_x1 = True
-            if max_root:
-                x1 = np.maximum(candidate_root, x1)
-            else:
-                x1 = np.minimum(candidate_root, x1)
-
-    # Error if an acceptable root was not found.
-    if not found_x1:
-        raise RuntimeError('No valid root found for alpha={}, roots={}.'.format(alpha, roots))
-
-    return x1
-
-"""
 Given alpha, computes x1(alpha) analytically. Returns a pair of
 (possibly complex) values, throws an error for input values of
 alpha=1/2 or 1/6 since computing x1 by this method is not well-defined
@@ -188,8 +139,7 @@ alpha = 0.48 # x1 = -0.737867, 0.1633997                (PI)
 # alpha = 0.444 imaginary
 ### try:
 ###     analytical_roots = compute_x1_analytical(alpha)
-###     x1 = compute_x1(alpha, max_root=False)
-###     w1, w2 = compute_weights(x1, alpha)
+###     w1, w2 = compute_weights(analytical_roots[0].real, alpha)
 ###     print('---')
 ###     print('w1={}'.format(w1))
 ###     print('x1={}'.format(x1))
