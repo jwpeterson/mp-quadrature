@@ -94,7 +94,7 @@ def compute_x1_analytical(alpha):
     A = 120*alpha**2 - 75*alpha + 9
     B = cmath.sqrt(3 * (5*alpha-1) * (240*alpha**3 - 240*alpha**2 + 75*alpha - 7))
     den = 30 * (2*alpha - 1) * (6*alpha - 1)
-    print('A={}, B={}, den={}'.format(A,B,den))
+    # print('A={}, B={}, den={}'.format(A,B,den))
     analytical_roots = [(A + B)/den, (A - B)/den]
     # print('analytical_roots_v2={}'.format(analytical_roots))
     return analytical_roots
@@ -114,9 +114,20 @@ def compute_weights(x1, x2):
 Function used with fsolve to find alpha for which w1(alpha) = w2(alpha) = 1/12
 """
 def residual(alpha):
-    x1 = compute_x1(alpha)
+    x1 = compute_x1_analytical(alpha)[0].real
     w1, w2 = compute_weights(x1, alpha)
     return w1 - 1./12
+
+"""
+Function used with minimize() to find a minimum value of x1. Returns the
+first root, "(A+B)/den", throwing an error if the value has a nonzero imaginary component.
+"""
+def fmin(alpha):
+    roots = compute_x1_analytical(alpha)
+    if (np.abs(roots[0].imag) > 1.e-6):
+        raise RuntimeError('No valid root found for alpha={}, roots={}.'.format(alpha, roots))
+    # Real-valued return
+    return roots[0].real
 
 ################################################################################
 
@@ -198,7 +209,7 @@ alpha = 0.48 # x1 = -0.737867, 0.1633997                (PI)
 # method='L-BFGS-B'
 # method='Newton-CG' # requires Jacobian
 # method='CG' # cannot handle constraints or bounds
-result = minimize(compute_x1, 0.11, method='CG', \
+result = minimize(fmin, 0.11, method='CG', \
                   options={'disp': False,
                            'gtol' : 1.e-10})
 
@@ -304,7 +315,7 @@ outside_x1 = np.zeros(len(outside_alphas))
 for i in xrange(len(outside_alphas)):
     alpha = outside_alphas[i]
     roots = compute_x1_analytical(alpha)
-    print('alpha={}, roots={}'.format(alpha, roots))
+    # print('alpha={}, roots={}'.format(alpha, roots))
     outside_x1[i] = roots[0].real
     outside_w1[i], outside_w2[i] = compute_weights(outside_x1[i], alpha)
 
