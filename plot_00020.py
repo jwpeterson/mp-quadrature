@@ -109,9 +109,11 @@ r2 = (9 - np.sqrt(21))/30 # .14725
 # Roots of "B", trigonometric forms:
 # alpha
 theta=(np.pi - np.arctan(3./4))
-alpha1_trig = (8 - 2*np.cos(theta/3) - 2*np.sqrt(3)*np.sin(theta/3)) / 24
-alpha2_trig = (8 - 2*np.cos(theta/3) + 2*np.sqrt(3)*np.sin(theta/3)) / 24
-alpha3_trig = (4 + 2*np.cos(theta/3)) / 12
+ct3 = np.cos(theta/3)
+st3 = np.sin(theta/3)
+alpha1_trig = (8 - 2*ct3 - 2*np.sqrt(3)*st3) / 24
+alpha2_trig = (8 - 2*ct3 + 2*np.sqrt(3)*st3) / 24
+alpha3_trig = (4 + 2*ct3) / 12
 # print('alpha1_trig={:.16E}'.format(alpha1_trig)) # 1.7048618881295388E-01
 # print('alpha2_trig={:.16E}'.format(alpha2_trig)) # 3.8403331572348476E-01
 # print('alpha3_trig={:.16E}'.format(alpha3_trig)) # 4.4548049546356139E-01
