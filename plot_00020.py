@@ -114,9 +114,11 @@ st3 = np.sin(theta/3)
 alpha1_trig = (4 - ct3 - np.sqrt(3)*st3) / 12
 alpha2_trig = (4 - ct3 + np.sqrt(3)*st3) / 12
 alpha3_trig = (2 + ct3) / 6
+x1_alpha3 = (-ct3/12 - np.cos(2*theta/3)/6 + 1./10)/st3**2
 print('alpha1_trig={:.16E}'.format(alpha1_trig)) # 1.7048618881295388E-01
 print('alpha2_trig={:.16E}'.format(alpha2_trig)) # 3.8403331572348476E-01
 print('alpha3_trig={:.16E}'.format(alpha3_trig)) # 4.4548049546356139E-01
+print('x1(alpha3)={:.16E}'.format(x1_alpha3)) # 1.0903900907287724E-01
 
 # Testing intervals
 # .) 0 < alpha < 1/6 = the PI/NI region we already investigated
