@@ -1,6 +1,6 @@
 #!/usr/bin/env python
 import sympy
-from sympy.abc import a, x
+from sympy.abc import a, x, t
 from fractions import Fraction
 import sys
 
@@ -43,11 +43,26 @@ root_dict = sympy.simplify(sympy.roots(numerator, x))
 for r in root_dict:
     print(r)
     # Substitute in some specific values.
-    x1_onefifth = r.subs([(a,Fraction(1,5))])
-    print('x1(alpha=1/5)={}'.format(x1_onefifth))
-    x1_rootA = sympy.simplify(r.subs([(a, (25 + sympy.sqrt(145))/80)]))
-    print('x1(alpha=root of A)={}, ~ {}'.format(x1_rootA, x1_rootA.evalf()))
+    # x1_onefifth = r.subs([(a,Fraction(1,5))])
+    # print('x1(alpha=1/5)={}'.format(x1_onefifth))
+
+    # x1_rootA = sympy.simplify(r.subs([(a, (25 + sympy.sqrt(145))/80)]))
+    # print('x1(alpha=root of A)={}, ~ {}'.format(x1_rootA, x1_rootA.evalf()))
 
 # When alpha = alpha1 = (2 + cos(theta/3)) / 6, we would like to know the analytical
 # value of x1 which should match what we called min_alpha in early versions of the
-# analysis.
+# analysis. In the formula below, "t" is theta. The discriminant Delta(alpha) = 0
+# because alpha1 is one of the roots of the cubic polynomial in Delta.
+# alpha1=cos(t/3)/6 + 1/3
+alpha1 = (2 + sympy.cos(t/3)) / 6
+print('alpha1={}'.format(alpha1))
+
+# x1_alpha1=(-cos(t/3)/12 - cos(2*t/3)/6 + 1/10)/sin(t/3)**2
+x1_alpha1 = sympy.simplify((120*alpha1**2 - 75*alpha1 + 9) / (30 * (2*alpha1 - 1) * (6*alpha1 - 1)))
+print('x1_alpha1={}'.format(x1_alpha1))
+
+# Make sure that x1_alpha1 approx 0.10903900907287808 by substituting in
+# theta = pi - arctan(3,4) ~ 2.498091544796508851659834154562
+# x1_alpha1_numerical=0.109039009072877
+x1_alpha1_numerical = x1_alpha1.subs([(t,2.498091544796508851659834154562)]).evalf()
+print('x1_alpha1_numerical={}'.format(x1_alpha1_numerical))
