@@ -260,7 +260,7 @@ for i in xrange(len(min_root_alphas)):
 # Make plot for 1/6 < alpha < alpha1. These should be real-valued points and
 # weights, but the points will be outside the region.
 # outside_alphas = np.linspace(1./6 + 1.e-6, alpha1_trig)
-outside_alphas = np.concatenate((np.linspace(1./6 + 1.e-6, 0.169), np.linspace(0.169, alpha1_trig)))
+outside_alphas = np.concatenate((np.linspace(1./6 + 1.e-6, 0.17), np.linspace(0.17, alpha1_trig)))
 outside_w1 = np.zeros(len(outside_alphas))
 outside_w2 = np.zeros(len(outside_alphas))
 outside_x1 = np.zeros(len(outside_alphas))
@@ -429,7 +429,7 @@ ax1.plot([1./6], [0.5], color='black', linestyle='', marker='o')
 ax1.text(1./6, 0.5+.005, r'PB')
 ax1.text(alpha1_trig, 0.525, r'$\alpha_1$')
 # Labels, limits, and legends
-ax1.set_xlim([1./6-.0001, alpha1_trig+.001])
+ax1.set_xlim([1./6-.0001, 0.171])
 ax1.set_ylim([0.49, 0.67])
 ax1.set_xlabel(r'$\alpha$')
 ax1.set_ylabel(r'$x_1(\alpha)$')
