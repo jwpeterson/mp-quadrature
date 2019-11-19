@@ -47,3 +47,7 @@ for r in root_dict:
     print('x1(alpha=1/5)={}'.format(x1_onefifth))
     x1_rootA = sympy.simplify(r.subs([(a, (25 + sympy.sqrt(145))/80)]))
     print('x1(alpha=root of A)={}, ~ {}'.format(x1_rootA, x1_rootA.evalf()))
+
+# When alpha = alpha1 = (2 + cos(theta/3)) / 6, we would like to know the analytical
+# value of x1 which should match what we called min_alpha in early versions of the
+# analysis.
