@@ -259,7 +259,8 @@ for i in xrange(len(min_root_alphas)):
 
 # Make plot for 1/6 < alpha < alpha1. These should be real-valued points and
 # weights, but the points will be outside the region.
-outside_alphas = np.linspace(1./6 + 1.e-3, alpha1_trig)
+# outside_alphas = np.linspace(1./6 + 1.e-6, alpha1_trig)
+outside_alphas = np.concatenate((np.linspace(1./6 + 1.e-6, 0.169), np.linspace(0.169, alpha1_trig)))
 outside_w1 = np.zeros(len(outside_alphas))
 outside_w2 = np.zeros(len(outside_alphas))
 outside_x1 = np.zeros(len(outside_alphas))
@@ -271,6 +272,7 @@ for i in xrange(len(outside_alphas)):
     outside_x1[i] = roots[0].real
     outside_w1[i], outside_w2[i] = compute_weights(outside_x1[i], alpha)
 
+# The weights are positive but the points are outside, so this is a "PO" rule
 # print('outside_w1={}'.format(outside_w1))
 # print('outside_x1={}'.format(outside_x1))
 # print('outside_w2={}'.format(outside_w2))
@@ -410,3 +412,25 @@ ax1.set_xlabel(r'$\alpha$')
 # ax1.set_ylim([0.01, 0.155])
 ax1.legend()
 plt.savefig('plot_00020_min_root_weights_vs_alpha.pdf', format='pdf')
+
+# Make plot for 1/6 < alpha < alpha1_trig. For these cases there are
+# two solution branches, both of which are outside the reference element.
+# This is a PO rule, so we use a solid line.
+fig = plt.figure()
+ax1 = fig.add_subplot(111)
+ax1.plot(outside_alphas, outside_x1, color='black', linestyle='-', marker=None)
+# line x=alpha_1
+ax1.plot([alpha1_trig,alpha1_trig], [0,1],color='lightgray', linestyle='--', linewidth=1)
+# line y=0.5
+ax1.plot([0,1], [0.5,0.5],color='lightgray', linestyle='--', linewidth=1)
+# Plot single points
+ax1.plot([1./6], [0.5], color='black', linestyle='', marker='o')
+# Point labels
+ax1.text(1./6, 0.5+.005, r'PB')
+ax1.text(alpha1_trig, 0.525, r'$\alpha_1$')
+# Labels, limits, and legends
+ax1.set_xlim([1./6-.0001, alpha1_trig+.001])
+ax1.set_ylim([0.49, 0.67])
+ax1.set_xlabel(r'$\alpha$')
+ax1.set_ylabel(r'$x_1(\alpha)$')
+plt.savefig('plot_00020_outside_alphas.pdf', format='pdf')
