@@ -53,7 +53,7 @@ for r in root_dict:
 # value of x1 which should match what we called "min_alpha" in early versions of the
 # analysis. In the formula below, "t" is theta. The discriminant Delta(alpha) = 0
 # because alpha1 is one of the roots of the cubic polynomial in Delta.
-# Note: theta = pi - arctan(3,4) ~ 2.498091544796508851659834154562
+# Note: theta = pi - arctan(3/4) ~ 2.498091544796508851659834154562
 
 # alpha3=cos(t/3)/6 + 1/3
 # x1_alpha3=(-cos(t/3)/12 - cos(2*t/3)/6 + 1/10)/sin(t/3)**2
