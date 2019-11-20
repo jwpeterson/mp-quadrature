@@ -81,3 +81,17 @@ x1_alpha1 = sympy.simplify((120*alpha1**2 - 75*alpha1 + 9) / (30 * (2*alpha1 - 1
 print('x1_alpha1={}'.format(x1_alpha1))
 x1_alpha1_numerical = x1_alpha1.subs([(t,2.498091544796508851659834154562)]).evalf()
 print('x1_alpha1_numerical={}'.format(x1_alpha1_numerical))
+
+# When alpha = alpha2 = (4 - ct3 + np.sqrt(3)*st3) / 12
+#                     ~ 3.8403331572348476E-01,
+# we would like to know the analytical value of x1.
+# alpha2=sqrt(3)*sin(t/3)/12 - cos(t/3)/12 + 1/3
+# x1_alpha2=(sqrt(3)*sin(2*t/3)/6 + cos(2*t/3)/6 + cos(t/3 + pi/3)/6 + 1/5)/(sin(2*t/3 + pi/6) + 1)
+# x1_alpha2_numerical=0.231933368553031
+print('---')
+alpha2 = (4 - sympy.cos(t/3) + sympy.sqrt(3)*sympy.sin(t/3)) / 12
+print('alpha2={}'.format(alpha2))
+x1_alpha2 = sympy.simplify((120*alpha2**2 - 75*alpha2 + 9) / (30 * (2*alpha2 - 1) * (6*alpha2 - 1)))
+print('x1_alpha2={}'.format(x1_alpha2))
+x1_alpha2_numerical = x1_alpha2.subs([(t,2.498091544796508851659834154562)]).evalf()
+print('x1_alpha2_numerical={}'.format(x1_alpha2_numerical))
