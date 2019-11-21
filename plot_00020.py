@@ -306,6 +306,42 @@ for i in xrange(len(outside_alphas)):
 
 ################################################################################
 
+# Note: for alpha1 < alpha < 1/5, the roots are imaginary, so we skip computing those.
+
+# Compute roots for 1/5 < alpha < alpha2. These are NI rules.
+alpha1_alpha2 = np.linspace(1./5, alpha2_trig)
+# first root
+alpha1_alpha2_x1_first = np.zeros(len(alpha1_alpha2))
+alpha1_alpha2_w1_first = np.zeros(len(alpha1_alpha2))
+alpha1_alpha2_w2_first = np.zeros(len(alpha1_alpha2))
+# second root
+alpha1_alpha2_x1_second = np.zeros(len(alpha1_alpha2))
+alpha1_alpha2_w1_second = np.zeros(len(alpha1_alpha2))
+alpha1_alpha2_w2_second = np.zeros(len(alpha1_alpha2))
+
+for i in xrange(len(alpha1_alpha2)):
+    alpha = alpha1_alpha2[i]
+    roots = compute_x1_analytical(alpha)
+    print('alpha={}, roots={}'.format(alpha, roots))
+    # First root
+    alpha1_alpha2_x1_first[i] = roots[0].real
+    alpha1_alpha2_w1_first[i], alpha1_alpha2_w2_first[i] = compute_weights(alpha1_alpha2_x1_first[i], alpha)
+    # Second root
+    alpha1_alpha2_x1_second[i] = roots[1].real
+    alpha1_alpha2_w1_second[i], alpha1_alpha2_w2_second[i] = compute_weights(alpha1_alpha2_x1_second[i], alpha)
+
+# First root
+# print('alpha1_alpha2_x1_first={}'.format(alpha1_alpha2_x1))
+# print('alpha1_alpha2_w1_first={}'.format(alpha1_alpha2_w1_first))
+# print('alpha1_alpha2_w2_first={}'.format(alpha1_alpha2_w2_first))
+
+# Second root
+# print('alpha1_alpha2_x1_second={}'.format(alpha1_alpha2_x1))
+# print('alpha1_alpha2_w1_second={}'.format(alpha1_alpha2_w1_second))
+# print('alpha1_alpha2_w2_second={}'.format(alpha1_alpha2_w2_second))
+
+################################################################################
+
 # Make plots
 
 # Plot (alpha, x1(alpha)) for 0 < alpha < 1/6
