@@ -110,19 +110,24 @@ r2 = (9 - np.sqrt(21))/30 # .14725
 # alpha
 mu = np.arctan(3./4)
 theta = np.pi - mu
+tp = theta + np.pi
 ct3 = np.cos(theta/3)
 st3 = np.sin(theta/3)
 cm3 = np.cos(mu/3)
 sm3 = np.sin(mu/3)
+ctp3 = np.cos(tp/3)
+stp3 = np.sin(tp/3)
 alpha1_trig = (4 - ct3 - np.sqrt(3)*st3) / 12
 alpha2_trig = (4 - ct3 + np.sqrt(3)*st3) / 12
 alpha3_trig = (2 + ct3) / 6
 x1_alpha1 = (6 + 5*cm3 - 10*np.cos(2*mu/3))/(60 * sm3**2)
+x1_alpha2 = (6 + 5*ctp3 - 10*np.cos(2*tp/3))/(60 * stp3**2)
 x1_alpha3 = (6 - 5*ct3 - 10*np.cos(2*theta/3))/(60 * st3**2)
 print('alpha1_trig={:.16E}'.format(alpha1_trig)) # 1.7048618881295388E-01
 print('alpha2_trig={:.16E}'.format(alpha2_trig)) # 3.8403331572348476E-01
 print('alpha3_trig={:.16E}'.format(alpha3_trig)) # 4.4548049546356139E-01
 print('x1(alpha1)={:.16E}'.format(x1_alpha1)) # 6.5902762237409251E-01
+print('x1(alpha2)={:.16E}'.format(x1_alpha2)) # 2.3193336855303059E-01
 print('x1(alpha3)={:.16E}'.format(x1_alpha3)) # 1.0903900907287724E-01
 
 # Testing intervals
