@@ -309,7 +309,7 @@ for i in xrange(len(outside_alphas)):
 # Note: for alpha1 < alpha < 1/5, the roots are imaginary, so we skip computing those.
 
 # Compute roots for 1/5 < alpha < alpha2. These are NI rules.
-alpha1_alpha2 = np.linspace(1./5, alpha2_trig)
+alpha1_alpha2 = np.concatenate((np.linspace(1./5, 1./5 + .01), np.linspace(1./5 + .01, 0.375), np.linspace(0.375, alpha2_trig)))
 # first root
 alpha1_alpha2_x1_first = np.zeros(len(alpha1_alpha2))
 alpha1_alpha2_w1_first = np.zeros(len(alpha1_alpha2))
@@ -511,10 +511,27 @@ ax1 = fig.add_subplot(111)
 ax1.plot([0.2,0.2], [0,3],color='lightgray', linestyle='--', linewidth=1)
 # line x=alpha2
 ax1.plot([alpha2_trig,alpha2_trig], [0,3],color='lightgray', linestyle='--', linewidth=1)
+# line y=1/5
+ax1.plot([0,3], [0.2,0.2], color='lightgray', linestyle='--', linewidth=1)
+# line y=alpha2
+ax1.plot([0,3], [alpha2_trig,alpha2_trig], color='lightgray', linestyle='--', linewidth=1)
+# Plot line for y=x
+ax1.plot([0,1], [0,1], color='lightgray', linestyle='--', linewidth=1)
 # Plot first solution branch
 ax1.plot(alpha1_alpha2, alpha1_alpha2_x1_first, color='black', linestyle='--', marker=None)
 # Plot second solution branch
 ax1.plot(alpha1_alpha2, alpha1_alpha2_x1_second, color='black', linestyle='--', marker=None)
+# Plot single points
+ax1.plot([1./3], [0.2], color='black', linestyle='', marker='o')
+ax1.plot([0.2], [1./3], color='black', linestyle='', marker='o')
+ax1.plot([alpha2_trig], [x1_alpha2], color='black', linestyle='', marker='o')
+ax1.plot([x1_alpha2], [alpha2_trig], color='black', linestyle='', marker='o')
+ax1.axis('square')
+# Point labels
+ax1.text(1./3, 0.2+.005, r'$\left(\frac{1}{3},\frac{1}{5}\right)$')
+ax1.text(0.2+.005, 1./3, r'$\left(\frac{1}{5},\frac{1}{3}\right)$')
+ax1.text(x1_alpha2, alpha2_trig+.005, r'$\left(x_1(\alpha_2),\alpha_2\right)$')
+# Labels, limits, and legends
 ax1.set_xlim([0.18, 0.4])
 ax1.set_ylim([0.18, 0.4])
 ax1.set_xlabel(r'$\alpha$')
