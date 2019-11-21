@@ -452,9 +452,10 @@ ax1.plot([1./6,1./6], [0,3],color='lightgray', linestyle='--', linewidth=1)
 ax1.plot([0,1], [0.5,0.5],color='lightgray', linestyle='--', linewidth=1)
 # Plot single points
 ax1.plot([1./6], [0.5], color='black', linestyle='', marker='o')
+ax1.plot([alpha1_trig], [x1_alpha1], color='black', linestyle='', marker='o')
 # Point labels
-ax1.text(1./6+5.e-5, 0.5+.05, r'PB')
-ax1.text(alpha1_trig+5.e-5, 0.525, r'$\alpha_1$')
+ax1.text(1./6+5.e-5, 0.5+.05, r'PB:\,$(\frac{1}{6},\frac{1}{2})$')
+ax1.text(alpha1_trig-.0011, x1_alpha1, r'PO:\,$(\alpha_1, x_1(\alpha_1))$')
 # Labels, limits, and legends
 ax1.set_xlim([1./6-.0001, 0.171])
 ax1.set_ylim([0.4, 2])
