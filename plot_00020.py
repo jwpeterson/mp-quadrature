@@ -393,11 +393,15 @@ plt.savefig('plot_00020_x1_vs_alpha_2.pdf', format='pdf')
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
 # Plot dashed line for y=x
-ax1.plot([0,1], [0,1], color='lightgray', linestyle='--', linewidth=1)
+# ax1.plot([0,1], [0,1], color='lightgray', linestyle='--', linewidth=1)
 # Plot dashed line for y=0
 # ax1.plot([0,1], [0,0], color='lightgray', linestyle='--', linewidth=1)
 # Plot dashed line for x=0
 # ax1.plot([0,0], [0,1], color='lightgray', linestyle='--', linewidth=1)
+# line y=x1(alpha3)
+ax1.plot([0,1], [x1_alpha3,x1_alpha3],color='lightgray', linestyle='--', linewidth=1)
+# line x=x1(alpha3)
+ax1.plot([x1_alpha3,x1_alpha3], [0,1], color='lightgray', linestyle='--', linewidth=1)
 # Plot the data, which forms a symmetric path about the origin.
 # We plot the first half of data up to the singular point, then
 # swap the arrays to plot the other half.
@@ -410,7 +414,8 @@ ax1.plot([min_alpha], [min_alpha], color='black', linestyle='', marker='o', mark
 # Add plot labels
 ax1.text(0+.002, r2+.001, r'NB:\,$(0, r_2)$')
 ax1.text(r2-.035, 0+.001, r'NB:\,$(r_2, 0)$')
-ax1.text(min_alpha-.05, min_alpha-.005, r'$(x_1(\alpha_3), x_1(\alpha_3))$')
+# ax1.text(min_alpha-.05, min_alpha-.005, r'$(x_1(\alpha_3), x_1(\alpha_3))$')
+ax1.text(0.01, x1_alpha3+.002, r'$x_1(\alpha_3)$')
 ax1.axis('square')
 ax1.set_xlim([-0.001, r2 + .01])
 ax1.set_ylim([-0.001, r2 + .01])
