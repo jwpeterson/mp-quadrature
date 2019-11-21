@@ -226,6 +226,32 @@ if iflag == 1:
 else:
     print('fsolve not converged.')
 
+################################################################################
+
+# Compute solution for alpha=1/5, x1(alpha) = 1/3.
+alpha=0.2
+roots = compute_x1_analytical(alpha)
+print('alpha={}, roots={}'.format(alpha, roots))
+# It does not matter whether you pick the first or second root because
+# they are both 1/3.
+x1 = roots[0].real
+(w1, w2) = compute_weights(x1, alpha)
+print('---')
+print('Non-conservative degenerate solution:')
+print('w1={}'.format(w1))
+print('x1={}'.format(x1))
+print('w2={}'.format(w2))
+print('x2={}'.format(alpha))
+
+# Results
+# Non-conservative degenerate solution:
+# w1=-0.09375       # (-3/32, but there are three of these weights, so -9/32 = -27/96)
+# x1=0.333333333333
+# w2=0.260416666667 # (25/96)
+# x2=0.2
+
+# Early return
+sys.exit(0)
 
 ################################################################################
 
@@ -306,9 +332,8 @@ for i in xrange(len(outside_alphas)):
 
 ################################################################################
 
-# Note: for alpha1 < alpha < 1/5, the roots are imaginary, so we skip computing those.
-
 # Compute roots for 1/5 < alpha < alpha2. These are NI rules.
+# Note: for alpha1 < alpha < 1/5, the roots are imaginary, so we skip computing those.
 alpha1_alpha2 = np.concatenate((np.linspace(1./5, 1./5 + .01), np.linspace(1./5 + .01, 0.375), np.linspace(0.375, alpha2_trig)))
 # first root
 alpha1_alpha2_x1_first = np.zeros(len(alpha1_alpha2))
