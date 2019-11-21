@@ -375,20 +375,20 @@ ax1.set_xlabel(r'$\alpha$')
 ax1.set_ylabel(r'$x_1(\alpha)$')
 plt.savefig('plot_00020_x1_vs_alpha_2.pdf', format='pdf')
 
-# Plot w1 and w2 vs. alpha. Do they cross somewhere?
-fig = plt.figure()
-ax1 = fig.add_subplot(111)
-# Plot line y=1/12. The weights are symmetric about this line.
-ax1.plot([-0.1,0.18], [1./12,1./12], color='lightgray', linestyle='--', linewidth=1)
-# Plot vertical line for the value of alpha where the weights are equal.
-ax1.plot([alpha_weights_equal,alpha_weights_equal], [0.,0.2],color='lightgray', linestyle='--', linewidth=1)
-ax1.plot(alphas, w1, color='blue', marker=None, linewidth=2, label=r'$w_1$')
-ax1.plot(alphas, w2, color='red', marker=None, linewidth=2, label=r'$w_2$')
-ax1.set_xlabel(r'$\alpha$')
-ax1.set_xlim([-0.01, 0.175])
-ax1.set_ylim([0.01, 0.155])
-ax1.legend()
-plt.savefig('plot_00020_weights_vs_alpha.pdf', format='pdf')
+### # Plot w1 and w2 vs. alpha. Do they cross somewhere?
+### fig = plt.figure()
+### ax1 = fig.add_subplot(111)
+### # Plot line y=1/12. The weights are symmetric about this line.
+### ax1.plot([-0.1,0.18], [1./12,1./12], color='lightgray', linestyle='--', linewidth=1)
+### # Plot vertical line for the value of alpha where the weights are equal.
+### ax1.plot([alpha_weights_equal,alpha_weights_equal], [0.,0.2],color='lightgray', linestyle='--', linewidth=1)
+### ax1.plot(alphas, w1, color='blue', marker=None, linewidth=2, label=r'$w_1$')
+### ax1.plot(alphas, w2, color='red', marker=None, linewidth=2, label=r'$w_2$')
+### ax1.set_xlabel(r'$\alpha$')
+### ax1.set_xlim([-0.01, 0.175])
+### ax1.set_ylim([0.01, 0.155])
+### ax1.legend()
+### plt.savefig('plot_00020_weights_vs_alpha.pdf', format='pdf')
 
 # Plot "min" root NI/NB branch (alpha, x1(alpha)) for 0 < alpha < min_alpha
 # and then the symmetric part, since it is "connected" in this case.
@@ -420,24 +420,24 @@ ax1.set_xlabel(r'$\alpha$')
 ax1.set_ylabel(r'$x_1(\alpha)$')
 plt.savefig('plot_00020_min_root.pdf', format='pdf')
 
-# Plot weights on "min" root NI/NB branch (w1 vs. alpha, w2 vs. alpha)
-fig = plt.figure()
-ax1 = fig.add_subplot(111)
-# Plot line y=1/12. The weights are symmetric about this line.
-# ax1.plot([-0.1,0.18], [1./12,1./12], color='lightgray', linestyle='--', linewidth=1)
-# Plot vertical line for the value of alpha where the weights are equal.
-# ax1.plot([alpha_weights_equal,alpha_weights_equal], [0.,0.2],color='lightgray', linestyle='--', linewidth=1)
-ax1.plot(min_root_alphas, min_root_w1, color='blue', marker=None, linewidth=2, label=r'$w_1$')
-ax1.plot(min_root_alphas, min_root_w2, color='red', marker=None, linewidth=2, label=r'$w_2$')
-# Plot second half of data, which is just the other weight due to symmetry, and
-# we can use the min_root_x1 for the x-values for the same reason.
-ax1.plot(min_root_x1, min_root_w2, color='blue', marker=None, linewidth=2)
-ax1.plot(min_root_x1, min_root_w1, color='red', marker=None, linewidth=2)
-ax1.set_xlabel(r'$\alpha$')
-# ax1.set_xlim([-0.01, 0.175])
-# ax1.set_ylim([0.01, 0.155])
-ax1.legend()
-plt.savefig('plot_00020_min_root_weights_vs_alpha.pdf', format='pdf')
+### # Plot weights on "min" root NI/NB branch (w1 vs. alpha, w2 vs. alpha)
+### fig = plt.figure()
+### ax1 = fig.add_subplot(111)
+### # Plot line y=1/12. The weights are symmetric about this line.
+### # ax1.plot([-0.1,0.18], [1./12,1./12], color='lightgray', linestyle='--', linewidth=1)
+### # Plot vertical line for the value of alpha where the weights are equal.
+### # ax1.plot([alpha_weights_equal,alpha_weights_equal], [0.,0.2],color='lightgray', linestyle='--', linewidth=1)
+### ax1.plot(min_root_alphas, min_root_w1, color='blue', marker=None, linewidth=2, label=r'$w_1$')
+### ax1.plot(min_root_alphas, min_root_w2, color='red', marker=None, linewidth=2, label=r'$w_2$')
+### # Plot second half of data, which is just the other weight due to symmetry, and
+### # we can use the min_root_x1 for the x-values for the same reason.
+### ax1.plot(min_root_x1, min_root_w2, color='blue', marker=None, linewidth=2)
+### ax1.plot(min_root_x1, min_root_w1, color='red', marker=None, linewidth=2)
+### ax1.set_xlabel(r'$\alpha$')
+### # ax1.set_xlim([-0.01, 0.175])
+### # ax1.set_ylim([0.01, 0.155])
+### ax1.legend()
+### plt.savefig('plot_00020_min_root_weights_vs_alpha.pdf', format='pdf')
 
 # Make plot for 1/6 < alpha < alpha1_trig. For these cases there are
 # two solution branches, both of which are outside the reference element.
