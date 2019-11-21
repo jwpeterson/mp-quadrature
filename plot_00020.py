@@ -322,7 +322,7 @@ alpha1_alpha2_w2_second = np.zeros(len(alpha1_alpha2))
 for i in xrange(len(alpha1_alpha2)):
     alpha = alpha1_alpha2[i]
     roots = compute_x1_analytical(alpha)
-    print('alpha={}, roots={}'.format(alpha, roots))
+    # print('alpha={}, roots={}'.format(alpha, roots))
     # First root
     alpha1_alpha2_x1_first[i] = roots[0].real
     alpha1_alpha2_w1_first[i], alpha1_alpha2_w2_first[i] = compute_weights(alpha1_alpha2_x1_first[i], alpha)
@@ -503,3 +503,20 @@ ax1.set_ylim([0.4, 2])
 ax1.set_xlabel(r'$\alpha$')
 ax1.set_ylabel(r'$x_1(\alpha)$')
 plt.savefig('plot_00020_outside_alphas.pdf', format='pdf')
+
+# Make plot for 1/5 < alpha < alpha2. Use dashed lines because they are NI solutions.
+fig = plt.figure()
+ax1 = fig.add_subplot(111)
+# line x=1/5
+ax1.plot([0.2,0.2], [0,3],color='lightgray', linestyle='--', linewidth=1)
+# line x=alpha2
+ax1.plot([alpha2_trig,alpha2_trig], [0,3],color='lightgray', linestyle='--', linewidth=1)
+# Plot first solution branch
+ax1.plot(alpha1_alpha2, alpha1_alpha2_x1_first, color='black', linestyle='--', marker=None)
+# Plot second solution branch
+ax1.plot(alpha1_alpha2, alpha1_alpha2_x1_second, color='black', linestyle='--', marker=None)
+ax1.set_xlim([0.18, 0.4])
+ax1.set_ylim([0.18, 0.4])
+ax1.set_xlabel(r'$\alpha$')
+ax1.set_ylabel(r'$x_1(\alpha)$')
+plt.savefig('plot_00020_alpha1_alpha2.pdf', format='pdf')
