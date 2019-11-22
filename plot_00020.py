@@ -159,12 +159,17 @@ result = minimize(fmin, 0.11, method='CG', \
                   options={'disp': False,
                            'gtol' : 1.e-10})
 
-# Extract the min x1 value and the alpha where it occurs.
-# Note: the value of x1 at the minimum is "alpha3_trig" which is computed exactly above.
-min_alpha = result.x[0]
-min_x1 = result.fun
+# The min should be "x1_alpha3" which is computed above, but I found
+# it only matches to 3 or 4 digits.
+if (np.abs(result.x[0] - x1_alpha3) > 1.e-3):
+    raise RuntimeError('Computed minimum {} did not match expected value: {}'.format(result.x[0], x1_alpha3))
+
+# The function value at this point should match alpha3_trig that we computed above.
+if (np.abs(result.fun - alpha3_trig) > 1.e-6):
+    raise RuntimeError('Solution {} did not match expected value: {}'.format(result.fun, alpha3_trig))
+
 # Compute the corresponding weights at the (alpha, x1(alpha)) solution
-w1, w2 = compute_weights(min_x1, min_alpha)
+w1, w2 = compute_weights(alpha3_trig, x1_alpha3)
 
 # The solution is:
 # w1=0.0995222256262
@@ -174,9 +179,9 @@ w1, w2 = compute_weights(min_x1, min_alpha)
 print('---')
 print('Min x1 solution:')
 print('w1={}'.format(w1))
-print('x1={}'.format(min_x1))
+print('x1={}'.format(alpha3_trig))
 print('w2={}'.format(w2))
-print('x2={}'.format(min_alpha))
+print('x2={}'.format(x1_alpha3))
 
 ################################################################################
 
@@ -358,22 +363,22 @@ ax1.plot([1./6,1./6], [0.44,0.55],color='lightgray', linestyle='--', linewidth=1
 ax1.plot([0.,0.],[0.44,0.55], color='lightgray', linestyle='--', linewidth=1)
 # Plot line y=0.5
 ax1.plot([-0.1,0.18], [0.5,0.5], color='lightgray', linestyle='--', linewidth=1)
-# Plot line y=min_x1
-ax1.plot([-0.1,0.18], [min_x1,min_x1], color='lightgray', linestyle='--', linewidth=1)
+# Plot line y=alpha3_trig
+ax1.plot([-0.1,0.18], [alpha3_trig,alpha3_trig], color='lightgray', linestyle='--', linewidth=1)
 # Plot line y=r1
 ax1.plot([-0.1,0.18], [r1,r1], color='lightgray', linestyle='--', linewidth=1)
 ax1.plot(alphas, x1, color='black', marker=None)
 ax1.plot([0], [r1], color='black', linestyle='', marker='o')
 ax1.plot([1./6], [0.5], color='black', linestyle='', marker='o')
-ax1.plot([x1_alpha3], [min_x1], color='black', linestyle='', marker='o')
+ax1.plot([x1_alpha3], [alpha3_trig], color='black', linestyle='', marker='o')
 ax1.plot([r2], [r1], color='black', linestyle='', marker='o')
 ax1.set_xlabel(r'$\alpha$')
 ax1.set_ylabel(r'$x_1(\alpha)$')
 ax1.text(0.+.002, r1+.001, 'PB:\,$(0,r_1)$')
 ax1.text(1./6-.03, 0.5-.004, r'PB:\,$(\frac{1}{6}, \frac{1}{2})$')
 ax1.text(r2, r1-.004, r'PI:\,$(r_2, r_1)$')
-ax1.text(x1_alpha3-.013, min_x1+.0055, r'PI:')
-ax1.text(x1_alpha3-.013, min_x1+.002, r'$(x_1(\alpha_3), \alpha_3)$')
+ax1.text(x1_alpha3-.013, alpha3_trig+.0055, r'PI:')
+ax1.text(x1_alpha3-.013, alpha3_trig+.002, r'$(x_1(\alpha_3), \alpha_3)$')
 ax1.set_xlim([-0.01, 0.175])
 ax1.set_ylim([0.443, 0.505])
 plt.savefig('plot_00020_x1_vs_alpha.pdf', format='pdf')
@@ -391,8 +396,8 @@ ax1.plot([0.4,0.51], [1./6,1./6], color='lightgray', linestyle='--', linewidth=1
 ax1.plot([0.4,0.51], [x1_alpha3,x1_alpha3], color='lightgray', linestyle='--', linewidth=1)
 # Plot line y=0
 ax1.plot([0.4,0.51], [0,0], color='lightgray', linestyle='--', linewidth=1)
-# Plot line x=min_x1
-ax1.plot([min_x1,min_x1], [-1,1], color='lightgray', linestyle='--', linewidth=1)
+# Plot line x=alpha3_trig
+ax1.plot([alpha3_trig,alpha3_trig], [-1,1], color='lightgray', linestyle='--', linewidth=1)
 # Plot line x=r1
 ax1.plot([r1,r1], [-1,1], color='lightgray', linestyle='--', linewidth=1)
 # Plot line x=0.5
@@ -402,13 +407,13 @@ ax1.plot([0.5,0.5], [-1,1], color='lightgray', linestyle='--', linewidth=1)
 ax1.plot(x1, alphas, color='black', marker=None)
 ax1.plot([r1], [r2], color='black', linestyle='', marker='o')
 ax1.plot([0.5], [1./6], color='black', linestyle='', marker='o')
-ax1.plot([min_x1], [x1_alpha3], color='black', linestyle='', marker='o')
+ax1.plot([alpha3_trig], [x1_alpha3], color='black', linestyle='', marker='o')
 ax1.plot([r1], [0], color='black', linestyle='', marker='o')
 ax1.text(r1+.001, r2-.008, r'PI:\,$(r_1, r_2)$')
-ax1.text(min_x1+.001, x1_alpha3+.0015, r'PI:\,$(\alpha_3, x_1(\alpha_3))$')
+ax1.text(alpha3_trig+.001, x1_alpha3+.0015, r'PI:\,$(\alpha_3, x_1(\alpha_3))$')
 ax1.text(0.5 - .005, 1./6 - .015, r'PB:\,$(\frac{1}{2}, \frac{1}{6})$')
 ax1.text(r1+.001, 0+.001, r'PB:\,$(r_1, 0)$')
-ax1.set_xlim([min_x1 - .005, 0.505])
+ax1.set_xlim([alpha3_trig - .005, 0.505])
 ax1.set_ylim([-0.02, 0.18])
 ax1.set_xlabel(r'$\alpha$')
 ax1.set_ylabel(r'$x_1(\alpha)$')
