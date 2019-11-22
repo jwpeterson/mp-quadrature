@@ -551,10 +551,11 @@ ax1.plot([1./3], [0.2], color='black', linestyle='', marker='o')
 ax1.plot([0.2], [1./3], color='black', linestyle='', marker='o')
 ax1.plot([alpha2_trig], [x1_alpha2], color='black', linestyle='', marker='o')
 ax1.plot([x1_alpha2], [alpha2_trig], color='black', linestyle='', marker='o')
-# TODO: find out where alpha=x1(alpha) on this branch since the weights
-# diverge to +/- \infty at these points. We should put an open circle
-# on the branch to indicate this
-# ax1.plot([???], [???], color='black', linestyle='', marker='o', markerfacecolor='white')
+# Plot single points where y=x on the graph. The weights diverge to
+# +/- \infty at these points. We should put an open circle on the
+# branch to indicate this.
+ax1.plot([x1_alpha2], [x1_alpha2], color='black', linestyle='', marker='o', markerfacecolor='white')
+ax1.plot([1./3], [1./3], color='black', linestyle='', marker='o', markerfacecolor='white')
 # Point labels
 ax1.text(1./3, 0.2+.005, r'$\left(\frac{1}{3},\frac{1}{5}\right)$')
 ax1.text(0.2+.005, 1./3, r'$\left(\frac{1}{5},\frac{1}{3}\right)$')
