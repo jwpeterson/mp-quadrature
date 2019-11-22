@@ -88,24 +88,6 @@ r2 = (9 - np.sqrt(21))/30 # .14725
 
 ################################################################################
 
-# Testing: are there solutions for 1/6 < alpha < r1? It appears that
-# there are mostly one real root (alpha) and two imaginary roots in this interval,
-# but we can go a bit outside the interval? I suspect the minimum is the
-# min_x1 which we computed previously...
-# ---
-# Roots of "A"
-# alpha = (25 + np.sqrt(145)) / 80 ~ 0.46302 # A = 0, x1= +/- 0.15701394368037236
-# alpha = (25 - np.sqrt(145)) / 80 ~ 0.16198 # A = 0, x1= +/- 0.47470687954772173
-# ---
-# Roots of "B"
-# alpha = 0.2 # B=0, x1=1/3 (points at centroid)
-# alpha = 0.170486188812954 # "alpha1", B = 0, x1 = 0.65902762237408341 (outside the region)
-# alpha = 0.384033315723485 # "alpha2",B = 0, x1 = 0.23193336855303029 (inside the region)
-# alpha = 0.445480495463561 # "alpha3", B = 0, x1 = 0.10903900907287808 (inside the region*)
-# * The values 0.445480495463561 and 0.10903900907287808 correspond to the (min_alpha, min_x1)
-#   values we had found earlier. The analytical expression for these alphas is very complicated
-#   but perhaps it is worth writing down since the value seems to be important?
-
 # Roots of "B", trigonometric forms:
 # alpha
 mu = np.arctan(3./4)
@@ -273,12 +255,10 @@ for i in xrange(len(alphas)):
 
 ################################################################################
 
-# Starting from alpha=0+eps and taking min roots, we can recover a branch
-# of NI rules instead. There is a singularity at alpha=min_alpha where
+# Create curve for 0 < alpha < x1(alpha3) taking the second root.
+# This is a branch of NI rules. There is a singularity at alpha=x1(alpha3) where
 # one set of weights blows up to +infty while the other set blows up to -infty.
-# We always take the real part of the smaller root, but we should verify that
-# the imaginary part is zero.
-min_root_alphas = np.linspace(1.e-6, min_alpha - 1.e-3)
+min_root_alphas = np.linspace(1.e-6, x1_alpha3 - 1.e-3)
 min_root_w1 = np.zeros(len(min_root_alphas))
 min_root_w2 = np.zeros(len(min_root_alphas))
 min_root_x1 = np.zeros(len(min_root_alphas))
@@ -385,15 +365,15 @@ ax1.plot([-0.1,0.18], [r1,r1], color='lightgray', linestyle='--', linewidth=1)
 ax1.plot(alphas, x1, color='black', marker=None)
 ax1.plot([0], [r1], color='black', linestyle='', marker='o')
 ax1.plot([1./6], [0.5], color='black', linestyle='', marker='o')
-ax1.plot([min_alpha], [min_x1], color='black', linestyle='', marker='o')
+ax1.plot([x1_alpha3], [min_x1], color='black', linestyle='', marker='o')
 ax1.plot([r2], [r1], color='black', linestyle='', marker='o')
 ax1.set_xlabel(r'$\alpha$')
 ax1.set_ylabel(r'$x_1(\alpha)$')
 ax1.text(0.+.002, r1+.001, 'PB:\,$(0,r_1)$')
 ax1.text(1./6-.03, 0.5-.004, r'PB:\,$(\frac{1}{6}, \frac{1}{2})$')
 ax1.text(r2, r1-.004, r'PI:\,$(r_2, r_1)$')
-ax1.text(min_alpha-.013, min_x1+.0055, r'PI:')
-ax1.text(min_alpha-.013, min_x1+.002, r'$(x_1(\alpha_3), \alpha_3)$')
+ax1.text(x1_alpha3-.013, min_x1+.0055, r'PI:')
+ax1.text(x1_alpha3-.013, min_x1+.002, r'$(x_1(\alpha_3), \alpha_3)$')
 ax1.set_xlim([-0.01, 0.175])
 ax1.set_ylim([0.443, 0.505])
 plt.savefig('plot_00020_x1_vs_alpha.pdf', format='pdf')
@@ -407,8 +387,8 @@ ax1 = fig.add_subplot(111)
 ax1.plot([0.4,0.51], [1./6,1./6], color='lightgray', linestyle='--', linewidth=1)
 # Plot line y=r2
 # ax1.plot([0.4,0.51], [r2,r2], color='lightgray', linestyle='--', linewidth=1)
-# Plot line y=min_alpha
-ax1.plot([0.4,0.51], [min_alpha,min_alpha], color='lightgray', linestyle='--', linewidth=1)
+# Plot line y=x1(alpha3)
+ax1.plot([0.4,0.51], [x1_alpha3,x1_alpha3], color='lightgray', linestyle='--', linewidth=1)
 # Plot line y=0
 ax1.plot([0.4,0.51], [0,0], color='lightgray', linestyle='--', linewidth=1)
 # Plot line x=min_x1
@@ -422,10 +402,10 @@ ax1.plot([0.5,0.5], [-1,1], color='lightgray', linestyle='--', linewidth=1)
 ax1.plot(x1, alphas, color='black', marker=None)
 ax1.plot([r1], [r2], color='black', linestyle='', marker='o')
 ax1.plot([0.5], [1./6], color='black', linestyle='', marker='o')
-ax1.plot([min_x1], [min_alpha], color='black', linestyle='', marker='o')
+ax1.plot([min_x1], [x1_alpha3], color='black', linestyle='', marker='o')
 ax1.plot([r1], [0], color='black', linestyle='', marker='o')
 ax1.text(r1+.001, r2-.008, r'PI:\,$(r_1, r_2)$')
-ax1.text(min_x1+.001, min_alpha+.0015, r'PI:\,$(\alpha_3, x_1(\alpha_3))$')
+ax1.text(min_x1+.001, x1_alpha3+.0015, r'PI:\,$(\alpha_3, x_1(\alpha_3))$')
 ax1.text(0.5 - .005, 1./6 - .015, r'PB:\,$(\frac{1}{2}, \frac{1}{6})$')
 ax1.text(r1+.001, 0+.001, r'PB:\,$(r_1, 0)$')
 ax1.set_xlim([min_x1 - .005, 0.505])
@@ -449,7 +429,7 @@ plt.savefig('plot_00020_x1_vs_alpha_2.pdf', format='pdf')
 ### ax1.legend()
 ### plt.savefig('plot_00020_weights_vs_alpha.pdf', format='pdf')
 
-# Plot "min" root NI/NB branch (alpha, x1(alpha)) for 0 < alpha < min_alpha
+# Plot "min" root NI/NB branch (alpha, x1(alpha)) for 0 < alpha < x1(alpha3)
 # and then the symmetric part, since it is "connected" in this case.
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
@@ -471,11 +451,11 @@ ax1.plot(min_root_x1, min_root_alphas, color='black', linestyle='--', marker=Non
 # Plot single points
 ax1.plot([0], [r2], color='black', linestyle='', marker='o')
 ax1.plot([r2], [0], color='black', linestyle='', marker='o')
-ax1.plot([min_alpha], [min_alpha], color='black', linestyle='', marker='o', markerfacecolor='white')
+ax1.plot([x1_alpha3], [x1_alpha3], color='black', linestyle='', marker='o', markerfacecolor='white')
 # Add plot labels
 ax1.text(0+.002, r2+.001, r'NB:\,$(0, r_2)$')
 ax1.text(r2-.035, 0+.001, r'NB:\,$(r_2, 0)$')
-# ax1.text(min_alpha-.05, min_alpha-.005, r'$(x_1(\alpha_3), x_1(\alpha_3))$')
+# ax1.text(x1_alpha3-.05, x1_alpha3-.005, r'$(x_1(\alpha_3), x_1(\alpha_3))$')
 ax1.text(0.01, x1_alpha3+.002, r'$x_1(\alpha_3)$')
 ax1.axis('square')
 ax1.set_xlim([-0.001, r2 + .01])
