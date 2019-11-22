@@ -560,6 +560,8 @@ ax1.plot([1./3], [1./3], color='black', linestyle='', marker='o', markerfacecolo
 ax1.text(1./3, 0.2+.005, r'$\left(\frac{1}{3},\frac{1}{5}\right)$')
 ax1.text(0.2+.005, 1./3, r'$\left(\frac{1}{5},\frac{1}{3}\right)$')
 ax1.text(x1_alpha2, alpha2_trig+.005, r'$\left(x_1(\alpha_2),\alpha_2\right)$')
+ax1.annotate(r"$(\alpha_2, x_1(\alpha_2))$", xy=(alpha2_trig-.0025, x1_alpha2), \
+             xytext=(0.3, 0.26), arrowprops=dict(arrowstyle="->"))
 # Labels, limits, and legends
 ax1.axis('square')
 ax1.set_xlim([0.18, 0.4])
