@@ -279,7 +279,24 @@ for i in xrange(len(min_root_alphas)):
 # print('min_root_x2={}'.format(min_root_alphas))
 
 # There should be a second solution for r2 < alpha < 1/6. There is only
-# one solution on the PI branch for alpha > r2 at the moment...
+# one solution on the PI branch for alpha > r2 at the moment... The second
+# root appears to be real-valued but it's negative, so it's outside the
+# reference element.
+min_root_alphas_negative = np.linspace(r2 + 1.e-3, 1./6 - 1.e-3)
+min_root_w1_negative = np.zeros(len(min_root_alphas_negative))
+min_root_w2_negative = np.zeros(len(min_root_alphas_negative))
+min_root_x1_negative = np.zeros(len(min_root_alphas_negative))
+for i in xrange(len(min_root_alphas_negative)):
+    alpha = min_root_alphas_negative[i]
+    roots = compute_x1_analytical(alpha)
+    # print('alpha={}, roots={}'.format(alpha, roots))
+    min_root_x1_negative[i] = compute_x1_analytical(alpha)[1].real
+    min_root_w1_negative[i], min_root_w2_negative[i] = compute_weights(min_root_x1_negative[i], alpha)
+
+# print('min_root_w1_negative={}'.format(min_root_w1_negative))
+# print('min_root_x1_negative={}'.format(min_root_x1_negative))
+# print('min_root_w2_negative={}'.format(min_root_w2_negative))
+# print('min_root_x2_negative={}'.format(min_root_alphas_negative))
 
 ################################################################################
 
