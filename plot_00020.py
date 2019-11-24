@@ -278,6 +278,9 @@ for i in xrange(len(min_root_alphas)):
 # print('min_root_w2={}'.format(min_root_w2))
 # print('min_root_x2={}'.format(min_root_alphas))
 
+# There should be a second solution for r2 < alpha < 1/6. There is only
+# one solution on the PI branch for alpha > r2 at the moment...
+
 ################################################################################
 
 # Make plot of first root for 1/6 < alpha < alpha1. These are PO rules.
@@ -569,17 +572,32 @@ plt.savefig('plot_00020_alpha1_alpha2.pdf', format='pdf')
 # Make plot combining all the different results.
 fig = plt.figure()
 ax1 = fig.add_subplot(111)
-# Plot lines x=1/6, 1/5, alpha1, alpha2, alpha3,
+# Plot lines x=1/6, 1/5, alpha1, alpha2, alpha3, y=x.
+# There is not much space between x=1/6=0.167 and x=alpha1=0.17 and the only solutions
+# in that region are with points outside the reference element, so it's not really helpful
+# to show both lines.
+# ax1.plot([r2,r2], [0,1],color='lightgray', linestyle='--', linewidth=1)
 ax1.plot([1./6,1./6], [0,1],color='lightgray', linestyle='--', linewidth=1)
 ax1.plot([0.2,0.2], [0,1],color='lightgray', linestyle='--', linewidth=1)
-ax1.plot([alpha1_trig,alpha1_trig], [0,1],color='lightgray', linestyle='--', linewidth=1)
+# ax1.plot([alpha1_trig,alpha1_trig], [0,1],color='lightgray', linestyle='--', linewidth=1)
 ax1.plot([alpha2_trig,alpha2_trig], [0,1],color='lightgray', linestyle='--', linewidth=1)
 ax1.plot([alpha3_trig,alpha3_trig], [0,1],color='lightgray', linestyle='--', linewidth=1)
-# Plot line y=x
+ax1.plot([x1_alpha1,x1_alpha1], [0,1],color='lightgray', linestyle='--', linewidth=1)
+# ax1.plot([x1_alpha2,x1_alpha2], [0,1],color='lightgray', linestyle='--', linewidth=1)
+# ax1.plot([x1_alpha3,x1_alpha3], [0,1],color='lightgray', linestyle='--', linewidth=1)
 ax1.plot([0,1], [0,1],color='lightgray', linestyle='--', linewidth=1)
 # Plot data from previous graphs
-ax1.plot(alphas, x1, color='black', marker=None)
-ax1.plot(x1, alphas, color='black', marker=None)
+ax1.plot(alphas, x1, color='black', marker=None) # PI/PB
+ax1.plot(x1, alphas, color='black', marker=None) # PI/PB
+ax1.plot(min_root_alphas, min_root_x1, color='black', linestyle='--', marker=None) # NI/NB
+ax1.plot(min_root_x1, min_root_alphas, color='black', linestyle='--', marker=None) # NI/NB
+ax1.plot(alpha1_alpha2, alpha1_alpha2_x1_first, color='black', linestyle='--', marker=None)  # NI
+ax1.plot(alpha1_alpha2, alpha1_alpha2_x1_second, color='black', linestyle='--', marker=None) # NI
+# Plot open circles for points on "solution" branch where y=x. This
+# can only happen if the weights blow up to +/- \infty.
+ax1.plot([x1_alpha3], [x1_alpha3], color='black', linestyle='', marker='o', markerfacecolor='white')
+ax1.plot([x1_alpha2], [x1_alpha2], color='black', linestyle='', marker='o', markerfacecolor='white')
+ax1.plot([1./3], [1./3], color='black', linestyle='', marker='o', markerfacecolor='white')
 # Labels, limits, and legends
 ax1.axis('square')
 ax1.set_xlim([0., 0.5])
