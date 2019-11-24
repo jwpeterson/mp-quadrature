@@ -352,7 +352,7 @@ for i in xrange(len(alpha1_alpha2)):
 
 ################################################################################
 
-# Compute roots for alpha2 < alpha < alpha3. These roots are all
+# Compute x1(alpha) for alpha2 < alpha < alpha3. These roots are all
 # imaginary so we don't plot them.
 alpha2_alpha3 = np.linspace(alpha2_trig, alpha3_trig)
 
@@ -565,3 +565,25 @@ ax1.set_ylim([0.18, 0.4])
 ax1.set_xlabel(r'$\alpha$')
 ax1.set_ylabel(r'$x_1(\alpha)$')
 plt.savefig('plot_00020_alpha1_alpha2.pdf', format='pdf')
+
+# Make plot combining all the different results.
+fig = plt.figure()
+ax1 = fig.add_subplot(111)
+# Plot lines x=1/6, 1/5, alpha1, alpha2, alpha3,
+ax1.plot([1./6,1./6], [0,1],color='lightgray', linestyle='--', linewidth=1)
+ax1.plot([0.2,0.2], [0,1],color='lightgray', linestyle='--', linewidth=1)
+ax1.plot([alpha1_trig,alpha1_trig], [0,1],color='lightgray', linestyle='--', linewidth=1)
+ax1.plot([alpha2_trig,alpha2_trig], [0,1],color='lightgray', linestyle='--', linewidth=1)
+ax1.plot([alpha3_trig,alpha3_trig], [0,1],color='lightgray', linestyle='--', linewidth=1)
+# Plot line y=x
+ax1.plot([0,1], [0,1],color='lightgray', linestyle='--', linewidth=1)
+# Plot data from previous graphs
+ax1.plot(alphas, x1, color='black', marker=None)
+ax1.plot(x1, alphas, color='black', marker=None)
+# Labels, limits, and legends
+ax1.axis('square')
+ax1.set_xlim([0., 0.5])
+ax1.set_ylim([0., 0.5])
+ax1.set_xlabel(r'$\alpha$')
+ax1.set_ylabel(r'$x_1(\alpha)$')
+plt.savefig('plot_00020_combined.pdf', format='pdf')
