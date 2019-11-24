@@ -352,6 +352,17 @@ for i in xrange(len(alpha1_alpha2)):
 
 ################################################################################
 
+# Compute roots for alpha2 < alpha < alpha3. These roots are all
+# imaginary so we don't plot them.
+alpha2_alpha3 = np.linspace(alpha2_trig, alpha3_trig)
+
+for i in xrange(len(alpha2_alpha3)):
+    alpha = alpha2_alpha3[i]
+    roots = compute_x1_analytical(alpha)
+    # print('alpha={}, roots={}'.format(alpha, roots))
+
+################################################################################
+
 # Make plots
 
 # Plot (alpha, x1(alpha)) for 0 < alpha < 1/6
