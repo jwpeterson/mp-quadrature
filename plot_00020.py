@@ -278,11 +278,13 @@ for i in xrange(len(min_root_alphas)):
 # print('min_root_w2={}'.format(min_root_w2))
 # print('min_root_x2={}'.format(min_root_alphas))
 
+################################################################################
+
 # There should be a second solution for r2 < alpha < 1/6. There is only
 # one solution on the PI branch for alpha > r2 at the moment... The second
 # root appears to be real-valued but it's negative, so it's outside the
 # reference element.
-min_root_alphas_negative = np.linspace(r2 + 1.e-3, 1./6 - 1.e-3)
+min_root_alphas_negative = np.linspace(r2 + 1.e-6, 1./6 - 1.e-3)
 min_root_w1_negative = np.zeros(len(min_root_alphas_negative))
 min_root_w2_negative = np.zeros(len(min_root_alphas_negative))
 min_root_x1_negative = np.zeros(len(min_root_alphas_negative))
@@ -518,6 +520,27 @@ plt.savefig('plot_00020_min_root.pdf', format='pdf')
 ### # ax1.set_ylim([0.01, 0.155])
 ### ax1.legend()
 ### plt.savefig('plot_00020_min_root_weights_vs_alpha.pdf', format='pdf')
+
+# Plot x1(alpha) < 0 values which arise for r2 < alpha < 1/6.
+fig = plt.figure()
+ax1 = fig.add_subplot(111)
+# line x=r2
+ax1.plot([r2,r2], [-3,1],color='lightgray', linestyle='--', linewidth=1)
+# line x=1/6
+ax1.plot([1./6,1./6], [-3,1],color='lightgray', linestyle='--', linewidth=1)
+# line y=0
+ax1.plot([0,1], [0,0], color='lightgray', linestyle='--', linewidth=1)
+ax1.plot(min_root_alphas_negative, min_root_x1_negative, color='black', linestyle='-', marker=None)
+# Plot single points
+ax1.plot([r2], [0], color='black', linestyle='', marker='o')
+# Text labels
+ax1.text(r2-.0015, -0.22, r'NB:\,$(r_2, 0)$')
+# Labels, limits, and legends
+ax1.set_xlabel(r'$\alpha$')
+ax1.set_ylabel(r'$x_1(\alpha)$')
+ax1.set_xlim([0.145, 0.1675])
+ax1.set_ylim([-2.5, 0.1])
+plt.savefig('plot_00020_negative_alphas.pdf', format='pdf')
 
 # Make plot for 1/6 < alpha < alpha1_trig. For these cases there are
 # two solution branches, both of which are outside the reference element.
