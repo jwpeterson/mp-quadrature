@@ -16,15 +16,6 @@ For configuration (0,0,0,2,0), plots x1(alpha) vs. alpha
 """
 
 """
-It's convenient to have Python functions for these polynomials.
-"""
-def f(x):
-    return 6*x**2 - 4*x + 0.5
-
-def g(x):
-    return x * (15*x**2 - 9*x + 1)
-
-"""
 Given alpha, computes x1(alpha) analytically. Returns a pair of
 (possibly complex) values, throws an error for input values of
 alpha=1/2 or 1/6 since computing x1 by this method is not well-defined
@@ -39,16 +30,24 @@ def compute_x1_analytical(alpha):
     # Using the polynomial_division.py code, we found the following roots analytically.
     # Note 1: we intentionally use cmath.sqrt so that we can obtain an imaginary root
     # instead of a NaN!
-    # Note 2: If the roots are real-valued, the second one will always be smaller since
-    # in that case B > 0
+    # Note 2: We always return the roots in the same order with the
+    # "+" root first and the "-" root second, sometimes the first root
+    # is larger and sometimes the 2nd root is larger.
     # Note 3: The notation here matches the discussion in the paper.
     A = 120*alpha**2 - 75*alpha + 9
-    B = cmath.sqrt(3 * (5*alpha-1) * (240*alpha**3 - 240*alpha**2 + 75*alpha - 7))
+    sqrtB = cmath.sqrt(3 * (5*alpha-1) * (240*alpha**3 - 240*alpha**2 + 75*alpha - 7))
     den = 30 * (2*alpha - 1) * (6*alpha - 1)
-    # print('A={}, B={}, den={}'.format(A,B,den))
-    analytical_roots = [(A + B)/den, (A - B)/den]
-    # print('analytical_roots_v2={}'.format(analytical_roots))
+    analytical_roots = [(A + sqrtB)/den, (A - sqrtB)/den]
     return analytical_roots
+
+"""
+It's convenient to have Python functions for these polynomials.
+"""
+def f(x):
+    return 6*x**2 - 4*x + 0.5
+
+def g(x):
+    return x * (15*x**2 - 9*x + 1)
 
 """
 Given x1 and x2, computes the weights w1 and w2
