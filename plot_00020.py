@@ -21,7 +21,7 @@ Given alpha, computes x1(alpha) analytically. Returns a pair of
 alpha=1/2 or 1/6 since computing x1 by this method is not well-defined
 for those values.
 """
-def compute_x1_analytical(alpha):
+def compute_x1(alpha):
     # Don't accept input values outside the range
     if (alpha <= 0.) or (alpha >= 0.5) or (np.abs(alpha - 1./6) < 1.e-8):
         print('Invalid input, alpha={}; 0 < alpha < 0.5 is required.'.format(alpha))
@@ -64,7 +64,7 @@ def compute_weights(x1, x2):
 Function used with fsolve to find alpha for which w1(alpha) = w2(alpha) = 1/12
 """
 def residual(alpha):
-    x1 = compute_x1_analytical(alpha)[0].real
+    x1 = compute_x1(alpha)[0].real
     w1, w2 = compute_weights(x1, alpha)
     return w1 - 1./12
 
@@ -73,7 +73,7 @@ Function used with minimize() to find a minimum value of x1. Returns the
 first root, "(A+B)/den", throwing an error if the value has a nonzero imaginary component.
 """
 def fmin(alpha):
-    roots = compute_x1_analytical(alpha)
+    roots = compute_x1(alpha)
     if (np.abs(roots[0].imag) > 1.e-6):
         raise RuntimeError('No valid root found for alpha={}, roots={}.'.format(alpha, roots))
     # Real-valued return
@@ -133,7 +133,7 @@ alpha = 0.48 # x1 = -0.737867, 0.1633997                (PI)
 # alpha = 0.445480495467 # min_x1
 # alpha = 0.444 imaginary
 ### try:
-###     analytical_roots = compute_x1_analytical(alpha)
+###     analytical_roots = compute_x1(alpha)
 ###     w1, w2 = compute_weights(analytical_roots[0].real, alpha)
 ###     print('---')
 ###     print('w1={}'.format(w1))
@@ -200,7 +200,7 @@ if iflag == 1:
     # print('Final residual norm = {}'.format(np.linalg.norm(infodict['fvec'])))
 
     # Compute and print full solution for this value of alpha
-    x1_weights_equal = compute_x1_analytical(alpha_weights_equal)[0].real
+    x1_weights_equal = compute_x1(alpha_weights_equal)[0].real
     w1, w2 = compute_weights(x1_weights_equal, alpha_weights_equal)
     # Print current result
     print('---')
@@ -216,7 +216,7 @@ else:
 
 # Compute solution for alpha=1/5, x1(alpha) = 1/3.
 alpha=0.2
-roots = compute_x1_analytical(alpha)
+roots = compute_x1(alpha)
 print('alpha={}, roots={}'.format(alpha, roots))
 # It does not matter whether you pick the first or second root because
 # they are both 1/3.
@@ -254,7 +254,7 @@ x1 = np.zeros(len(alphas))
 
 for i in xrange(len(alphas)):
     alpha = alphas[i]
-    x1[i] = compute_x1_analytical(alpha)[0].real
+    x1[i] = compute_x1(alpha)[0].real
     w1[i], w2[i] = compute_weights(x1[i], alpha)
 
 ################################################################################
@@ -269,7 +269,7 @@ min_root_x1 = np.zeros(len(min_root_alphas))
 
 for i in xrange(len(min_root_alphas)):
     alpha = min_root_alphas[i]
-    min_root_x1[i] = compute_x1_analytical(alpha)[1].real
+    min_root_x1[i] = compute_x1(alpha)[1].real
     min_root_w1[i], min_root_w2[i] = compute_weights(min_root_x1[i], alpha)
 
 # print('min_root_w1={}'.format(min_root_w1))
@@ -289,9 +289,9 @@ min_root_w2_negative = np.zeros(len(min_root_alphas_negative))
 min_root_x1_negative = np.zeros(len(min_root_alphas_negative))
 for i in xrange(len(min_root_alphas_negative)):
     alpha = min_root_alphas_negative[i]
-    roots = compute_x1_analytical(alpha)
+    roots = compute_x1(alpha)
     # print('alpha={}, roots={}'.format(alpha, roots))
-    min_root_x1_negative[i] = compute_x1_analytical(alpha)[1].real
+    min_root_x1_negative[i] = compute_x1(alpha)[1].real
     min_root_w1_negative[i], min_root_w2_negative[i] = compute_weights(min_root_x1_negative[i], alpha)
 
 # print('min_root_w1_negative={}'.format(min_root_w1_negative))
@@ -309,7 +309,7 @@ outside_w2_first = np.zeros(len(outside_alphas))
 
 for i in xrange(len(outside_alphas)):
     alpha = outside_alphas[i]
-    roots = compute_x1_analytical(alpha)
+    roots = compute_x1(alpha)
     # print('alpha={}, roots={}'.format(alpha, roots))
     outside_x1_first[i] = roots[0].real
     outside_w1_first[i], outside_w2_first[i] = compute_weights(outside_x1_first[i], alpha)
@@ -326,7 +326,7 @@ outside_w2_second = np.zeros(len(outside_alphas))
 
 for i in xrange(len(outside_alphas)):
     alpha = outside_alphas[i]
-    roots = compute_x1_analytical(alpha)
+    roots = compute_x1(alpha)
     # print('alpha={}, roots={}'.format(alpha, roots))
     outside_x1_second[i] = roots[1].real
     outside_w1_second[i], outside_w2_second[i] = compute_weights(outside_x1_second[i], alpha)
@@ -352,7 +352,7 @@ alpha1_alpha2_w2_second = np.zeros(len(alpha1_alpha2))
 
 for i in xrange(len(alpha1_alpha2)):
     alpha = alpha1_alpha2[i]
-    roots = compute_x1_analytical(alpha)
+    roots = compute_x1(alpha)
     # print('alpha={}, roots={}'.format(alpha, roots))
     # First root
     alpha1_alpha2_x1_first[i] = roots[0].real
@@ -379,7 +379,7 @@ alpha2_alpha3 = np.linspace(alpha2_trig, alpha3_trig)
 
 for i in xrange(len(alpha2_alpha3)):
     alpha = alpha2_alpha3[i]
-    roots = compute_x1_analytical(alpha)
+    roots = compute_x1(alpha)
     # print('alpha={}, roots={}'.format(alpha, roots))
 
 ################################################################################
