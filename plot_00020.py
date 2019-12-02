@@ -384,6 +384,16 @@ for i in xrange(len(alpha2_alpha3)):
 
 ################################################################################
 
+# Compute values for the line x1 = 1-2*alpha. The Jacobian has a zero
+# determinant along this line, the line x1=alpha, and x1=1/3. Note:
+# zero determinant/singular Jacobian does _not_ mean there is no
+# solution, it just means that more investigation is needed to
+# determine whether there might be a solution.
+det_zero_alpha=np.linspace(0, 0.5)
+det_zero_x1 = 1 - 2.0 * det_zero_alpha
+
+################################################################################
+
 # Make plots
 
 # Plot (alpha, x1(alpha)) for 0 < alpha < 1/6
@@ -399,7 +409,12 @@ ax1.plot([-0.1,0.18], [0.5,0.5], color='lightgray', linestyle='--', linewidth=1)
 ax1.plot([-0.1,0.18], [alpha3_trig,alpha3_trig], color='lightgray', linestyle='--', linewidth=1)
 # Plot line y=r1
 ax1.plot([-0.1,0.18], [r1,r1], color='lightgray', linestyle='--', linewidth=1)
+# Plot other lines where Jacobian determinant vanishes
+ax1.plot(det_zero_alpha, det_zero_x1, color='lightgray', linestyle='--', linewidth=1)
+ax1.plot(det_zero_x1, det_zero_alpha, color='lightgray', linestyle='--', linewidth=1)
+# Plot solution branch
 ax1.plot(alphas, x1, color='black', marker=None)
+# Plot single points
 ax1.plot([0], [r1], color='black', linestyle='', marker='o')
 ax1.plot([1./6], [0.5], color='black', linestyle='', marker='o')
 ax1.plot([x1_alpha3], [alpha3_trig], color='black', linestyle='', marker='o')
@@ -434,6 +449,9 @@ ax1.plot([alpha3_trig,alpha3_trig], [-1,1], color='lightgray', linestyle='--', l
 ax1.plot([r1,r1], [-1,1], color='lightgray', linestyle='--', linewidth=1)
 # Plot line x=0.5
 ax1.plot([0.5,0.5], [-1,1], color='lightgray', linestyle='--', linewidth=1)
+# Plot other lines where Jacobian determinant vanishes
+ax1.plot(det_zero_alpha, det_zero_x1, color='lightgray', linestyle='--', linewidth=1)
+ax1.plot(det_zero_x1, det_zero_alpha, color='lightgray', linestyle='--', linewidth=1)
 # Plot the data - note we just flip the x and y coordinates from the first plot,
 # since the solutions are symmetric about the line y=x
 ax1.plot(x1, alphas, color='black', marker=None)
@@ -554,11 +572,16 @@ ax1.plot([alpha1_trig,alpha1_trig], [0,3],color='lightgray', linestyle='--', lin
 ax1.plot([1./6,1./6], [0,3],color='lightgray', linestyle='--', linewidth=1)
 # line y=0.5
 ax1.plot([0,1], [0.5,0.5],color='lightgray', linestyle='--', linewidth=1)
+# Plot other lines where Jacobian determinant vanishes. Note: due to the small
+# horizontal scale of this plot, this looks like a horizontal line? I decided to
+# omit it since it did not help much with the exposition.
+# ax1.plot(outside_alphas, 1 - 2.0 * outside_alphas, color='darkblue', linestyle='--', linewidth=1)
+# ax1.plot(1 - 2.0 * outside_alphas, outside_alphas, color='darkblue', linestyle='--', linewidth=1)
 # Plot single points
 ax1.plot([1./6], [0.5], color='black', linestyle='', marker='o')
 ax1.plot([alpha1_trig], [x1_alpha1], color='black', linestyle='', marker='o')
 # Point labels
-ax1.text(1./6+5.e-5, 0.5+.05, r'PB:\,$(\frac{1}{6},\frac{1}{2})$')
+ax1.text(1./6+5.e-5, 0.5+.05, r'PB:\,$\left(\frac{1}{6},\frac{1}{2}\right)$')
 ax1.text(alpha1_trig-.0011, x1_alpha1, r'PO:\,$(\alpha_1, x_1(\alpha_1))$')
 # Labels, limits, and legends
 ax1.set_xlim([1./6-.0001, 0.171])
@@ -625,6 +648,9 @@ ax1.plot([x1_alpha1,x1_alpha1], [0,1],color='lightgray', linestyle='--', linewid
 # ax1.plot([x1_alpha2,x1_alpha2], [0,1],color='lightgray', linestyle='--', linewidth=1)
 # ax1.plot([x1_alpha3,x1_alpha3], [0,1],color='lightgray', linestyle='--', linewidth=1)
 ax1.plot([0,1], [0,1],color='lightgray', linestyle='--', linewidth=1)
+# Plot other lines where Jacobian determinant vanishes
+ax1.plot(det_zero_alpha, det_zero_x1, color='lightgray', linestyle='--', linewidth=1)
+ax1.plot(det_zero_x1, det_zero_alpha, color='lightgray', linestyle='--', linewidth=1)
 # Plot data from previous graphs
 ax1.plot(alphas, x1, color='black', marker=None) # PI/PB
 ax1.plot(x1, alphas, color='black', marker=None) # PI/PB
