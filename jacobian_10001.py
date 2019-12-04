@@ -36,19 +36,30 @@ det = J.det()
 print('---')
 print('det(J) = {}'.format(det))
 
-det = sympy.simplify(det.subs([(z,1-x-y)]))
+det_xy = sympy.simplify(det.subs([(z,1-x-y)]))
 print('---')
 print('With z=1-x-y: {}'.format(det))
 
-det = sympy.simplify(det / (2 * w**2))
+det_xy = sympy.simplify(det_xy / (2 * w**2))
 print('---')
-print('To simplify the problem, divide by 2w^2 (we note that w=0 makes Jacobian singular):\n{}'.format(det))
+print('To simplify the problem, divide by 2w^2 (we note that w=0 makes Jacobian singular):\n{}'.format(det_xy))
 
-det = sympy.factor(det)
+det_xy = sympy.factor(det_xy)
 print('---')
-print('sympy.factor:\n{}'.format(det))
+print('sympy.factor:\n{}'.format(det_xy))
 # Amazingly, this works really well and makes the result much simpler to understand. Is this even true?
 # Result: (3*x**2 + 3*x*y - 3*x + 3*y**2 - 3*y + 1)**3/9
+
+# Keep all three of x, y, and z
+det_xyz = sympy.simplify(det / (2 * w**2))
+print('---')
+print('det_xyz scaled by (2 w^2):\n{}'.format(det_xyz))
+
+# For some reason, factoring when x, y, and z are all present does not
+# result in a simple expression...
+det_xyz = sympy.factor(det_xyz)
+print('---')
+print('det_xyz.factor:\n{}'.format(det_xyz))
 
 # # Substitute in x=y=a
 # det_xya = sympy.simplify(det.subs([(x,a), (y,a)]))
