@@ -50,6 +50,13 @@ print('sympy.factor:\n{}'.format(det_xy))
 # Amazingly, this works really well and makes the result much simpler to understand. Is this even true?
 # Result: (3*x**2 + 3*x*y - 3*x + 3*y**2 - 3*y + 1)**3/9
 
+# Is it possible this is equal to
+tmp = (3*x-1) * (3*y-1) * (3*z-1)
+tmp = sympy.expand(tmp.subs([(z,1-x-y)]))
+tmp = sympy.factor(tmp)
+print('---')
+print('(3*x-1) * (3*y-1) * (3*z-1) = \n{}'.format(tmp))
+
 # Keep all three of x, y, and z
 det_xyz = sympy.simplify(det / (2 * w**2))
 print('---')
