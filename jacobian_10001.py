@@ -50,23 +50,33 @@ print('sympy.factor:\n{}'.format(det_xy))
 # Amazingly, this works really well and makes the result much simpler to understand. Is this even true?
 # Result: (3*x**2 + 3*x*y - 3*x + 3*y**2 - 3*y + 1)**3/9
 
-# Is it possible this is equal to
-tmp = (3*x-1) * (3*y-1) * (3*z-1)
-tmp = sympy.expand(tmp.subs([(z,1-x-y)]))
-tmp = sympy.factor(tmp)
-print('---')
-print('(3*x-1) * (3*y-1) * (3*z-1) = \n{}'.format(tmp))
+# On the assumption that (3x-1)*(3y-1) appears in the factored result, what happens if
+# we subtract that out. The result is:
+# 3*x**2 + 3*x*y - 3*x + 3*y**2 - 3*y + 1 = (3*x-1)*(3*y-1) + (x-y)**2
+# Note the plus sign, that's not as convenient as it could be...
+# tmp = sympy.simplify((3*x**2 + 3*x*y - 3*x + 3*y**2 - 3*y + 1) - (3*x-1)*(3*y-1))
+# tmp = sympy.factor(tmp)
+# print('---')
+# print('tmp:\n{}'.format(tmp))
+
+# Q: Is it possible this is equal to: (3x-1) * (3y-1) * (3z-1)?
+# A: No, we end up with -27*x**2*y + 9*x**2 - 27*x*y**2 + 36*x*y - 9*x + 9*y**2 - 9*y + 2
+# which does not match the factored result above.
+# tmp = (3*x-1) * (3*y-1) * (3*z-1)
+# tmp = sympy.expand(tmp.subs([(z,1-x-y)]))
+# print('---')
+# print('(3*x-1) * (3*y-1) * (3*z-1) = \n{}'.format(tmp))
 
 # Keep all three of x, y, and z
-det_xyz = sympy.simplify(det / (2 * w**2))
-print('---')
-print('det_xyz scaled by (2 w^2):\n{}'.format(det_xyz))
+# det_xyz = sympy.simplify(det / (2 * w**2))
+# print('---')
+# print('det_xyz scaled by (2 w^2):\n{}'.format(det_xyz))
 
 # For some reason, factoring when x, y, and z are all present does not
 # result in a simple expression...
-det_xyz = sympy.factor(det_xyz)
-print('---')
-print('det_xyz.factor:\n{}'.format(det_xyz))
+# det_xyz = sympy.factor(det_xyz)
+# print('---')
+# print('det_xyz.factor:\n{}'.format(det_xyz))
 
 # # Substitute in x=y=a
 # det_xya = sympy.simplify(det.subs([(x,a), (y,a)]))
