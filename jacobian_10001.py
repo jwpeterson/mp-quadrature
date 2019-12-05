@@ -49,6 +49,17 @@ print('---')
 print('sympy.factor:\n{}'.format(det_xy))
 # Amazingly, this works really well and makes the result much simpler to understand. Is this even true?
 # Result: (3*x**2 + 3*x*y - 3*x + 3*y**2 - 3*y + 1)**3/9
+# Note: according to Wofram-alpha, the value in parentheses has only one real root at (x=1/3, y=1/3). It
+# is an elliptic paraboloid with values >= 0 for all input values (x,y).
+# Also when y=x, the value in parens is (1-3*x)**2 = (3x-1)**2, which is similar to/consistent
+# with what we obtained for the reduced Jacobian's determinant, (-4/9)*wg*(3*x-1)^4.
+
+# Let's do another test to make sure this determinant is correct? If
+# check==0 then I think we can be relatively confident that the factor
+# approach did not lead us astray.
+check = sympy.simplify(det.subs([(z,1-x-y)]) - 2 * w**2 * (3*x**2 + 3*x*y - 3*x + 3*y**2 - 3*y + 1)**3/9)
+print('---')
+print('check:\n{}'.format(check))
 
 # On the assumption that (3x-1)*(3y-1) appears in the factored result, what happens if
 # we subtract that out. The result is:
