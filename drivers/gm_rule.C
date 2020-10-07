@@ -1,12 +1,14 @@
+// mp-quadrature includes
+#include "grundmann_moller.h"
+#include "exact.h"
+
+// C++ includes
 #include <iomanip>
 #include <algorithm> // std::sort
 #include <set>
 #include <cstdlib> // std::abort
 #include <getopt.h> // getopt_long()
 #include <cmath> // log10
-
-#include "grundmann_moller.h"
-#include "exact.h"
 
 // An unoptimized pow function for mpq_class objects
 mpq_class pow(const mpq_class & base, unsigned power)
@@ -405,7 +407,7 @@ int main(int argc, char** argv)
             sum += mpfr_class(weight_copy[i]);
 
           // Compute the error
-          mpfr_class current_error(/*value=*/abs(sum - true_solution), /*precision=*/2*b);
+          mpfr_class current_error(/*value=*/my_abs(mpfr_class(sum - true_solution)), /*precision=*/2*b);
 
           // Possibly update the best order
           if (current_error < min_error)
@@ -749,7 +751,7 @@ void verify(unsigned rule_index,
           // std::cout << "analytical = " << analytical << std::endl;
 
           // Compute the absolute error (using higher precision):
-          T abs_err(/*value=*/abs(sum-analytical), /*precision=*/double_input_precision);
+          T abs_err(/*value=*/my_abs(T(sum - analytical)), /*precision=*/double_input_precision);
 
           // Debugging
           // std::cout << "abs_err = " << abs_err << std::endl;

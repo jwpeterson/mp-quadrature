@@ -1,8 +1,12 @@
+// mp-quadrature includes
+#include "exact.h"
+#include "conical.h"
+#include "common_definitions.h" // my_abs()
+
+// C++ includes
 #include <cstdlib> // std::abort, atoi
 #include <iomanip>
 #include <algorithm> // std::sort
-#include "exact.h"
-#include "conical.h"
 
 // In this program we compute multi-precision
 // points and weights to be used in 3D Conical Product
@@ -78,7 +82,7 @@ int main(int argc, char** argv)
           // std::cout << "analytical = " << analytical << std::endl;
 
           // Compute the absolute error:
-          mpfr_class abs_err = abs(sum-analytical);
+          mpfr_class abs_err = my_abs(mpfr_class(sum - analytical));
 
           // Print message.  In 3D, this is just way too much output.
           //std::cout << "Computing integral of: x^" << x_power << " y^" << y_power << " z^" << z_power

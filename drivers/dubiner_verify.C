@@ -1,7 +1,9 @@
+// mp-quadrature includes
 #include "common_definitions.h"
 #include "dubiner.h"
 #include "conical.h"
 
+// C++ includes
 #include <getopt.h> // getopt_long()
 
 // A usage function for this utility
@@ -138,7 +140,7 @@ int main(int argc, char** argv)
       for (unsigned i=0; i<Np; ++i)
         for (unsigned j=0; j<Np; ++j)
           {
-            if ((i != j) && (abs(mass_sums(i,j)) > 1.e-30))
+            if ((i != j) && (my_abs(mass_sums(i,j)) > 1.e-30))
               {
                 std::cerr << "Matrix entry " << i << "," << j << " should be zero, but is " << mass_sums(i,j) << std::endl;
                 std::abort();
