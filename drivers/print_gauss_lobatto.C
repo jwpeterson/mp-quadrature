@@ -1,3 +1,13 @@
+// mp-quadrature includes
+#include "common_definitions.h"
+#include "gauss_lobatto.h"
+
+// The GNU multi-precision library
+#include "gmp.h"
+#include "mpfr.h"
+#include "gmpfrxx.h"
+
+// C++ includes
 #include <cstdlib> // atoi, std::abort
 #include <iostream>
 #include <limits>
@@ -5,15 +15,6 @@
 #include <cstdio>
 #include <vector>
 #include <iomanip>
-
-// The GNU multi-precision library
-#include "gmp.h"
-#include "mpfr.h"
-#include "gmpfrxx.h"
-
-// Header files for this project
-#include "common_definitions.h"
-#include "gauss_lobatto.h"
 
 // This program prints the points and weights for 1D Gauss-Lobatto rules.
 int main(int argc, char** argv)
@@ -205,7 +206,7 @@ int main(int argc, char** argv)
       // std::cout << "exact      = " << exact << std::endl;
 
       // Compute the absolute error:
-      mpfr_class abs_err = abs(sum-exact);
+      mpfr_class abs_err = my_abs(mpfr_class(sum-exact));
 
       // Print message
       std::cout << "Computing int(x^" << order << ", x=-1..1)"

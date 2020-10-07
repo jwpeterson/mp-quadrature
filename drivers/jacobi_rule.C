@@ -1,3 +1,21 @@
+// mp-quadrature includes
+#include "common_definitions.h"
+#include "jacobi.h"
+
+// The GMPFRXX library defines a C++ interface for
+// the mpfr library.  You cannot include the gmpxx.h
+// header *and* the gmpfrxx.h headers at the same time
+// though!
+#include "gmpfrxx.h"
+
+// The MPFR library defines special functions
+// like sin, cos, exp, etc.
+#include "mpfr.h"
+
+// The GNU multi-precision library
+#include "gmp.h"
+
+// C++ includes
 #include <cstdlib> // std::abort
 #include <iostream>
 #include <limits>
@@ -7,23 +25,6 @@
 #include <iomanip>
 #include <sstream>
 #include <getopt.h> // getopt_long()
-
-// The GNU multi-precision library
-#include "gmp.h"
-
-// The MPFR library defines special functions
-// like sin, cos, exp, etc.
-#include "mpfr.h"
-
-// The GMPFRXX library defines a C++ interface for
-// the mpfr library.  You cannot include the gmpxx.h
-// header *and* the gmpfrxx.h headers at the same time
-// though!
-#include "gmpfrxx.h"
-
-// Header files for this project
-#include "common_definitions.h"
-#include "jacobi.h"
 
 // Print a simple usage message when unrecognized command line arguments are encountered
 void usage();
@@ -181,7 +182,7 @@ int main(int argc, char** argv)
       // std::cout << "exact      = " << exact << std::endl;
 
       // Compute the absolute error:
-      mpfr_class abs_err = abs(sum - exact);
+      mpfr_class abs_err = my_abs(mpfr_class(sum - exact));
 
       // Print message
       std::cout << "Computing int((1-x)^" << alpha << " * x^" << order << ", x=0..1)"

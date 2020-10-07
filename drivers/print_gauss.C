@@ -1,3 +1,13 @@
+// mp-quadrature includes
+#include "common_definitions.h"
+#include "gauss.h"
+
+// The GNU multi-precision library
+#include "gmp.h"
+#include "mpfr.h"
+#include "gmpfrxx.h"
+
+// C++ includes
 #include <cstdlib> // std::abort
 #include <iostream>
 #include <limits>
@@ -5,15 +15,6 @@
 #include <cstdio>
 #include <vector>
 #include <iomanip>
-
-// The GNU multi-precision library
-#include "gmp.h"
-#include "mpfr.h"
-#include "gmpfrxx.h"
-
-// Header files for this project
-#include "common_definitions.h"
-#include "gauss.h"
 
 // This program implements what is probably a Numerical
 // recipes algorithm for computing Legendre polynomial
@@ -157,13 +158,13 @@ int main(int argc, char** argv)
                         << "delta_w[" << i << "]=" << delta_w << std::endl;
 
               // Print an error message and abort if the error in either the points or weights is too large
-              if (abs(delta_x) > mpfr_class(1.e-30))
+              if (my_abs(delta_x) > mpfr_class(1.e-30))
                 {
                   std::cerr << "Error: Disagreement between analytical and computed point values!" << std::endl;
                   std::abort();
                 }
 
-              if (abs(delta_w) > mpfr_class(1.e-30))
+              if (my_abs(delta_w) > mpfr_class(1.e-30))
                 {
                   std::cerr << "Error: Disagreement between analytical and computed weight values!" << std::endl;
                   std::abort();
@@ -231,7 +232,7 @@ int main(int argc, char** argv)
       // std::cout << "exact      = " << exact << std::endl;
 
       // Compute the absolute error:
-      mpfr_class abs_err = abs(sum-exact);
+      mpfr_class abs_err = my_abs(mpfr_class(sum-exact));
 
       // Print message
       std::cout << "Computing int(x^" << order << ", x=-1..1)"

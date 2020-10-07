@@ -1,6 +1,9 @@
 #ifndef MATRIX_H
 #define MATRIX_H
 
+// mp-quadrature includes
+#include "common_definitions.h" // my_abs()
+
 // C++ includes
 #include <iostream>
 #include <vector>
@@ -209,8 +212,7 @@ void Matrix<T>::print(std::ostream& os) const
           // Don't print values smaller than epsilon=1.e-30
           T val = A(i,j);
 
-          if ((val > 0 && val < 1.e-30) ||
-              (val < 0 && val > -1.e-30))
+          if (my_abs(val) < 1.e-30)
             val = 0.;
 
           os << std::setprecision(6)
@@ -289,10 +291,10 @@ void Matrix<T>::_lu_decompose()
       // the mpfr_class type...  We also can't catch the return as a
       // "Real" since there is no automatic conversion to that type,
       // and it would lose precision.
-      T max = abs( A(i,i) );
+      T max = my_abs( A(i,i) );
       for (unsigned j=i+1; j<_n_rows; ++j)
         {
-          T candidate_max = abs( A(j,i) );
+          T candidate_max = my_abs( A(j,i) );
           if (max < candidate_max)
             {
               max = candidate_max;
@@ -482,7 +484,7 @@ T Matrix<T>::asymmetry() const
 
   for (unsigned int i=0; i<_n_rows; ++i)
     for (unsigned int j=i+1; j<_n_cols; ++j)
-      asymmetry += abs((*this)(i,j) - (*this)(j,i));
+      asymmetry += my_abs((*this)(i,j) - (*this)(j,i));
 
   return asymmetry;
 }

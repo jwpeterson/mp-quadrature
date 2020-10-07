@@ -1,12 +1,16 @@
+// mp-quadrature includes
+#include "legendre.h"
+#include "gauss.h"
+#include "do_mkdir.h"
+#include "integrand.h"
+#include "common_definitions.h" // my_abs()
+
+// C++ includes
 #include <fstream>
 #include <sstream>
 #include <iomanip>
 #include <memory> // std::unique_ptr
 #include <getopt.h> // getopt_long()
-#include "legendre.h"
-#include "gauss.h"
-#include "do_mkdir.h"
-#include "integrand.h"
 
 // Function which computes and prints ||r_N||_2 values for the 1D rule
 // defined by the points x and weights w.  The 'filebase' string is used
@@ -383,8 +387,12 @@ mpfr_class test_integral(const std::vector<mpfr_class> & x,
   // std::cout << "H1-seminorm**2=" << integrand.H1_semi_norm_squared() << std::endl;
   // std::cout << "H1-norm=" << integrand.H1_norm() << std::endl;
 
-  // Compute abs(E(f)) by subtracting
-  return abs(sum-exact);
+  // Compute abs(E(f)) by subtracting. Note: one limitation of the
+  // my_abs approach is that you can't call e.g. my_abs(sum - exact)
+  // directly since I don't know how to properly specialize for the
+  // case of an "expression" object which is the difference between
+  // two mpfr_classes.
+  return my_abs(mpfr_class(sum - exact));
 }
 
 

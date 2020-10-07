@@ -1,12 +1,4 @@
-#include <iostream>
-#include <iomanip>
-#include <string>
-#include <fstream>
-#include <cstdlib>
-#include <vector>
-#include <getopt.h> // getopt_long()
-
-#include "gmpfrxx.h"
+// mp-quadrature includes
 #include "common_definitions.h"
 #include "generator.h"
 #include "rule.h"
@@ -14,6 +6,18 @@
 #include "compose_all.h"
 #include "exact.h"
 #include "dubiner.h"
+
+// gmpfrxx includes
+#include "gmpfrxx.h"
+
+// C++ includes
+#include <iostream>
+#include <iomanip>
+#include <string>
+#include <fstream>
+#include <cstdlib>
+#include <vector>
+#include <getopt.h> // getopt_long()
 
 // Function explaining command line options that gets called when the
 // program is run with --help.
@@ -127,7 +131,8 @@ int main(int argc, char** argv)
   for (unsigned i=0; i<generated_weights.size(); ++i)
     weight_sum += generated_weights[i];
 
-  if ( abs(weight_sum - mpfr_class(1.)/mpfr_class(2.)) > 1.e-30 )
+  mpfr_class weight_diff = weight_sum - mpfr_class(1.)/mpfr_class(2.);
+  if ( my_abs(weight_diff) > 1.e-30 )
     {
       // Scale weights by (1/2 * weight_sum)
       for (unsigned i=0; i<generated_weights.size(); ++i)
