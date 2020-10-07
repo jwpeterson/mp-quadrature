@@ -209,7 +209,8 @@ void Matrix<T>::print(std::ostream& os) const
           // Don't print values smaller than epsilon=1.e-30
           T val = A(i,j);
 
-          if (abs(val) < 1.e-30)
+          if ((val > 0 && val < 1.e-30) ||
+              (val < 0 && val > -1.e-30))
             val = 0.;
 
           os << std::setprecision(6)
