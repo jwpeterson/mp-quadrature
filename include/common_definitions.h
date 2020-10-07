@@ -1,9 +1,10 @@
-#ifndef __common_definitions__
-#define __common_definitions__
+#ifndef COMMON_DEFINITIONS_H
+#define COMMON_DEFINITIONS_H
 
 #include <string>
 #include <vector>
 #include <algorithm> // std::partition
+#include <cmath> // std::abs
 
 // For mpfr_class.  It may be possible to forward declare this, but
 // I'm not sure how.
@@ -252,4 +253,21 @@ void interleave(std::vector<T> & v)
   v = result;
 }
 
-#endif // __common_definitions__
+// A templated absolute value function with full specializations for all
+// the required types.
+template <typename T>
+T my_abs(const T & input);
+
+template <>
+inline mpfr_class my_abs(const mpfr_class & input) { return abs(input); }
+
+template <>
+inline mpq_class my_abs(const mpq_class & input) { return abs(input); }
+
+template <>
+inline mpz_class my_abs(const mpz_class & input) { return abs(input); }
+
+template <>
+inline double my_abs(const double & input) { return std::abs(input); }
+
+#endif // COMMON_DEFINITIONS_H
