@@ -42,7 +42,9 @@ double myfunc(unsigned n, const double * x, double * grad, void * my_func_data);
 double myconstraint(unsigned n, const double *x, double *grad, void *data);
 
 // Convert a numerical nlopt_result successful return code to a human readable string.
-std::string nlopt_result_to_string(nlopt_result res);
+// Note: newer versions of nlopt provide an nlopt_result_to_string() function, but
+// I wrote this when no such function existed.
+std::string result_to_string(nlopt_result res);
 
 // Call this function when the program is run with the wrong arguments.
 void usage();
@@ -1539,7 +1541,7 @@ int main(int argc, char ** argv)
       }
       else
         {
-          std::cout << "nlopt converged with reason: " << nlopt_result_to_string(res) << std::endl;
+          std::cout << "nlopt converged with reason: " << result_to_string(res) << std::endl;
           std::cout << "found minimum " << minf << " at " << std::endl;
           print(x);
 
@@ -1634,7 +1636,7 @@ void usage()
 }
 
 
-std::string nlopt_result_to_string(nlopt_result res)
+std::string result_to_string(nlopt_result res)
 {
   switch (res)
     {
