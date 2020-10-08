@@ -1,17 +1,3 @@
-// nlopt includes. The preprocessor define is set on the compile line
-// with a -D flag.
-#ifndef HAVE_NLOPT
-
-int main()
-{
-  std::cout << "This driver requires nlopt. Install nlopt and then rerun configure, "
-            << "using the --with-nlopt-include and --with-nlopt-lib flags to specify "
-            << "its location." << std::endl;
-  return 0;
-}
-
-#else
-
 // mp-quadrature includes
 #include "solver_data.h"
 #include "newton.h"
@@ -27,6 +13,20 @@ int main()
 #include <math.h>
 #include <stdlib.h> // random()
 #include <getopt.h> // getopt_long()
+
+// nlopt includes. The preprocessor define is set on the compile line
+// with a -D flag.
+#ifndef HAVE_NLOPT
+
+int main()
+{
+  std::cout << "This driver requires nlopt. Install nlopt and then rerun configure, "
+            << "using the --with-nlopt-include and --with-nlopt-lib flags to specify "
+            << "its location." << std::endl;
+  return 0;
+}
+
+#else
 
 // Objective function f : R^n -> R and, if grad != nullptr, grad(f).
 double myfunc(unsigned n, const double * x, double * grad, void * my_func_data);
