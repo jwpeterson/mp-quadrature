@@ -46,7 +46,37 @@ def f2hex(f2rgb, f):
 # ./drivers/tri_rule -w -i inputs/some_file.in
 
 # d=3
-# filename = 'quad_2d_p03_Ro3_1110_07QP_equilateral.csv'
+
+# 4 QPs
+# filename = 'quad_2d_p03_NI_equilateral.csv'
+# filename = 'quad_2d_p03_CP_equilateral.csv'
+
+# 6 QPs
+# filename = 'quad_2d_p03_Ro3_00020_06QP_equilateral.csv'
+# filename = 'quad_2d_p03_Ro3_00020_06QP_second_equilateral.csv'
+# filename = 'quad_2d_p03_Ro3_00020_06QP_third_equilateral.csv'
+# filename = 'quad_2d_p03_Ro3_00020_06QP_fourth_equilateral.csv'
+# filename = 'quad_2d_p03_Ro3_00020_06QP_PI_equilateral.csv' # solved for by hand!
+# filename = 'quad_2d_p03_Ro3_00110_06QP_equilateral.csv'
+# filename = 'quad_2d_p03_Ro3_00110_06QP_Case2a_equilateral.csv'
+# filename = 'quad_2d_p03_Ro3_00110_06QP_Case2b_equilateral.csv' # negative weights
+# filename = 'quad_2d_p03_Ro3_00020_06QP_equal_weights_equilateral.csv'
+filename = 'quad_2d_p03_Ro3_00020_06QP_min_x1_equilateral.csv'
+
+# 7 QPs
+# filename = 'quad_2d_p03_Ro3_11010_07QP_equilateral.csv'
+# filename = 'quad_2d_p03_Ro3_11010_07QP_second_equilateral.csv'
+# filename = 'quad_2d_p03_Ro3_11010_07QP_third_equilateral.csv'
+# filename = 'quad_2d_p03_Ro3_11100_07QP_equilateral.csv'
+# Case I: alpha < (9 - sqrt(21))/30 ~ .14725 -> wv negative
+# filename = 'quad_2d_p03_Ro3_11010_07QP_CaseI_NB_equilateral.csv'
+# Case II: .14725 < alpha < 0.2 -> wc _and_ wv negative
+# filename = 'quad_2d_p03_Ro3_11010_07QP_CaseII_NB_equilateral.csv'
+# Case III: Same as 4 QPs case
+# Case IV: 0.2 < alpha < (9 + sqrt(21))/30 ~ 0.45275 -> wc negative
+# filename = 'quad_2d_p03_Ro3_11010_07QP_CaseIV_NB_equilateral.csv'
+# Case V: 0.45275 < alpha <= 0.5 -> All weights positive
+# filename = 'quad_2d_p03_Ro3_11010_07QP_CaseV_PB_equilateral.csv'
 
 # d=4
 # filename = 'quad_2d_p04_06QP_equilateral.csv'
@@ -85,7 +115,7 @@ def f2hex(f2rgb, f):
 # filename = 'quad_2d_p08_16QP_equilateral.csv'
 
 # d=9
-filename = 'quad_2d_p09_Ro3_1006_19QP_equilateral.csv' # same as D3-invariant rule.
+# filename = 'quad_2d_p09_Ro3_1006_19QP_equilateral.csv' # same as D3-invariant rule.
 # filename = 'quad_2d_p09_Ro3_0106_21QP_equilateral.csv'
 # filename = 'quad_2d_p09_Ro3_1115_22QP_equilateral.csv'
 # filename = 'quad_2d_p09_Ro3_0134_24QP_equilateral.csv'
@@ -171,18 +201,25 @@ wts = data[:, 2]
 # print('wts={}'.format(wts))
 
 # Create a colormap. This is mostly a matter of preference?
-# cmap = cm.get_cmap('RdYlGn')
+cmap = cm.get_cmap('RdYlGn')
 # cmap = cm.get_cmap(plt.cm.jet)
 
 # Perceptually uniform sequential colormaps
-cmap = cm.get_cmap(plt.cm.viridis)
+# cmap = cm.get_cmap(plt.cm.viridis) # Can't see black QPs on purple background
 # cmap = cm.get_cmap(plt.cm.plasma)
 # cmap = cm.get_cmap(plt.cm.inferno)
 # cmap = cm.get_cmap(plt.cm.magma)
 
 # Create a numerical value -> color mapping based on the quadrature weights.
 # We use f2rgb when calling 'f2hex', see below.
-norm = colors.Normalize(vmin=np.min(wts), vmax=np.max(wts))
+minw = np.min(wts)
+maxw = np.max(wts)
+# If the weights are approximately equal, use a default range, since
+# otherwise the text on the colorbar is formatted strangely.
+if np.abs(maxw - minw) < 1.e-6:
+    minw = 0
+    maxw = 1./2
+norm = colors.Normalize(vmin=minw, vmax=maxw)
 f2rgb = cm.ScalarMappable(norm=norm, cmap=cmap)
 
 # To create a "bounded" Voronoi region, we first reflect the original

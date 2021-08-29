@@ -2,11 +2,12 @@
 
 
 Ro3::Ro3(unsigned int d_in, unsigned int nc_in, unsigned int nv_in,
-         unsigned int ne_in, unsigned int ng_in) :
+         unsigned int ne_in, unsigned int nm_in, unsigned int ng_in) :
   d(d_in),
   nc(nc_in),
   nv(nv_in),
   ne(ne_in),
+  nm(nm_in),
   ng(ng_in),
   one_third(mpfr_class(1) / 3)
 {
@@ -16,6 +17,7 @@ Ro3::Ro3(unsigned int d_in, unsigned int nc_in, unsigned int nv_in,
                 << nc << ","
                 << nv << ","
                 << ne << ","
+                << nm << ","
                 << ng << ")"
                 << " are inconsistent with degree " << d
                 << std::endl;
@@ -24,7 +26,7 @@ Ro3::Ro3(unsigned int d_in, unsigned int nc_in, unsigned int nv_in,
 
   // Initialize the polynomial exponents array.
   polys =
-    {                                                         //        a_d
+    {                                                         // d      a_d
       {0,0},                                                  // const  1
       {2,0},                                                  // 2nd    1
       {3,0},  {2,1},                                          // 3rd    2]
@@ -57,6 +59,14 @@ Ro3::Ro3(unsigned int d_in, unsigned int nc_in, unsigned int nv_in,
 
 
 
+bool Ro3::has_orbits(unsigned int nc_in, unsigned int nv_in, unsigned int ne_in,
+                     unsigned int nm_in, unsigned int ng_in)
+{
+  return
+    (nc == nc_in) && (nv == nv_in) && (ne == ne_in) &&
+    (nm == nm_in) && (ng == ng_in);
+}
+
 unsigned int Ro3::begin(Orbit orb)
 {
   switch (orb)
@@ -69,9 +79,12 @@ unsigned int Ro3::begin(Orbit orb)
     case EDGE:
       if (!ne) return dim();
       return nc + nv;
+    case MEDIAN:
+      if (!nm) return dim();
+      return nc + nv + 2*ne;
     case GENERAL:
       if (!ng) return dim();
-      return nc + nv + 2*ne;
+      return nc + nv + 2*(ne + nm);
     default:
       std::cerr << "Unknown Orbit type." << std::endl;
       exit(1);
@@ -92,6 +105,9 @@ unsigned int Ro3::end(Orbit orb)
     case EDGE:
       if (!ne) return dim();
       return nc + nv + 2*ne;
+    case MEDIAN:
+      if (!nm) return dim();
+      return nc + nv + 2*(ne + nm);
     case GENERAL:
       return dim();
     default:
@@ -125,6 +141,15 @@ void Ro3::bounds(std::vector<double> & lb, std::vector<double> & ub)
       ub[i+1] = 1.;
     }
 
+  // Median orbits have a weight dof (appearing 3 times) and a spatial dof.
+  // The upper bound for the spatial coordinate is 1/2 since the orbit points are
+  // (x,x) ; (1-2*x,x) ; (x,1-2*x)
+  for (unsigned int i=begin(MEDIAN); i<end(MEDIAN); i+=2)
+    {
+      ub[i] = 1. / 6;
+      ub[i+1] = 0.5;
+    }
+
   // General orbits have a weight dof and two spatial dofs.
   for (unsigned int i=begin(GENERAL); i<end(GENERAL); i+=3)
     {
@@ -153,6 +178,13 @@ void Ro3::guess(std::vector<double> & x)
     {
       x[i] = 1. / 6 * double(random())/RAND_MAX;
       x[i+1] = 1. * double(random())/RAND_MAX;
+    }
+
+  // Median orbits have a weight dof (appearing 3 times) and a spatial dof.
+  for (unsigned int i=begin(MEDIAN); i<end(MEDIAN); i+=2)
+    {
+      x[i] = 1. / 6 * double(random())/RAND_MAX;
+      x[i+1] = 0.5 * double(random())/RAND_MAX;
     }
 
   // General orbits have a weight dof and two spatial dofs.
@@ -308,6 +340,47 @@ void Ro3::residual_and_jacobian (std::vector<mpfr_class> * r,
             }
         }
 
+      // Residual & Jacobian contributions due to median orbits.
+      for (unsigned int q=begin(MEDIAN); q<end(MEDIAN); q+=2)
+        {
+          mpfr_class w = u[q];
+          mpfr_class x = u[q+1];
+
+          // Match with notation in our notes!
+          unsigned int a = xpower;
+          unsigned int b = ypower;
+
+          // A convenient quantity.
+          mpfr_class om2x = mpfr_class(1) - mpfr_class(2) * x;
+
+          // The spatial part is needed for both residual and Jacobian.
+          mpfr_class spatial =
+            pow(x, a + b) +
+            pow(om2x, a) * pow(x, b) +
+            pow(x, a) * pow(om2x, b);
+
+          // Compute residual contribution, if required.
+          if (r)
+            (*r)[i] += w * spatial;
+
+          // Compute Jacobian contribution, if required.
+          if (jac)
+            {
+              // Derivative wrt w
+              (*jac)(i, q) += spatial;
+
+              // Derivative wrt x
+              unsigned int am1 = a > 0 ? a - 1 : 0;
+              unsigned int bm1 = b > 0 ? b - 1 : 0;
+              unsigned int apbm1 = (a + b > 0) ? (a + b - 1) : 0;
+
+              (*jac)(i,q+1) += w *
+                ((a+b) * pow(x, apbm1) +
+                 pow(om2x,a) * b * pow(x,bm1) - 2 * a * pow(x,b) * pow(om2x,am1) +
+                 -2 * b * pow(x,a) * pow(om2x,bm1) + a * pow(x,am1) * pow(om2x, b));
+            }
+        }
+
       // Residual & Jacobian contributions due to general orbits.
       for (unsigned int q=begin(GENERAL); q<end(GENERAL); q+=3)
         {
@@ -402,7 +475,15 @@ bool Ro3::check_feasibility (const std::vector<mpfr_class> & trial_u)
         return false;
     }
 
-  // 3.) Check if 1-x-y < 0 in general orbits
+  // 3.) Check if x < 1/2 in median orbits
+  for (unsigned int q=begin(MEDIAN); q<end(MEDIAN); q+=2)
+    {
+      mpfr_class x = trial_u[q+1];
+      if (x >= mpfr_class(1)/2)
+        return false;
+    }
+
+  // 4.) Check if 1-x-y < 0 in general orbits
   for (unsigned int q=begin(GENERAL); q<end(GENERAL); q+=3)
     {
       mpfr_class x = trial_u[q+1];
