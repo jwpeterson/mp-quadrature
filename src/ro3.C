@@ -25,6 +25,23 @@ Ro3::Ro3(unsigned int d_in, unsigned int nc_in, unsigned int nv_in,
     }
 
   // Initialize the polynomial exponents array.
+  // The approach for choosing these polynomials is currently ad hoc:
+  // 1.) We can compute the "a_d" for the Ro3 basis at each order "d"
+  //     using the "Molien series" approach.
+  // 2.) Starting with the polynomial "x^d * y^0", we then generate the required
+  //     a_d polynomials for a given order by subtracting one from the
+  //     x-power and adding one to the y-power.
+  // In principle it does not matter which a_d polynomials of a given
+  // order you choose to integrate exactly, however you must be sure
+  // that they are independent *and* that they are not _zero_ under
+  // the Reynolds operator. In the cubic (d=3) case, for example,
+  // we have:
+  // x**3     -> (x^3 - 3 * x**2 * y) -> r**3 * cos(3*theta)
+  // x**2 * y -> (y^3 - 3 * y**2 * x) -> r**3 * sin(3*theta)
+  // x * y**2 -> r**3 * cos(3*theta)
+  // y**3     -> r**3 * sin(3*theta)
+  // Since a_3 = 2, we can pick e.g. (x^3, x^2*y) or (x*y^2, y^3) but _not_
+  // (x^3, x*y^2) since they would not be independent.
   polys =
     {                                                         // d      a_d
       {0,0},                                                  // const  1
