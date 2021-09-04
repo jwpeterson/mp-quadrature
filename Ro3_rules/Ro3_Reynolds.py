@@ -43,7 +43,7 @@ def to_polar(d, Reynolds_polys):
 
         Reynolds_polar.append(sy.expand(q_polar))
 
-        if d==5:
+        if d==5 or d==7:
             Reynolds_polar[-1] = sy.trigsimp(Reynolds_polar[-1])
             Reynolds_polar[-1] = sy.expand(Reynolds_polar[-1])
             # Replace cos^3(theta)
@@ -53,11 +53,13 @@ def to_polar(d, Reynolds_polys):
             Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.cos(theta)*sy.cos(2*theta), Fraction(1,2)*(sy.cos(theta) + sy.cos(3*theta)))
             Reynolds_polar[-1] = sy.expand(Reynolds_polar[-1])
 
-        if d==6:
+        if d==6 or d==8:
             # Trig. substitutions:
             # https://en.wikipedia.org/wiki/List_of_trigonometric_identities
             # The following are tailored to the 6th-order case; it would be good
             # if we could generalize this.
+            Reynolds_polar[-1] = sy.trigsimp(Reynolds_polar[-1])
+            Reynolds_polar[-1] = sy.expand(Reynolds_polar[-1])
 
             # Replace cos^2(theta) and sin^2(theta) with multiple angle representations
             Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.cos(theta)**2, Fraction(1,2)*(1 + sy.cos(2*theta)))
@@ -71,7 +73,7 @@ def to_polar(d, Reynolds_polys):
             # Debugging
             # print(f'Reynolds_polar[-1] = {Reynolds_polar[-1]}')
 
-            # Replace third powers of cos(2*theta) and sin(2*theta) with multiple angle representations
+            # Replace cos^3(2*theta) and sin^3(2*theta) with multiple angle representations
             Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.cos(2*theta)**3, Fraction(1,4)*(3*sy.cos(2*theta) + sy.cos(6*theta)))
             Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(2*theta)**3, Fraction(1,4)*(3*sy.sin(2*theta) - sy.sin(6*theta)))
             Reynolds_polar[-1] = sy.expand(Reynolds_polar[-1]) # expand before substituting next
@@ -86,6 +88,79 @@ def to_polar(d, Reynolds_polys):
 
             # Replace sin(2*theta)*cos(4*theta) with (1/2) * (sin(6*theta) + sin(-2*theta))
             Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(2*theta)*sy.cos(4*theta), Fraction(1,2)*(sy.sin(6*theta) - sy.sin(2*theta)))
+            Reynolds_polar[-1] = sy.expand(Reynolds_polar[-1]) # expand before substituting next
+            # Replace sin^2(theta) with multiple angle representations (again)
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(theta)**2, Fraction(1,2)*(1 - sy.cos(2*theta)))
+            Reynolds_polar[-1] = sy.expand(Reynolds_polar[-1]) # expand before substituting next
+
+        if d==9:
+            Reynolds_polar[-1] = sy.trigsimp(Reynolds_polar[-1])
+            Reynolds_polar[-1] = sy.expand(Reynolds_polar[-1])
+            # Replace sin(theta)*cos(theta) with sin(2*theta)/2
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.cos(theta)*sy.sin(theta), Fraction(1,2)*(sy.sin(2*theta)))
+            Reynolds_polar[-1] = sy.expand(Reynolds_polar[-1]) # expand before substituting next
+            # Replace cos^3(theta) and sin^3(theta) with multiple angle representations
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.cos(theta)**3, Fraction(1,4)*(3*sy.cos(theta) + sy.cos(3*theta)))
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(theta)**3, Fraction(1,4)*(3*sy.sin(theta) - sy.sin(3*theta)))
+            Reynolds_polar[-1] = sy.expand(Reynolds_polar[-1]) # expand before substituting next
+            # Replace cos^7(theta) and sin^7(theta) with cos^2(theta) and sin^2(theta) * multiple angle representations
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.cos(theta)**7, sy.cos(theta)**2 * Fraction(1,16)*(10*sy.cos(theta) + 5*sy.cos(3*theta) + sy.cos(5*theta)))
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(theta)**7, sy.sin(theta)**2 * Fraction(1,16)*(10*sy.sin(theta) - 5*sy.sin(3*theta) + sy.sin(5*theta)))
+            Reynolds_polar[-1] = sy.expand(Reynolds_polar[-1]) # expand before substituting next
+            # Replace cos^5(theta) and sin^5(theta) with multiple angle representations
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.cos(theta)**5, Fraction(1,16)*(10*sy.cos(theta) + 5*sy.cos(3*theta) + sy.cos(5*theta)))
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(theta)**5, Fraction(1,16)*(10*sy.sin(theta) - 5*sy.sin(3*theta) + sy.sin(5*theta)))
+            Reynolds_polar[-1] = sy.expand(Reynolds_polar[-1]) # expand before substituting next
+            # Replace cos^3(theta) and sin^3(theta) with multiple angle representations (again)
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.cos(theta)**3, Fraction(1,4)*(3*sy.cos(theta) + sy.cos(3*theta)))
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(theta)**3, Fraction(1,4)*(3*sy.sin(theta) - sy.sin(3*theta)))
+            Reynolds_polar[-1] = sy.expand(Reynolds_polar[-1]) # expand before substituting next
+            # Replace cos^2(theta) and sin^2(theta) with multiple angle representations
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.cos(theta)**2, Fraction(1,2)*(1 + sy.cos(2*theta)))
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(theta)**2, Fraction(1,2)*(1 - sy.cos(2*theta)))
+            Reynolds_polar[-1] = sy.expand(Reynolds_polar[-1]) # expand before substituting next
+            # Replace cos^2(2*theta) and sin^2(2*theta) with multiple angle representations
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.cos(2*theta)**2, Fraction(1,2)*(1 + sy.cos(4*theta)))
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(2*theta)**2, Fraction(1,2)*(1 - sy.cos(4*theta)))
+            Reynolds_polar[-1] = sy.expand(Reynolds_polar[-1]) # expand before substituting next
+            # Replace sin(alpha) * sin(beta) = (1/2) * (cos(alpha-beta) - cos(alpha+beta))
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(theta)*sy.sin(2*theta), Fraction(1,2)*(sy.cos(theta) - sy.cos(3*theta))) # sin(theta)*sin(2*theta)
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(2*theta)*sy.sin(3*theta), Fraction(1,2)*(sy.cos(theta) - sy.cos(5*theta))) # sin(2*theta)*sin(3*theta)
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(2*theta)*sy.sin(5*theta), Fraction(1,2)*(sy.cos(3*theta) - sy.cos(7*theta))) # sin(2*theta)*sin(5*theta)
+            Reynolds_polar[-1] = sy.expand(Reynolds_polar[-1]) # expand before substituting next
+            # Replace cos(alpha) * cos(beta) = (1/2) * (cos(alpha-beta) + cos(alpha+beta))
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.cos(theta)*sy.cos(2*theta), Fraction(1,2)*(sy.cos(theta) + sy.cos(3*theta))) # cos(theta)*cos(2*theta)
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.cos(theta)*sy.cos(4*theta), Fraction(1,2)*(sy.cos(3*theta) + sy.cos(5*theta))) # cos(theta)*cos(4*theta)
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.cos(2*theta)*sy.cos(3*theta), Fraction(1,2)*(sy.cos(theta) + sy.cos(5*theta))) # cos(2*theta)*cos(3*theta)
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.cos(2*theta)*sy.cos(5*theta), Fraction(1,2)*(sy.cos(3*theta) + sy.cos(7*theta))) # cos(2*theta)*cos(5*theta)
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.cos(2*theta)*sy.cos(7*theta), Fraction(1,2)*(sy.cos(5*theta) + sy.cos(9*theta))) # cos(2*theta)*cos(7*theta)
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.cos(3*theta)*sy.cos(4*theta), Fraction(1,2)*(sy.cos(theta) + sy.cos(7*theta))) # cos(3*theta)*cos(4*theta)
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.cos(4*theta)*sy.cos(5*theta), Fraction(1,2)*(sy.cos(theta) + sy.cos(9*theta))) # cos(4*theta)*cos(5*theta)
+            Reynolds_polar[-1] = sy.expand(Reynolds_polar[-1]) # expand before substituting next
+            # Replace sin^3(2*theta) with multiple angle representations (again)
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(2*theta)**3, Fraction(1,4)*(3*sy.sin(2*theta) - sy.sin(6*theta)))
+            Reynolds_polar[-1] = sy.expand(Reynolds_polar[-1]) # expand before substituting next
+            # Replace sin(3*theta)**2
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(3*theta)**2, Fraction(1,2)*(1 - sy.cos(6*theta)))
+            Reynolds_polar[-1] = sy.expand(Reynolds_polar[-1]) # expand before substituting next
+            # Replace sin(3*theta)**3
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(3*theta)**3, Fraction(1,4)*(3*sy.sin(3*theta) - sy.sin(9*theta)))
+            Reynolds_polar[-1] = sy.expand(Reynolds_polar[-1]) # expand before substituting next
+            # Replace cos(alpha) * cos(beta) = (1/2) * (cos(alpha-beta) + cos(alpha+beta))
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.cos(3*theta)*sy.cos(6*theta), Fraction(1,2)*(sy.cos(3*theta) + sy.cos(9*theta))) # cos(3*theta)*cos(6*theta)
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.cos(2*theta)*sy.cos(3*theta), Fraction(1,2)*(sy.cos(theta)   + sy.cos(5*theta))) # cos(2*theta)*cos(3*theta)
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.cos(theta)*sy.cos(6*theta),   Fraction(1,2)*(sy.cos(5*theta) + sy.cos(7*theta))) # cos(theta)*cos(6*theta)
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.cos(theta)*sy.cos(2*theta),   Fraction(1,2)*(sy.cos(theta)   + sy.cos(3*theta))) # cos(theta)*cos(2*theta)
+            Reynolds_polar[-1] = sy.expand(Reynolds_polar[-1]) # expand before substituting next
+            # Replace sin(alpha) * cos(beta) = (1/2) * (sin(alpha+beta) + sin(alpha-beta))
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(5*theta)*sy.cos(2*theta), Fraction(1,2)*(sy.sin(7*theta) + sy.sin(3*theta))) # sin(5*theta)*cos(2*theta)
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(3*theta)*sy.cos(2*theta), Fraction(1,2)*(sy.sin(5*theta) + sy.sin(theta))) # sin(3*theta)*cos(2*theta)
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(2*theta)*sy.cos(5*theta), Fraction(1,2)*(sy.sin(7*theta) + sy.sin(-3*theta))) # sin(2*theta)*cos(5*theta)
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(2*theta)*sy.cos(3*theta), Fraction(1,2)*(sy.sin(5*theta) + sy.sin(-theta))) # sin(2*theta)*cos(3*theta)
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(2*theta)*sy.cos(theta),   Fraction(1,2)*(sy.sin(3*theta) + sy.sin(theta))) # sin(2*theta)*cos(theta)
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(theta)*sy.cos(6*theta),   Fraction(1,2)*(sy.sin(7*theta) + sy.sin(-5*theta))) # sin(theta)*cos(6*theta)
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(6*theta)*sy.cos(theta),   Fraction(1,2)*(sy.sin(7*theta) + sy.sin(5*theta))) # sin(6*theta)*cos(theta)
+            Reynolds_polar[-1] = Reynolds_polar[-1].subs(sy.sin(6*theta)*sy.cos(3*theta), Fraction(1,2)*(sy.sin(9*theta) + sy.sin(3*theta))) # sin(6*theta)*cos(3*theta)
             Reynolds_polar[-1] = sy.expand(Reynolds_polar[-1]) # expand before substituting next
 
     return Reynolds_polar
@@ -163,7 +238,7 @@ if False:
     print('')
 
 # 5th-order
-if True:
+if False:
     quintic, Reynolds_quintic = compute_reynolds(5, x_prime)
     Reynolds_quintic_polar = to_polar(5, Reynolds_quintic)
     print(f'quintic = {quintic}')
@@ -201,9 +276,37 @@ if False:
     # print(f'Reynolds_sixth = {Reynolds_sixth}')
     for i in range(len(Reynolds_sixth_polar)):
         print(f'Reynolds_sixth_polar[{i}] = {Reynolds_sixth_polar[i]}')
-
     print('')
 
+# 7th-order
+if False:
+    seventh, Reynolds_seventh = compute_reynolds(7, x_prime)
+    Reynolds_seventh_polar = to_polar(7, Reynolds_seventh)
+    print(f'seventh = {seventh}')
+    # print(f'Reynolds_seventh = {Reynolds_seventh}')
+    for i in range(len(Reynolds_seventh_polar)):
+        print(f'Reynolds_seventh_polar[{i}] = {Reynolds_seventh_polar[i]}')
+    print('')
+
+# 8th-order
+if False:
+    eighth, Reynolds_eighth = compute_reynolds(8, x_prime)
+    Reynolds_eighth_polar = to_polar(8, Reynolds_eighth)
+    print(f'eighth = {eighth}')
+    # print(f'Reynolds_eighth = {Reynolds_eighth}')
+    for i in range(len(Reynolds_eighth_polar)):
+        print(f'Reynolds_eighth_polar[{i}] = {Reynolds_eighth_polar[i]}')
+    print('')
+
+# 9th-order
+if True:
+    ninth, Reynolds_ninth = compute_reynolds(9, x_prime)
+    Reynolds_ninth_polar = to_polar(9, Reynolds_ninth)
+    print(f'ninth = {ninth}')
+    # print(f'Reynolds_ninth = {Reynolds_ninth}')
+    for i in range(len(Reynolds_ninth_polar)):
+        print(f'Reynolds_ninth_polar[{i}] = {Reynolds_ninth_polar[i]}')
+    print('')
 
 # 10th-order.
 # These are formed by taking P2^r * P3a^s * P3b^t, where:
