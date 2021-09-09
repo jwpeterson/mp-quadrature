@@ -72,4 +72,4 @@ print('')
 # print(f'xy4={sy.expand(xy4)}')
 
 print('2.) Linear combination of quintic polynomials which is not LI:')
-print(f'2 x**5 + 5 (x**4 y + x**3 y**2) - 5/2 x**4 - 5 x**2 y + 1/2 = {sy.expand(2*x5 + 5*(x4y + x3y2) - Fraction(5,2)*x4 - 5*x2y + Fraction(1,2))}')
+print(f'4 x**5 + 10 (x**4 y + x**3 y**2) - 5 x**4 - 10 x**2 y + 1 = {sy.expand(4*x5 + 10*(x4y + x3y2) - 5*x4 - 10*x2y + 1)}')
