@@ -32,7 +32,7 @@ def poly_string(coeffs):
         if val != 1 and val != -1:
             poly_string += str(val) + '*'
 
-        poly_string += key
+        poly_string += 'Orb(' + key + ')'
         count += 1
     return poly_string
 
@@ -43,10 +43,12 @@ def poly_string(coeffs):
 a, b = sy.sympify('a, b')
 x = [(a,b), (1-a-b,a), (b, 1-a-b)]
 
-# Compute monomials from degree 2 up to degree dmax. Initialize the
-# dict with the constant "1" term.
+# Compute orbits for monomials from degree 2 up to degree dmax. Initialize the
+# dict with the constant "1" term. Note that Orb(1) = 3 technically but we
+# are free to "normalize" any orbit by multiplying it by a scalar, so we just
+# leave it as 1.
 dmax = 5
-monomials = {'1':1}
+monomial_orbits = {'1':1}
 for d in range(2, dmax+1):
     for ypower in range(d+1):
         for i in range(3):
@@ -54,7 +56,7 @@ for d in range(2, dmax+1):
             xpower = d - ypower
 
             # Create dict key. We omit terms with 0 exponent, but we
-            # explicitly include 1 exponents.
+            # explicitly include 1 exponents when generating the string.
             key = ''
             if xpower > 0:
                 key += 'x' + str(xpower)
@@ -69,34 +71,43 @@ for d in range(2, dmax+1):
             yi = x[i][1]
 
             # KeyError: 'x3'
-            # monomials[key] += (xi**xpower) * (yi**ypower)
+            # monomial_orbits[key] += (xi**xpower) * (yi**ypower)
 
             # Doing this in 1 line doesn't work for some reason, I think
             # it is the += operator? The error is:
             # SyntaxError: can't assign to function call
-            # monomials.setdefault(key, 0) += (xi**xpower) * (yi**ypower)
+            # monomial_orbits.setdefault(key, 0) += (xi**xpower) * (yi**ypower)
 
             # So we use two lines
-            monomial = monomials.setdefault(key, 0)
-            monomials[key] += (xi**xpower) * (yi**ypower)
+            monomial = monomial_orbits.setdefault(key, 0)
+            monomial_orbits[key] += (xi**xpower) * (yi**ypower)
 
 # Debugging
-print('monomials =')
-for key, val in monomials.items():
+print('monomial_orbits =')
+for key, val in monomial_orbits.items():
     print(f'  {key} = {sy.expand(val)}')
 
-# Cubic
-# x**3 + x**2y + xy**2 - x**2 = 0
-cubic_coeffs = {'x3':1, 'x2y1':1, 'x1y2':1, 'x2':-1}
 print('')
 print('Results:')
-print('1.) Linear combination of cubic polynomials which is not LI:')
-print(f'{poly_string(cubic_coeffs)} = {linear_comb(cubic_coeffs, monomials)}')
+
+# Quadratic
+# Orb(x**2) + 2*Orb(x*y) - 1 = 0
+quadratic_coeffs = {'x2':1, 'x1y1':2, '1':-1}
+print('')
+print('.) Linear combination of quadratic monomial orbits which is not LI:')
+print(f'{poly_string(quadratic_coeffs)} = {linear_comb(quadratic_coeffs, monomial_orbits)}')
+print('')
+
+# Cubic
+# Orb(x**3) + Orb(x**2y) + Orb(xy**2) - Orb(x**2) = 0
+cubic_coeffs = {'x3':1, 'x2y1':1, 'x1y2':1, 'x2':-1}
+print('.) Linear combination of cubic monomial orbits which is not LI:')
+print(f'{poly_string(cubic_coeffs)} = {linear_comb(cubic_coeffs, monomial_orbits)}')
 print('')
 
 # Quintic
-# 4 x**5 + 10 (x**4 y + x**3 y**2) - 5 x**4 - 10 x**2 y + 1
+# 4*Orb(x**5) + 10*Orb(x**4 y + x**3 y**2) - 5*Orb(x**4) - 10*Orb(x**2 y) + 1
 quintic_coeffs = {'x5':4, 'x4y1':10, 'x3y2':10, 'x4':-5, 'x2y1':-10, '1':1}
-print('2.) Linear combination of quintic polynomials which is not LI:')
-print(f'{poly_string(quintic_coeffs)} = {linear_comb(quintic_coeffs, monomials)}')
+print('.) Linear combination of quintic monomial orbits which is not LI:')
+print(f'{poly_string(quintic_coeffs)} = {linear_comb(quintic_coeffs, monomial_orbits)}')
 print('')
