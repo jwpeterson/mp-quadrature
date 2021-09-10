@@ -145,13 +145,27 @@ print(f'{poly_string(quintic_coeffs)} = {linear_comb(quintic_coeffs, monomial_or
 print('')
 
 # Sixth-order
+# The following degree=six coeffs are the (scaled) entries of the nullspace of the matrix A_sym,
+# and we can indeed verify that the 6th-order terms are now cancelled by this linear combination.
+# The remaining terms of the linear combination were then found by "inspecting" the remaining
+# terms.
+sixth_coeffs = {'x6':10, 'x5y1':30, 'x4y2':30, 'x3y3':20, 'x4y1':-30, 'x5':-18, 'x3':20, 'x2':-15, '1':3}
+print('> Linear combination of sixth order monomial orbits which is not LI:')
+print(f'{poly_string(sixth_coeffs)} = {linear_comb(sixth_coeffs, monomial_orbits)}')
+print('')
+
+
+# Sixth-order
 d = 6
 
-# One more than "a_d" for this d. If we consider a linear combination
-# of the first n basis functions, this is sufficient to show linear
-# dependence.  For the d=6 case, we only have to consider up to x^3 *
-# y^3 to show linear dependence.
-n = 4
+# Number of basis functions to consider for this d.
+# .) If n = a_d(d) + 1, then we should get a non-trivial nullspace
+#    for the linear system of equations that we build.
+# .) If n = a_d(d), we should get only the trivial nullspace.
+# For example, in the d=6 case, if we consider n=4 basis functions (up
+# to x^3 * y^3) then we should get linear dependence.
+# n = a_d(d)
+n = a_d(d) + 1
 
 # Matrix to store coeffs
 # We use a sympy Matrix since that has the nullspace() command
@@ -188,26 +202,26 @@ for ypower in range(n):
 # Print result
 # print(f'A_sym = {A_sym}')
 
-# Compute nullspace of this matrix. The result is:
+# Returns a list of sympy matrices (vectors) representing the nullspace
+# Compute nullspace of this matrix.
+# For d=6, with n=4, for example, the result is:
 # [1/2],
 # [3/2],
 # [3/2],
 # [  1]
-# print(f'A_sym.nullspace() = {A_sym.nullspace()}')
+nullsp = A_sym.nullspace()
 
-# The following degree=six coeffs are the (scaled) entries of the nullspace of the matrix A_sym,
-# and we can indeed verify that the 6th-order terms are now cancelled by this linear combination.
-# The remaining terms of the linear combination were then found by "inspecting" the remaining
-# terms.
-sixth_coeffs = {'x6':10, 'x5y1':30, 'x4y2':30, 'x3y3':20, 'x4y1':-30, 'x5':-18, 'x3':20, 'x2':-15, '1':3}
-print('> Linear combination of sixth order monomial orbits which is not LI:')
-print(f'{poly_string(sixth_coeffs)} = {linear_comb(sixth_coeffs, monomial_orbits)}')
-print('')
+# from sympy import shape # does not work
+# print(f'Shape of nullspace = {nullsp.shape}') # no
+if not nullsp:
+    print(f'Basis with {n} monomials is linearly independent.')
+else:
+    print(f'Basis with {n} monomials is linearly dependent with nullspace =\n{nullsp}')
 
 # Test a_d() function
-print(f'a_0 = {a_d(0)} (should be 1)')
-print(f'a_6 = {a_d(6)} (should be 3)')
-print(f'a_7 = {a_d(7)} (should be 2)')
-print(f'a_12 = {a_d(12)} (should be 5)')
-print(f'a_17 = {a_d(17)} (should be 6)')
-print(f'a_24 = {a_d(24)} (should be 9)')
+# print(f'a_0 = {a_d(0)} (should be 1)')
+# print(f'a_6 = {a_d(6)} (should be 3)')
+# print(f'a_7 = {a_d(7)} (should be 2)')
+# print(f'a_12 = {a_d(12)} (should be 5)')
+# print(f'a_17 = {a_d(17)} (should be 6)')
+# print(f'a_24 = {a_d(24)} (should be 9)')
