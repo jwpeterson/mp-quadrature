@@ -48,28 +48,40 @@ def key_from_powers(xpower, ypower):
         key += 'y' + str(ypower)
     return key
 
-# Returns the number of basis functions for a given degree, d.
-# These numbers are given by the Molien series for the Ro3 basis.
-# Note that the _total_ size of the basis for a given d is the
-# sum_d a_d.
-def a_d(d):
+# Helper function used by a_d and s_d functions below
+def a_d_array(d):
     #    a_0, a_1, a_2, a_3, a_4
     a = [  1,   0,   1,   2,   1]
 
     # Handle pre-computed cases
     if d < len(a):
-        return a[d]
+        return a[0:d+1]
 
     # Use formula to compute a_d for larger d
     a_ell = 0
     for ell in range(5, d+1):
         a.append(a[ell-1] + a[ell-3] - a[ell-4])
 
-    # Debugging
-    # print(f'a = {a}')
+    return a
 
-    # The last entry in a is the one we requested
-    return a[-1]
+# Returns the number of basis functions for a given degree, d.
+# These numbers are given by the Molien series for the Ro3 basis.
+# Note that the _total_ size of the basis for a given d is the
+# sum_d a_d.
+def a_d(d):
+    # The last entry in the array returned by the a_d_array() function
+    # is the one we requested.
+    return a_d_array(d)[-1]
+
+# Returns the sum of the a_d up to and including d
+def s_d(d):
+    a = a_d_array(d)
+    return sum(a)
+
+# I found this formula in my notes, it is much simpler to use than
+# computing all of the a_d's
+def s_d_simple(d):
+    return int((d*d + 3*d + 6)/6)
 
 # Given degree d and a the set of monomial_orbits of at least degree
 # d, computes the nullspace for the orbits of degree d. If the
@@ -234,7 +246,7 @@ for each d.
 """
 
 # Compute orbits for monomials from degree 2 up to degree dmax.
-dmax = 8
+dmax = 10
 monomial_orbits = compute_monomial_orbits(dmax)
 
 print('--------------------------------------------------------------------------------')
@@ -297,8 +309,17 @@ for d in range(2,dmax+1):
 
 # Test a_d() function
 # print(f'a_0 = {a_d(0)} (should be 1)')
+# print(f'a_1 = {a_d(1)} (should be 0)')
+# print(f'a_2 = {a_d(2)} (should be 1)')
+# print(f'a_3 = {a_d(3)} (should be 2)')
+# print(f'a_4 = {a_d(4)} (should be 1)')
+# print(f'a_5 = {a_d(5)} (should be 2)')
 # print(f'a_6 = {a_d(6)} (should be 3)')
 # print(f'a_7 = {a_d(7)} (should be 2)')
 # print(f'a_12 = {a_d(12)} (should be 5)')
 # print(f'a_17 = {a_d(17)} (should be 6)')
 # print(f'a_24 = {a_d(24)} (should be 9)')
+
+# Test s_d() function. Apparently s_d = (d*d + 3*d + 6)/6 as well?
+for d in range(dmax+1):
+    print(f's_{d} = {s_d(d)}, s_d_simple({d}) = {s_d_simple(d)}')
