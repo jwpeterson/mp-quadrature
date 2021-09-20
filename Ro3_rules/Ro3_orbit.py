@@ -200,29 +200,25 @@ def compute_monomial_orbits(dmax):
                 # Create dict key.
                 key = key_from_powers(xpower, ypower)
 
-                # Debugging
-                # print(f'key={key}')
-
-                # Compute monomial
+                # Shorthand notation for current Ro3 orbit values to evaluate
                 xi = x[i][0]
                 yi = x[i][1]
 
-                # KeyError: 'x3'
-                # monomial_orbits[key] += (xi**xpower) * (yi**ypower)
-
-                # Doing this in 1 line doesn't work for some reason, I think
-                # it is the += operator? The error is:
-                # SyntaxError: can't assign to function call
-                # monomial_orbits.setdefault(key, 0) += (xi**xpower) * (yi**ypower)
-
-                # So we use two lines
-                monomial = monomial_orbits.setdefault(key, 0)
+                # I thought that setdefault() either inserts a new key
+                # with the default value or returns a "reference" to
+                # an existing value. However, this does not seem to be
+                # what it does... the value returned by setdefault is
+                # not a reference to a dict entry that you can then
+                # modify, so we still have to then perform a lookup
+                # with dict operator[] to accumulate the value.
+                monomial_orbits.setdefault(key, 0)
                 monomial_orbits[key] += (xi**xpower) * (yi**ypower)
 
     # Debugging
     # print('monomial_orbits =')
     # for key, val in monomial_orbits.items():
     #     print(f'  {key} = {sy.expand(val)}')
+
     return monomial_orbits
 
 
