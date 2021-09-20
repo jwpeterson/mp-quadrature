@@ -3,6 +3,7 @@
 import sympy as sy
 from fractions import Fraction
 import numpy as np
+from collections import defaultdict
 
 # Compute (and expand) a linear combination from the given
 # coefficients and monomials dicts.
@@ -190,7 +191,13 @@ def compute_nullspace(d, monomial_orbits):
 def compute_monomial_orbits(dmax):
     a, b = sy.sympify('a, b')
     x = [(a,b), (1-a-b,a), (b, 1-a-b)]
-    monomial_orbits = {'1':1}
+    # Create a defaultdict here since we want to "accumulate" into the
+    # different keys below without worrying about whether an entry
+    # already exists. Note that the default value for int (0) is
+    # sufficient for us to use here, even though we will actually be
+    # storing sympy objects in the dict.
+    monomial_orbits = defaultdict(int)
+    monomial_orbits['1'] = 1
     for d in range(2, dmax+1):
         for ypower in range(d+1):
             for i in range(3):
@@ -204,14 +211,7 @@ def compute_monomial_orbits(dmax):
                 xi = x[i][0]
                 yi = x[i][1]
 
-                # I thought that setdefault() either inserts a new key
-                # with the default value or returns a "reference" to
-                # an existing value. However, this does not seem to be
-                # what it does... the value returned by setdefault is
-                # not a reference to a dict entry that you can then
-                # modify, so we still have to then perform a lookup
-                # with dict operator[] to accumulate the value.
-                monomial_orbits.setdefault(key, 0)
+                # Accumulate orbit contribution
                 monomial_orbits[key] += (xi**xpower) * (yi**ypower)
 
     # Debugging
