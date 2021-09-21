@@ -196,7 +196,11 @@ def compute_nullspace(d, monomial_orbits):
 # constructed by calling:
 # compute_monomial_orbits(dmax, "nullspace")
 # for some d.
-def compute_nullspace2(dmax, monomial_orbits):
+def compute_nullspace2(dmax):
+    # Compute the monomial orbits for a_d polynomials for each degree
+    # up to dmax, and a_d+1 polynomials for degree dmax
+    monomial_orbits = compute_monomial_orbits(dmax, "nullspace")
+
     # The input monomial_orbits dict contains polynomials a^p * b^q
     a, b = sy.sympify('a, b')
 
@@ -390,6 +394,7 @@ print('-------------------------------------------------------------------------
 quadratic_coeffs = {'x2':1, 'x1y1':2, '1':-1}
 print('> Linear combination of quadratic monomial orbits which is not LI:')
 print(f'{poly_string(quadratic_coeffs)} = {linear_comb(quadratic_coeffs, monomial_orbits)}')
+compute_nullspace2(2)
 print('')
 
 # Cubic (a_3 = 2)
@@ -397,13 +402,14 @@ print('')
 cubic_coeffs = {'x3':1, 'x2y1':1, 'x1y2':1, 'x2':-1}
 print('> Linear combination of cubic monomial orbits which is not LI:')
 print(f'{poly_string(cubic_coeffs)} = {linear_comb(cubic_coeffs, monomial_orbits)}')
+compute_nullspace2(3)
 print('')
 
 # Quartic (a_4 = 1)
+quartic_coeffs = {'x2':1, 'x3':-2, 'x2y1':-2, 'x4':1, 'x3y1':2}
 print('> Linear combination of quartic monomial orbits which is not LI:')
-dmax = 4
-monomial_orbits_nullspace = compute_monomial_orbits(dmax, "nullspace")
-compute_nullspace2(dmax, monomial_orbits_nullspace)
+print(f'{poly_string(quartic_coeffs)} = {linear_comb(quartic_coeffs, monomial_orbits)}')
+compute_nullspace2(4)
 print('')
 
 # Quintic (a_5 = 2)
@@ -413,7 +419,7 @@ print('> Linear combination of quintic monomial orbits which is not LI:')
 print(f'{poly_string(quintic_coeffs)} = {linear_comb(quintic_coeffs, monomial_orbits)}')
 # Note: these results are the same, but they are in a slightly different order and
 # they have a different scalar, which can be verified by inspection
-compute_nullspace2(5, compute_monomial_orbits(5, "nullspace"))
+compute_nullspace2(5)
 print('')
 
 # Sixth-order (a_6 = 3)
@@ -424,6 +430,7 @@ print('')
 sixth_coeffs = {'x6':10, 'x5y1':30, 'x4y2':30, 'x3y3':20, 'x4y1':-30, 'x5':-18, 'x3':20, 'x2':-15, '1':3}
 print('> Linear combination of sixth order monomial orbits which is not LI:')
 print(f'{poly_string(sixth_coeffs)} = {linear_comb(sixth_coeffs, monomial_orbits)}')
+compute_nullspace2(6)
 print('')
 
 # Seventh-order (a_7 = 2)
@@ -438,6 +445,12 @@ print('')
 seventh_coeffs = {'x7':18, 'x6y1':63, 'x5y2':63, 'x6':-63, 'x5y1':-168, 'x4y2':-105, 'x5':63, 'x4y1':105, 'x3':-35, 'x2':21, '1':-4}
 print('> Linear combination of seventh order monomial orbits which is not LI:')
 print(f'{poly_string(seventh_coeffs)} = {linear_comb(seventh_coeffs, monomial_orbits)}')
+compute_nullspace2(7)
+print('')
+
+# Eighth-order
+print('> Linear combination of eighth order monomial orbits which is not LI:')
+compute_nullspace2(8)
 print('')
 
 # Compute nullspaces for degrees up to dmax
