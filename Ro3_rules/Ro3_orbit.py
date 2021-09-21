@@ -184,6 +184,127 @@ def compute_nullspace(d, monomial_orbits):
             raise RuntimeError(f'Expected linear combination to have degree < {d}, but got {linear_comb_degree} instead')
 
 
+
+# Alternate version of the function above that computes a more
+# complete nullspace by finding the coeffs of all monomial orbits, not
+# just the highest degree ones.  Must be passed a monomial_orbits
+# constructed by calling:
+# compute_monomial_orbits(dmax, "nullspace")
+# for some d.
+def compute_nullspace2(dmax, monomial_orbits):
+    # The input monomial_orbits dict contains polynomials a^p * b^q
+    a, b = sy.sympify('a, b')
+
+    # We are going to build an nrows x ncols system of equations, where ncols is the
+    # number of entries in monomial_orbits, and nrows = (dmax+1)*(dmax+2)/2 is the number of
+    # monomial terms in a 2D polynomial of degree dmax.
+    nrows = int((dmax+1)*(dmax+2)/2)
+    ncols = len(monomial_orbits)
+
+    # Debugging
+    print(f'number of rows = {nrows}')
+    print(f'number of cols = {ncols}')
+
+    # Matrix to store coeffs
+    # We use a sympy Matrix since that has the nullspace() command
+    A_symb = sy.zeros(nrows, ncols)
+
+    # We are going to fill in column by column
+    col = 0
+    for key, val in monomial_orbits.items():
+        # Debugging
+        print(f'col = {col}, key = {key}')
+
+        # Special case for 1, can't create Poly from 1
+        if val == 1:
+            if col != 0:
+                raise RuntimeError(f'Expected basis function 1 to come first')
+            A_symb[0, col] = 1
+
+        else:
+            print(f'val = {val}')
+            poly = sy.Poly(val)
+
+            # Extract powers of a^{apower} * b^{bpower} in loop, where
+            # apower + bpower = 0, 1, ..., dmax
+            row = 0
+            for d in range(dmax+1):
+                for bpower in range(d+1):
+                    apower = d - bpower
+
+                    # Debugging
+                    # print(f'row = {row}, apower = {apower}, bpower = {bpower}')
+
+                    coeff = poly.coeff_monomial(a**apower * b**bpower)
+
+                    # Debugging
+                    # print(f'coeff of a^{apower} * b^{bpower} = {coeff}')
+
+                    # Store this coeff in the matrix
+                    A_symb[row, col] = coeff
+
+                    # Go to next row
+                    row += 1
+
+        # Go to next col
+        col += 1
+
+    # Print result
+    print(f'A_symb = {A_symb}')
+
+    # Returns a list of sympy matrices (vectors) representing the nullspace
+    # Compute nullspace of this matrix.
+    nullsp = A_symb.nullspace()
+
+    # Debugging. For example in the dmax=4 case, we get:
+    # [  0],   "1"
+    # [1/2],   "x2"
+    # [ -1],   "x3"
+    # [ -1],   "x2y"
+    # [1/2],   "x4"
+    # [  1]])] "x3y"
+    print(f'nullsp = {nullsp}')
+
+    if not nullsp:
+        print(f'd = {d} basis with {n} monomials is linearly independent.')
+    else:
+        # Compute linear combination of polynomials according to the
+        # coeffs in nullsp.  We should find that it the result is zero!
+        # Notes:
+        # 1. We assume that the "nullsp" list has only a single entry,
+        #    and we refer directly to it in the loop below.
+        # 2. We convert to Poly when building the linear combination, since
+        #    I was getting an error for the degree 2 case when trying to
+        #    construct the Poly later.
+
+        # Extract nullspace coeffs into list. Currently "nullsp" is a
+        # list of Sympy column Matrix objects, which is not as
+        # straightforward to work with.
+        nullspace_coeffs = [val for val in nullsp[0].col(0)]
+        print(f'dmax = {dmax} basis with {ncols} monomials is linearly dependent with nullspace = {nullspace_coeffs}')
+
+        linear_comb = 0
+        idx = 0
+        for key, val in monomial_orbits.items():
+            # Special case for 1, can't create Poly from 1
+            if val == 1:
+                linear_comb += nullspace_coeffs[idx]
+            else:
+                linear_comb += nullspace_coeffs[idx] * sy.Poly(val)
+            # Go to next index
+            idx += 1
+
+        # Debugging: print result
+        print(f'linear_comb = {linear_comb}')
+
+        # Now check that linear_comb is the zero polynomial, which by definition has degree "-oo"
+        linear_comb_degree = sy.degree(linear_comb)
+        print(f'linear_comb_degree = {linear_comb_degree}')
+
+        if linear_comb_degree != -(sy.oo):
+            raise RuntimeError(f'Expected linear combination to give zero polynomial, got {linear_comb} instead')
+
+
 # Compute orbits for monomials from degree 2 up to degree dmax. Initialize the
 # dict with the constant "1" term. Note that Orb(1) = 3 technically but we
 # are free to "normalize" any orbit by multiplying it by a scalar, so we just
@@ -343,7 +464,12 @@ for d in range(2,dmax+1):
 
 # Test computing a_d polynomials for each d < dmax, then a_d+1
 # polynomials for d==dmax
-monomial_orbits_nullspace = compute_monomial_orbits(6, "nullspace")
+dmax = 4
+monomial_orbits_nullspace = compute_monomial_orbits(dmax, "nullspace")
+
+# Debugging
 print('monomial_orbits_nullspace =')
 for key, val in monomial_orbits_nullspace.items():
     print(f'  {key} = {sy.expand(val)}')
+
+compute_nullspace2(dmax, monomial_orbits_nullspace)
