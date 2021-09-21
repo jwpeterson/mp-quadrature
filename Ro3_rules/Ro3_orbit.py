@@ -18,6 +18,11 @@ def poly_string(coeffs):
     poly_string = ''
     count = 0
     for key, val in coeffs.items():
+        # Handle zero coeffs by skipping them
+        if val == 0:
+            count += 1
+            continue
+
         # For positive coeffs after the first, print a plus sign
         if count > 0 and val > 0:
             poly_string += ' + '
@@ -406,6 +411,9 @@ print('')
 quintic_coeffs = {'x5':4, 'x4y1':10, 'x3y2':10, 'x4':-5, 'x2y1':-10, '1':1}
 print('> Linear combination of quintic monomial orbits which is not LI:')
 print(f'{poly_string(quintic_coeffs)} = {linear_comb(quintic_coeffs, monomial_orbits)}')
+# Note: these results are the same, but they are in a slightly different order and
+# they have a different scalar, which can be verified by inspection
+compute_nullspace2(5, compute_monomial_orbits(5, "nullspace"))
 print('')
 
 # Sixth-order (a_6 = 3)
