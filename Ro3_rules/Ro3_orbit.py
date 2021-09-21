@@ -338,5 +338,12 @@ for d in range(2,dmax+1):
 # print(f'a_24 = {a_d(24)} (should be 9)')
 
 # Test s_d() function. Apparently s_d = (d*d + 3*d + 6)/6 as well?
-for d in range(dmax+1):
-    print(f's_{d} = {s_d(d)}, s_d_simple({d}) = {s_d_simple(d)}')
+# for d in range(dmax+1):
+#     print(f's_{d} = {s_d(d)}, s_d_simple({d}) = {s_d_simple(d)}')
+
+# Test computing a_d polynomials for each d < dmax, then a_d+1
+# polynomials for d==dmax
+monomial_orbits_nullspace = compute_monomial_orbits(6, "nullspace")
+print('monomial_orbits_nullspace =')
+for key, val in monomial_orbits_nullspace.items():
+    print(f'  {key} = {sy.expand(val)}')
