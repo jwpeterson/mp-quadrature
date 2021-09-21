@@ -110,7 +110,7 @@ def compute_nullspace(d, monomial_orbits):
         key = key_from_powers(xpower, ypower)
 
         # Debugging
-        # print(f'Coeffs of {key}:')
+        # print(f'monomial_orbits[{key}] = {monomial_orbits[key]}')
 
         # Build a Poly object out of the orbit with this key. We can then
         # call coeff_monomial() on the Poly object.
@@ -187,8 +187,12 @@ def compute_nullspace(d, monomial_orbits):
 # Compute orbits for monomials from degree 2 up to degree dmax. Initialize the
 # dict with the constant "1" term. Note that Orb(1) = 3 technically but we
 # are free to "normalize" any orbit by multiplying it by a scalar, so we just
-# leave it as 1.
-def compute_monomial_orbits(dmax):
+# leave it as 1. The num_polys string can have any of the following values:
+# "all" = computes all polynomials for every degree up to/including dmax
+# "LI" = computes a_d polynomials for each degree up to/including dmax
+# "nullspace" = computes a_d polynomials for all degrees < dmax, and a_d+1 polynomials of degree dmax
+# Note: the polynomials are always computed in descending order of the x power.
+def compute_monomial_orbits(dmax, num_polys):
     a, b = sy.sympify('a, b')
     x = [(a,b), (1-a-b,a), (b, 1-a-b)]
     # Create a defaultdict here since we want to "accumulate" into the
@@ -199,7 +203,24 @@ def compute_monomial_orbits(dmax):
     monomial_orbits = defaultdict(int)
     monomial_orbits['1'] = 1
     for d in range(2, dmax+1):
-        for ypower in range(d+1):
+
+        # Determine the number of polynomials we are computing orbits for
+        np = None
+        if num_polys == "all":
+            np = d+1
+        elif num_polys == "LI":
+            np = a_d(d)
+        elif num_polys == "nullspace":
+            np = a_d(d)
+            if d == dmax:
+                np += 1
+        else:
+            raise RuntimeError(f"num_polys must be one of 'all', 'LI', or 'nullspace'")
+
+        # Debugging:
+        # print(f'd = {d}, np = {np}')
+
+        for ypower in range(np):
             for i in range(3):
                 # The xpower is the complement of the ypower
                 xpower = d - ypower
@@ -243,7 +264,7 @@ for each d.
 
 # Compute orbits for monomials from degree 2 up to degree dmax.
 dmax = 10
-monomial_orbits = compute_monomial_orbits(dmax)
+monomial_orbits = compute_monomial_orbits(dmax, "all")
 
 print('--------------------------------------------------------------------------------')
 print('I. Linear combinations of Ro3-invariant polynomials that sum to zero (are not LI)')
