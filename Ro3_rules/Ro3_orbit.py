@@ -89,114 +89,11 @@ def s_d(d):
 def s_d_simple(d):
     return int((d*d + 3*d + 6)/6)
 
-# Given degree d and a the set of monomial_orbits of at least degree
-# d, computes the nullspace for the orbits of degree d. If the
-# nullspace is non-trivial, this gives us a linear combination of
-# degree d polynomials which is linearly-dependent.
-def compute_nullspace(d, monomial_orbits):
-    # The input monomial_orbits dict contains polynomials a^p * b^q
-    a, b = sy.sympify('a, b')
-
-    # Number of basis functions to consider for this d.
-    # .) If n = a_d(d) + 1, then we should get a non-trivial nullspace
-    #    for the linear system of equations that we build.
-    # .) If n = a_d(d), we should get only the trivial nullspace.
-    # For example, in the d=6 case, if we consider n=4 basis functions (up
-    # to x^3 * y^3) then we should get linear dependence.
-    # n = a_d(d)
-    n = a_d(d) + 1
-
-    # Matrix to store coeffs
-    # We use a sympy Matrix since that has the nullspace() command
-    A_sym = sy.zeros(n, n)
-
-    for ypower in range(n):
-        xpower = d - ypower
-        key = key_from_powers(xpower, ypower)
-
-        # Debugging
-        # print(f'monomial_orbits[{key}] = {monomial_orbits[key]}')
-
-        # Build a Poly object out of the orbit with this key. We can then
-        # call coeff_monomial() on the Poly object.
-        poly = sy.Poly(monomial_orbits[key])
-
-        # Debugging
-        # print(f'poly = {poly}')
-
-        # Extract powers of a^p * b^q in loop
-        for bpower in range(n):
-            apower = d - bpower
-            coeff = poly.coeff_monomial(a**apower * b**bpower)
-
-            # Debugging
-            # print(f'coeff of a^{apower} * b^{bpower} = {coeff}')
-
-            # We fill in the matrix of coefficients column by column.
-            # This way, the first row of A is all the a^p coeffs, the
-            # second row is all the a^{p-1} * b coeffs, etc.
-            # Store in array
-            A_sym[bpower, ypower] = coeff
-
-    # Print result
-    # print(f'A_sym = {A_sym}')
-
-    # Returns a list of sympy matrices (vectors) representing the nullspace
-    # Compute nullspace of this matrix.
-    # For d=6, with n=4, for example, the result is:
-    # [1/2],
-    # [3/2],
-    # [3/2],
-    # [  1]
-    nullsp = A_sym.nullspace()
-
-    # from sympy import shape # does not work
-    # print(f'Shape of nullspace = {nullsp.shape}') # no
-    if not nullsp:
-        print(f'd = {d} basis with {n} monomials is linearly independent.')
-    else:
-        # Compute linear combination of polynomials according to the
-        # coeffs in nullsp.  We should find that it is at most degree
-        # d-1, in other words, that the degree d terms have all
-        # cancelled. Notes:
-        # 1. We assume that the "nullsp" list has only a single entry,
-        #    and we refer directly to it in the loop below.
-        # 2. We convert to Poly when building the linear combination, since
-        #    I was getting an error for the degree 2 case when trying to
-        #    construct the Poly later.
-
-        # Extract nullspace coeffs into list. Currently "nullsp" is a
-        # list of Sympy column Matrix objects, which is not as
-        # straightforward to work with.
-        nullspace_coeffs = [val for val in nullsp[0].col(0)]
-        print(f'd = {d} basis with {n} monomials is linearly dependent with nullspace = {nullspace_coeffs}')
-
-        linear_comb = 0
-        for ypower in range(n):
-            xpower = d - ypower
-            key = key_from_powers(xpower, ypower)
-            linear_comb += nullspace_coeffs[ypower] * sy.Poly(monomial_orbits[key])
-
-        # Debugging: print result
-        # print(f'linear_comb = {linear_comb}')
-
-        # Now check the degree of linear_comb, which should be <= d,
-        # confirming that the polynomials tested are not linearly
-        # independent.
-        linear_comb_degree = sy.degree(linear_comb)
-        # print(f'linear_comb_degree = {linear_comb_degree}')
-        if not linear_comb_degree < d:
-            raise RuntimeError(f'Expected linear combination to have degree < {d}, but got {linear_comb_degree} instead')
-
-
-
-# Alternate version of the function above that computes a more
-# complete nullspace by finding the coeffs of all monomial orbits, not
-# just the highest degree ones.  Must be passed a monomial_orbits
-# constructed by calling:
-# compute_monomial_orbits(dmax, "nullspace")
-# for some d.
-def compute_nullspace2(dmax):
+# Computes a linear combination of monomial orbits for a given degree
+# by considering "a_d + 1" polynomials of degree d. Uses the
+# compute_monomial_orbits() function with the "nullspace" flag to get
+# the correct orbits.
+def compute_nullspace(dmax):
     # Compute the monomial orbits for a_d polynomials for each degree
     # up to dmax, and a_d+1 polynomials for degree dmax
     monomial_orbits = compute_monomial_orbits(dmax, "nullspace")
@@ -394,7 +291,7 @@ print('-------------------------------------------------------------------------
 quadratic_coeffs = {'x2':1, 'x1y1':2, '1':-1}
 print('> Linear combination of quadratic monomial orbits which is not LI:')
 print(f'{poly_string(quadratic_coeffs)} = {linear_comb(quadratic_coeffs, monomial_orbits)}')
-compute_nullspace2(2)
+compute_nullspace(2)
 print('')
 
 # Cubic (a_3 = 2)
@@ -402,14 +299,14 @@ print('')
 cubic_coeffs = {'x3':1, 'x2y1':1, 'x1y2':1, 'x2':-1}
 print('> Linear combination of cubic monomial orbits which is not LI:')
 print(f'{poly_string(cubic_coeffs)} = {linear_comb(cubic_coeffs, monomial_orbits)}')
-compute_nullspace2(3)
+compute_nullspace(3)
 print('')
 
 # Quartic (a_4 = 1)
 quartic_coeffs = {'x2':1, 'x3':-2, 'x2y1':-2, 'x4':1, 'x3y1':2}
 print('> Linear combination of quartic monomial orbits which is not LI:')
 print(f'{poly_string(quartic_coeffs)} = {linear_comb(quartic_coeffs, monomial_orbits)}')
-compute_nullspace2(4)
+compute_nullspace(4)
 print('')
 
 # Quintic (a_5 = 2)
@@ -419,7 +316,7 @@ print('> Linear combination of quintic monomial orbits which is not LI:')
 print(f'{poly_string(quintic_coeffs)} = {linear_comb(quintic_coeffs, monomial_orbits)}')
 # Note: these results are the same, but they are in a slightly different order and
 # they have a different scalar, which can be verified by inspection
-compute_nullspace2(5)
+compute_nullspace(5)
 print('')
 
 # Sixth-order (a_6 = 3)
@@ -430,7 +327,7 @@ print('')
 sixth_coeffs = {'x6':10, 'x5y1':30, 'x4y2':30, 'x3y3':20, 'x4y1':-30, 'x5':-18, 'x3':20, 'x2':-15, '1':3}
 print('> Linear combination of sixth order monomial orbits which is not LI:')
 print(f'{poly_string(sixth_coeffs)} = {linear_comb(sixth_coeffs, monomial_orbits)}')
-compute_nullspace2(6)
+compute_nullspace(6)
 print('')
 
 # Seventh-order (a_7 = 2)
@@ -445,20 +342,19 @@ print('')
 seventh_coeffs = {'x7':18, 'x6y1':63, 'x5y2':63, 'x6':-63, 'x5y1':-168, 'x4y2':-105, 'x5':63, 'x4y1':105, 'x3':-35, 'x2':21, '1':-4}
 print('> Linear combination of seventh order monomial orbits which is not LI:')
 print(f'{poly_string(seventh_coeffs)} = {linear_comb(seventh_coeffs, monomial_orbits)}')
-compute_nullspace2(7)
+compute_nullspace(7)
 print('')
 
 # Eighth-order
 print('> Linear combination of eighth order monomial orbits which is not LI:')
-compute_nullspace2(8)
+compute_nullspace(8)
 print('')
 
-# Compute nullspaces for degrees up to dmax
-# print('--------------------------------------------------------------------------------')
-# print(f'II. Nullspaces for degrees up to {dmax}')
-# print('--------------------------------------------------------------------------------')
-# for d in range(2,dmax+1):
-#     compute_nullspace(d, monomial_orbits)
+# Ninth-order
+print('> Linear combination of ninth order monomial orbits which is not LI:')
+compute_nullspace(9)
+print('')
+
 
 
 # Test a_d() function
