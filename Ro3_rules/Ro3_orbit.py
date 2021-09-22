@@ -5,22 +5,25 @@ from fractions import Fraction
 import numpy as np
 from collections import defaultdict
 
-# Compute (and expand) a linear combination from the given
-# coefficients and monomials dicts.
+"""
+Compute (and expand) a linear combination from the given
+coefficients and monomials dicts.
+"""
 def linear_comb(coeffs, monomials):
     comb = 0
     for key, val in coeffs.items():
         comb += val * monomials[key]
     return sy.expand(comb)
 
-# Returns a polynomial string with the given coefficients and terms for printing
+"""
+Returns a polynomial string with the given coefficients and terms for printing
+"""
 def poly_string(coeffs):
     poly_string = ''
     count = 0
     for key, val in coeffs.items():
         # Handle zero coeffs by skipping them
         if val == 0:
-            count += 1
             continue
 
         # For positive coeffs after the first, print a plus sign
@@ -43,9 +46,11 @@ def poly_string(coeffs):
         count += 1
     return poly_string
 
-# Returns a string key like 'x2y3' based on the input powers and some
-# conventions. We omit terms with 0 exponent, but we explicitly
-# include 1 exponents when generating the string.
+"""
+Returns a string key like 'x2y3' based on the input powers and some
+conventions. We omit terms with 0 exponent, but we explicitly
+include 1 exponents when generating the string.
+"""
 def key_from_powers(xpower, ypower):
     key = ''
     if xpower > 0:
@@ -54,7 +59,9 @@ def key_from_powers(xpower, ypower):
         key += 'y' + str(ypower)
     return key
 
-# Helper function used by a_d and s_d functions below
+"""
+Helper function used by a_d and s_d functions below
+"""
 def a_d_array(d):
     #    a_0, a_1, a_2, a_3, a_4
     a = [  1,   0,   1,   2,   1]
@@ -70,34 +77,35 @@ def a_d_array(d):
 
     return a
 
-# Returns the number of basis functions for a given degree, d.
-# These numbers are given by the Molien series for the Ro3 basis.
-# Note that the _total_ size of the basis for a given d is the
-# sum_d a_d.
+"""
+Returns the number of basis functions for a given degree, d.
+These numbers are given by the Molien series for the Ro3 basis.
+Note that the _total_ size of the basis for a given d is the
+sum_d a_d.
+"""
 def a_d(d):
     # The last entry in the array returned by the a_d_array() function
     # is the one we requested.
     return a_d_array(d)[-1]
 
-# Returns the sum of the a_d up to and including d
+"""
+Returns the sum of the a_d up to and including d
+"""
 def s_d(d):
     a = a_d_array(d)
     return sum(a)
 
-# I found this formula in my notes, it is much simpler to use than
-# computing all of the a_d's
+"""
+I found this formula in my notes, it is much simpler to use than
+computing all of the a_d's
+"""
 def s_d_simple(d):
     return int((d*d + 3*d + 6)/6)
 
-# Computes a linear combination of monomial orbits for a given degree
-# by considering "a_d + 1" polynomials of degree d. Uses the
-# compute_monomial_orbits() function with the "nullspace" flag to get
-# the correct orbits.
-def compute_nullspace(dmax):
-    # Compute the monomial orbits for a_d polynomials for each degree
-    # up to dmax, and a_d+1 polynomials for degree dmax
-    monomial_orbits = compute_monomial_orbits(dmax, "nullspace")
-
+"""
+Helper function used by both compute_nullspace() and check_LI()
+"""
+def coeff_matrix(dmax, monomial_orbits):
     # The input monomial_orbits dict contains polynomials a^p * b^q
     a, b = sy.sympify('a, b')
 
@@ -158,6 +166,22 @@ def compute_nullspace(dmax):
         # Go to next col
         col += 1
 
+    return A_symb
+
+"""
+Computes a linear combination of monomial orbits for a given degree
+by considering "a_d + 1" polynomials of degree d. Uses the
+compute_monomial_orbits() function with the "nullspace" flag to get
+the correct orbits.
+"""
+def compute_nullspace(dmax):
+    # Compute the monomial orbits for a_d polynomials for each degree
+    # up to dmax, and a_d+1 polynomials for degree dmax
+    monomial_orbits = compute_monomial_orbits(dmax, "nullspace")
+
+    # Compute coefficient matrix for these orbits
+    A_symb = coeff_matrix(dmax, monomial_orbits)
+
     # Print result
     # print(f'A_symb = {A_symb}')
 
@@ -186,6 +210,17 @@ def compute_nullspace(dmax):
         # straightforward to work with.
         nullspace_coeffs = [val for val in nullsp[0].col(0)]
 
+        # Scale by each non-unity denominator to clear all the denominators
+        # from the nullspace coeffs
+        for i in range(len(nullspace_coeffs)):
+            denom = Fraction(nullspace_coeffs[i]).denominator()
+            # print(f'denom = {denom}')
+            if denom != 1:
+                nullspace_coeffs = [denom * x for x in nullspace_coeffs]
+
+        # Debugging
+        # print(f'nullspace_coeffs = {nullspace_coeffs}')
+
         # Construct dict for pretty printing and computing linear combinations
         ps = dict(zip(monomial_orbits.keys(), nullspace_coeffs))
 
@@ -200,14 +235,41 @@ def compute_nullspace(dmax):
             raise RuntimeError(f'Expected linear combination to give zero polynomial, got {LC} instead')
 
 
-# Compute orbits for monomials from degree 2 up to degree dmax. Initialize the
-# dict with the constant "1" term. Note that Orb(1) = 3 technically but we
-# are free to "normalize" any orbit by multiplying it by a scalar, so we just
-# leave it as 1. The num_polys string can have any of the following values:
-# "all" = computes all polynomials for every degree up to/including dmax
-# "LI" = computes a_d polynomials for each degree up to/including dmax
-# "nullspace" = computes a_d polynomials for all degrees < dmax, and a_d+1 polynomials of degree dmax
-# Note: the polynomials are always computed in descending order of the x power.
+
+"""
+This function verifies that the set of s_d := sum_d a_d monomial orbits
+is linearly-independent by checking that the nullspace is trivial. Note:
+this function is very similar to the compute_nullspace() function, so they
+will eventually be able to share some code.
+"""
+def check_LI(dmax):
+    # Compute the monomial orbits for a_d polynomials for each degree
+    # up to and including dmax
+    monomial_orbits = compute_monomial_orbits(dmax, "LI")
+
+    # Compute coefficient matrix for these orbits
+    A_symb = coeff_matrix(dmax, monomial_orbits)
+
+    # Compute nullspace and verify that it is the trivial one
+    nullsp = A_symb.nullspace()
+    # print(f'nullsp = {nullsp}')
+
+    # Throw an error if nullspace is non-trivial
+    if nullsp:
+        raise RuntimeError(f'Expected trivial nullspace but got {nullsp} instead')
+
+
+"""
+Compute orbits for monomials from degree 2 up to degree dmax. Initialize the
+dict with the constant "1" term. Note that Orb(1) = 3 technically but we
+are free to "normalize" any orbit by multiplying it by a scalar, so we just
+leave it as 1. The num_polys string can have any of the following values:
+- "all" = computes all polynomials for every degree up to/including dmax
+- "LI" = computes a_d polynomials for each degree up to/including dmax
+- "nullspace" = computes a_d polynomials for all degrees < dmax, and
+  a_d+1 polynomials of degree dmax
+Note: the polynomials are always computed in descending order of the x power.
+"""
 def compute_monomial_orbits(dmax, num_polys):
     a, b = sy.sympify('a, b')
     x = [(a,b), (1-a-b,a), (b, 1-a-b)]
@@ -277,7 +339,6 @@ a linear combination of a_d + 1 such polynomials which is linearly
 dependent, and this confirms that we need only consider a_d polynomials
 for each d.
 """
-
 # Compute orbits for monomials from degree 2 up to degree dmax.
 dmax = 10
 monomial_orbits = compute_monomial_orbits(dmax, "all")
@@ -288,7 +349,7 @@ print('-------------------------------------------------------------------------
 
 # Quadratic (a_2 = 1)
 # Orb(x**2) + 2*Orb(x*y) - 1 = 0
-quadratic_coeffs = {'x2':1, 'x1y1':2, '1':-1}
+quadratic_coeffs = {'1':-1, 'x2':1, 'x1y1':2}
 print('> Linear combination of quadratic monomial orbits which is not LI:')
 print(f'{poly_string(quadratic_coeffs)} = {linear_comb(quadratic_coeffs, monomial_orbits)}')
 compute_nullspace(2)
@@ -296,7 +357,7 @@ print('')
 
 # Cubic (a_3 = 2)
 # Orb(x**3) + Orb(x**2y) + Orb(xy**2) - Orb(x**2) = 0
-cubic_coeffs = {'x3':1, 'x2y1':1, 'x1y2':1, 'x2':-1}
+cubic_coeffs = {'x2':-1, 'x3':1, 'x2y1':1, 'x1y2':1}
 print('> Linear combination of cubic monomial orbits which is not LI:')
 print(f'{poly_string(cubic_coeffs)} = {linear_comb(cubic_coeffs, monomial_orbits)}')
 compute_nullspace(3)
@@ -311,7 +372,7 @@ print('')
 
 # Quintic (a_5 = 2)
 # 4*Orb(x**5) + 10*Orb(x**4 y + x**3 y**2) - 5*Orb(x**4) - 10*Orb(x**2 y) + 1
-quintic_coeffs = {'x5':4, 'x4y1':10, 'x3y2':10, 'x4':-5, 'x2y1':-10, '1':1}
+quintic_coeffs = {'1':1, 'x2y1':-10, 'x4':-5, 'x5':4, 'x4y1':10, 'x3y2':10}
 print('> Linear combination of quintic monomial orbits which is not LI:')
 print(f'{poly_string(quintic_coeffs)} = {linear_comb(quintic_coeffs, monomial_orbits)}')
 # Note: these results are the same, but they are in a slightly different order and
@@ -324,7 +385,7 @@ print('')
 # and we can indeed verify that the 6th-order terms are now cancelled by this linear combination.
 # The remaining terms of the linear combination were then found by "inspecting" the remaining
 # terms.
-sixth_coeffs = {'x6':10, 'x5y1':30, 'x4y2':30, 'x3y3':20, 'x4y1':-30, 'x5':-18, 'x3':20, 'x2':-15, '1':3}
+sixth_coeffs = {'1':3, 'x2':-15, 'x3':20, 'x5':-18, 'x4y1':-30, 'x6':10, 'x5y1':30, 'x4y2':30, 'x3y3':20}
 print('> Linear combination of sixth order monomial orbits which is not LI:')
 print(f'{poly_string(sixth_coeffs)} = {linear_comb(sixth_coeffs, monomial_orbits)}')
 compute_nullspace(6)
@@ -339,7 +400,7 @@ print('')
 # [1, 0, 0,    -7],
 # [0, 1, 0, -56/3],
 # [0, 0, 1, -35/3]]), (0, 1, 2))
-seventh_coeffs = {'x7':18, 'x6y1':63, 'x5y2':63, 'x6':-63, 'x5y1':-168, 'x4y2':-105, 'x5':63, 'x4y1':105, 'x3':-35, 'x2':21, '1':-4}
+seventh_coeffs = {'1':-4, 'x2':21, 'x3':-35, 'x5':63, 'x4y1':105, 'x6':-63, 'x5y1':-168, 'x4y2':-105, 'x7':18, 'x6y1':63, 'x5y2':63}
 print('> Linear combination of seventh order monomial orbits which is not LI:')
 print(f'{poly_string(seventh_coeffs)} = {linear_comb(seventh_coeffs, monomial_orbits)}')
 compute_nullspace(7)
@@ -373,3 +434,9 @@ print('')
 # Test s_d() function. Apparently s_d = (d*d + 3*d + 6)/6 as well?
 # for d in range(dmax+1):
 #     print(f's_{d} = {s_d(d)}, s_d_simple({d}) = {s_d_simple(d)}')
+
+# Verify that orbits up to degree dmax are linearly-independent
+for d in range(dmax+1):
+    print(f'Checking linear independence for d = {d}...', end='')
+    check_LI(d)
+    print('Done!')
