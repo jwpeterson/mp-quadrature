@@ -425,5 +425,8 @@ print('')
 # for d in range(dmax+1):
 #     print(f's_{d} = {s_d(d)}, s_d_simple({d}) = {s_d_simple(d)}')
 
-# Verify that 5th-order orbits are linearly-independent
-check_LI(5)
+# Verify that orbits up to degree dmax are linearly-independent
+for d in range(dmax+1):
+    print(f'Checking linear independence for d = {d}...', end='')
+    check_LI(d)
+    print('Done!')
