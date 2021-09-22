@@ -24,7 +24,6 @@ def poly_string(coeffs):
     for key, val in coeffs.items():
         # Handle zero coeffs by skipping them
         if val == 0:
-            count += 1
             continue
 
         # For positive coeffs after the first, print a plus sign
