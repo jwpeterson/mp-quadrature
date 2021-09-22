@@ -350,7 +350,7 @@ print('-------------------------------------------------------------------------
 
 # Quadratic (a_2 = 1)
 # Orb(x**2) + 2*Orb(x*y) - 1 = 0
-quadratic_coeffs = {'x2':1, 'x1y1':2, '1':-1}
+quadratic_coeffs = {'1':-1, 'x2':1, 'x1y1':2}
 print('> Linear combination of quadratic monomial orbits which is not LI:')
 print(f'{poly_string(quadratic_coeffs)} = {linear_comb(quadratic_coeffs, monomial_orbits)}')
 compute_nullspace(2)
@@ -358,7 +358,7 @@ print('')
 
 # Cubic (a_3 = 2)
 # Orb(x**3) + Orb(x**2y) + Orb(xy**2) - Orb(x**2) = 0
-cubic_coeffs = {'x3':1, 'x2y1':1, 'x1y2':1, 'x2':-1}
+cubic_coeffs = {'x2':-1, 'x3':1, 'x2y1':1, 'x1y2':1}
 print('> Linear combination of cubic monomial orbits which is not LI:')
 print(f'{poly_string(cubic_coeffs)} = {linear_comb(cubic_coeffs, monomial_orbits)}')
 compute_nullspace(3)
@@ -373,7 +373,7 @@ print('')
 
 # Quintic (a_5 = 2)
 # 4*Orb(x**5) + 10*Orb(x**4 y + x**3 y**2) - 5*Orb(x**4) - 10*Orb(x**2 y) + 1
-quintic_coeffs = {'x5':4, 'x4y1':10, 'x3y2':10, 'x4':-5, 'x2y1':-10, '1':1}
+quintic_coeffs = {'1':1, 'x2y1':-10, 'x4':-5, 'x5':4, 'x4y1':10, 'x3y2':10}
 print('> Linear combination of quintic monomial orbits which is not LI:')
 print(f'{poly_string(quintic_coeffs)} = {linear_comb(quintic_coeffs, monomial_orbits)}')
 # Note: these results are the same, but they are in a slightly different order and
@@ -386,7 +386,7 @@ print('')
 # and we can indeed verify that the 6th-order terms are now cancelled by this linear combination.
 # The remaining terms of the linear combination were then found by "inspecting" the remaining
 # terms.
-sixth_coeffs = {'x6':10, 'x5y1':30, 'x4y2':30, 'x3y3':20, 'x4y1':-30, 'x5':-18, 'x3':20, 'x2':-15, '1':3}
+sixth_coeffs = {'1':3, 'x2':-15, 'x3':20, 'x5':-18, 'x4y1':-30, 'x6':10, 'x5y1':30, 'x4y2':30, 'x3y3':20}
 print('> Linear combination of sixth order monomial orbits which is not LI:')
 print(f'{poly_string(sixth_coeffs)} = {linear_comb(sixth_coeffs, monomial_orbits)}')
 compute_nullspace(6)
@@ -401,7 +401,7 @@ print('')
 # [1, 0, 0,    -7],
 # [0, 1, 0, -56/3],
 # [0, 0, 1, -35/3]]), (0, 1, 2))
-seventh_coeffs = {'x7':18, 'x6y1':63, 'x5y2':63, 'x6':-63, 'x5y1':-168, 'x4y2':-105, 'x5':63, 'x4y1':105, 'x3':-35, 'x2':21, '1':-4}
+seventh_coeffs = {'1':-4, 'x2':21, 'x3':-35, 'x5':63, 'x4y1':105, 'x6':-63, 'x5y1':-168, 'x4y2':-105, 'x7':18, 'x6y1':63, 'x5y2':63}
 print('> Linear combination of seventh order monomial orbits which is not LI:')
 print(f'{poly_string(seventh_coeffs)} = {linear_comb(seventh_coeffs, monomial_orbits)}')
 compute_nullspace(7)
