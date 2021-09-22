@@ -211,6 +211,17 @@ def compute_nullspace(dmax):
         # straightforward to work with.
         nullspace_coeffs = [val for val in nullsp[0].col(0)]
 
+        # Scale by each non-unity denominator to clear all the denominators
+        # from the nullspace coeffs
+        for i in range(len(nullspace_coeffs)):
+            denom = Fraction(nullspace_coeffs[i]).denominator()
+            # print(f'denom = {denom}')
+            if denom != 1:
+                nullspace_coeffs = [denom * x for x in nullspace_coeffs]
+
+        # Debugging
+        # print(f'nullspace_coeffs = {nullspace_coeffs}')
+
         # Construct dict for pretty printing and computing linear combinations
         ps = dict(zip(monomial_orbits.keys(), nullspace_coeffs))
 
