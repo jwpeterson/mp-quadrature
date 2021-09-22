@@ -237,6 +237,17 @@ def check_LI(dmax):
     # up to and including dmax
     monomial_orbits = compute_monomial_orbits(dmax, "LI")
 
+    # Compute coefficient matrix for these orbits
+    A_symb = coeff_matrix(dmax, monomial_orbits)
+
+    # Compute nullspace and verify that it is the trivial one
+    nullsp = A_symb.nullspace()
+    # print(f'nullsp = {nullsp}')
+
+    # Throw an error if nullspace is non-trivial
+    if nullsp:
+        raise RuntimeError(f'Expected trivial nullspace but got {nullsp} instead')
+
 
 """
 Compute orbits for monomials from degree 2 up to degree dmax. Initialize the
@@ -413,3 +424,6 @@ print('')
 # Test s_d() function. Apparently s_d = (d*d + 3*d + 6)/6 as well?
 # for d in range(dmax+1):
 #     print(f's_{d} = {s_d(d)}, s_d_simple({d}) = {s_d_simple(d)}')
+
+# Verify that 5th-order orbits are linearly-independent
+check_LI(5)
