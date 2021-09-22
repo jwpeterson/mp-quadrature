@@ -104,16 +104,9 @@ def s_d_simple(d):
     return int((d*d + 3*d + 6)/6)
 
 """
-Computes a linear combination of monomial orbits for a given degree
-by considering "a_d + 1" polynomials of degree d. Uses the
-compute_monomial_orbits() function with the "nullspace" flag to get
-the correct orbits.
+Helper function used by both compute_nullspace() and check_LI()
 """
-def compute_nullspace(dmax):
-    # Compute the monomial orbits for a_d polynomials for each degree
-    # up to dmax, and a_d+1 polynomials for degree dmax
-    monomial_orbits = compute_monomial_orbits(dmax, "nullspace")
-
+def coeff_matrix(dmax, monomial_orbits):
     # The input monomial_orbits dict contains polynomials a^p * b^q
     a, b = sy.sympify('a, b')
 
@@ -173,6 +166,22 @@ def compute_nullspace(dmax):
 
         # Go to next col
         col += 1
+
+    return A_symb
+
+"""
+Computes a linear combination of monomial orbits for a given degree
+by considering "a_d + 1" polynomials of degree d. Uses the
+compute_monomial_orbits() function with the "nullspace" flag to get
+the correct orbits.
+"""
+def compute_nullspace(dmax):
+    # Compute the monomial orbits for a_d polynomials for each degree
+    # up to dmax, and a_d+1 polynomials for degree dmax
+    monomial_orbits = compute_monomial_orbits(dmax, "nullspace")
+
+    # Compute coefficient matrix for these orbits
+    A_symb = coeff_matrix(dmax, monomial_orbits)
 
     # Print result
     # print(f'A_symb = {A_symb}')
