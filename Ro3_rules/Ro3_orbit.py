@@ -254,9 +254,10 @@ Compute orbits for monomials from degree 2 up to degree dmax. Initialize the
 dict with the constant "1" term. Note that Orb(1) = 3 technically but we
 are free to "normalize" any orbit by multiplying it by a scalar, so we just
 leave it as 1. The num_polys string can have any of the following values:
-"all" = computes all polynomials for every degree up to/including dmax
-"LI" = computes a_d polynomials for each degree up to/including dmax
-"nullspace" = computes a_d polynomials for all degrees < dmax, and a_d+1 polynomials of degree dmax
+- "all" = computes all polynomials for every degree up to/including dmax
+- "LI" = computes a_d polynomials for each degree up to/including dmax
+- "nullspace" = computes a_d polynomials for all degrees < dmax, and
+  a_d+1 polynomials of degree dmax
 Note: the polynomials are always computed in descending order of the x power.
 """
 def compute_monomial_orbits(dmax, num_polys):
@@ -328,7 +329,6 @@ a linear combination of a_d + 1 such polynomials which is linearly
 dependent, and this confirms that we need only consider a_d polynomials
 for each d.
 """
-
 # Compute orbits for monomials from degree 2 up to degree dmax.
 dmax = 10
 monomial_orbits = compute_monomial_orbits(dmax, "all")
