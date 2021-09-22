@@ -5,15 +5,19 @@ from fractions import Fraction
 import numpy as np
 from collections import defaultdict
 
-# Compute (and expand) a linear combination from the given
-# coefficients and monomials dicts.
+"""
+Compute (and expand) a linear combination from the given
+coefficients and monomials dicts.
+"""
 def linear_comb(coeffs, monomials):
     comb = 0
     for key, val in coeffs.items():
         comb += val * monomials[key]
     return sy.expand(comb)
 
-# Returns a polynomial string with the given coefficients and terms for printing
+"""
+Returns a polynomial string with the given coefficients and terms for printing
+"""
 def poly_string(coeffs):
     poly_string = ''
     count = 0
@@ -43,9 +47,11 @@ def poly_string(coeffs):
         count += 1
     return poly_string
 
-# Returns a string key like 'x2y3' based on the input powers and some
-# conventions. We omit terms with 0 exponent, but we explicitly
-# include 1 exponents when generating the string.
+"""
+Returns a string key like 'x2y3' based on the input powers and some
+conventions. We omit terms with 0 exponent, but we explicitly
+include 1 exponents when generating the string.
+"""
 def key_from_powers(xpower, ypower):
     key = ''
     if xpower > 0:
@@ -54,7 +60,9 @@ def key_from_powers(xpower, ypower):
         key += 'y' + str(ypower)
     return key
 
-# Helper function used by a_d and s_d functions below
+"""
+Helper function used by a_d and s_d functions below
+"""
 def a_d_array(d):
     #    a_0, a_1, a_2, a_3, a_4
     a = [  1,   0,   1,   2,   1]
@@ -70,29 +78,37 @@ def a_d_array(d):
 
     return a
 
-# Returns the number of basis functions for a given degree, d.
-# These numbers are given by the Molien series for the Ro3 basis.
-# Note that the _total_ size of the basis for a given d is the
-# sum_d a_d.
+"""
+Returns the number of basis functions for a given degree, d.
+These numbers are given by the Molien series for the Ro3 basis.
+Note that the _total_ size of the basis for a given d is the
+sum_d a_d.
+"""
 def a_d(d):
     # The last entry in the array returned by the a_d_array() function
     # is the one we requested.
     return a_d_array(d)[-1]
 
-# Returns the sum of the a_d up to and including d
+"""
+Returns the sum of the a_d up to and including d
+"""
 def s_d(d):
     a = a_d_array(d)
     return sum(a)
 
-# I found this formula in my notes, it is much simpler to use than
-# computing all of the a_d's
+"""
+I found this formula in my notes, it is much simpler to use than
+computing all of the a_d's
+"""
 def s_d_simple(d):
     return int((d*d + 3*d + 6)/6)
 
-# Computes a linear combination of monomial orbits for a given degree
-# by considering "a_d + 1" polynomials of degree d. Uses the
-# compute_monomial_orbits() function with the "nullspace" flag to get
-# the correct orbits.
+"""
+Computes a linear combination of monomial orbits for a given degree
+by considering "a_d + 1" polynomials of degree d. Uses the
+compute_monomial_orbits() function with the "nullspace" flag to get
+the correct orbits.
+"""
 def compute_nullspace(dmax):
     # Compute the monomial orbits for a_d polynomials for each degree
     # up to dmax, and a_d+1 polynomials for degree dmax
@@ -200,14 +216,29 @@ def compute_nullspace(dmax):
             raise RuntimeError(f'Expected linear combination to give zero polynomial, got {LC} instead')
 
 
-# Compute orbits for monomials from degree 2 up to degree dmax. Initialize the
-# dict with the constant "1" term. Note that Orb(1) = 3 technically but we
-# are free to "normalize" any orbit by multiplying it by a scalar, so we just
-# leave it as 1. The num_polys string can have any of the following values:
-# "all" = computes all polynomials for every degree up to/including dmax
-# "LI" = computes a_d polynomials for each degree up to/including dmax
-# "nullspace" = computes a_d polynomials for all degrees < dmax, and a_d+1 polynomials of degree dmax
-# Note: the polynomials are always computed in descending order of the x power.
+
+"""
+This function verifies that the set of s_d := sum_d a_d monomial orbits
+is linearly-independent by checking that the nullspace is trivial. Note:
+this function is very similar to the compute_nullspace() function, so they
+will eventually be able to share some code.
+"""
+def check_LI(dmax):
+    # Compute the monomial orbits for a_d polynomials for each degree
+    # up to and including dmax
+    monomial_orbits = compute_monomial_orbits(dmax, "LI")
+
+
+"""
+Compute orbits for monomials from degree 2 up to degree dmax. Initialize the
+dict with the constant "1" term. Note that Orb(1) = 3 technically but we
+are free to "normalize" any orbit by multiplying it by a scalar, so we just
+leave it as 1. The num_polys string can have any of the following values:
+"all" = computes all polynomials for every degree up to/including dmax
+"LI" = computes a_d polynomials for each degree up to/including dmax
+"nullspace" = computes a_d polynomials for all degrees < dmax, and a_d+1 polynomials of degree dmax
+Note: the polynomials are always computed in descending order of the x power.
+"""
 def compute_monomial_orbits(dmax, num_polys):
     a, b = sy.sympify('a, b')
     x = [(a,b), (1-a-b,a), (b, 1-a-b)]
